@@ -131,6 +131,10 @@ REST_USE_JWT = True
 JWT_AUTH_COOKIE = 'jwt-auth-cookie'
 JWT_AUTH_REFRESH_COOKIE = 'jwt-auth-refresh-cookie'
 
+REST_AUTH_SERIALIZERS = {
+    "USER_DETAILS_SERIALIZER": 'spoolio_backend.apps.authentication.serializers.UserDetailsSerializer',
+}
+
 CORS_ORIGIN_WHITELIST = (
         'http://localhost:8080',
         'http://127.0.0.1:8080',
