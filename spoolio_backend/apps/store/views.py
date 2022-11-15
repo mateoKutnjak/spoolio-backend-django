@@ -7,10 +7,10 @@ from . import models, serializers
 from ...libs import views as common_views
 
 
-class BlogViewSet(viewsets.ModelViewSet):
+class ProductViewSet(viewsets.ModelViewSet):
 
-    queryset = models.Blog.objects.all()
-    serializer_class = serializers.BlogSerializer
+    queryset = models.Product.objects.all()
+    serializer_class = serializers.ProductSerializer
     permission_classes = (common_views.ActionBasedPermission,)
     pagination_class = LimitOffsetPagination
 

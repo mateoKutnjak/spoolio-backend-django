@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
-from ...apps.authentication import models as auth_models
 from ...libs import models as common_models
 
 
