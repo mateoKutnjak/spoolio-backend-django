@@ -36,16 +36,26 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.sites',
     'django.contrib.staticfiles',
 
     'rest_framework',
     'rest_framework.authtoken',
 
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+
     'dj_rest_auth',
+    'dj_rest_auth.registration',
+
+    'corsheaders',
 
     'spoolio_backend.apps.authentication',
     'spoolio_backend.apps.blog',
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -55,6 +65,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'spoolio_backend.urls'
@@ -107,6 +119,20 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+    )
+}
+
+REST_USE_JWT = True
+JWT_AUTH_COOKIE = 'jwt-auth-cookie'
+JWT_AUTH_REFRESH_COOKIE = 'jwt-auth-refresh-cookie'
+
+CORS_ORIGIN_WHITELIST = (
+        'http://localhost:8080',
+        'http://127.0.0.1:8080',
+)
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/

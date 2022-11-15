@@ -1,3 +1,6 @@
 Django
+django-allauth
+django-cors-headers
 djangorestframework
-dj-rest-auth
+djangorestframework-simplejwt
+dj-rest-auth[with_social]

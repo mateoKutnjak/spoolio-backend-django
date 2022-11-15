@@ -19,5 +19,5 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include('spoolio_backend.apps.authentication.urls')),
-    path('blogs/', include('spoolio_backend.apps.blog.urls')),
+    path('api/', include('spoolio_backend.apps.blog.urls')),
 ]
