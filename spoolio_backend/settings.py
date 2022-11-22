@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'spoolio_backend.apps.authentication',
     'spoolio_backend.apps.blog',
     'spoolio_backend.apps.store',
+    'spoolio_backend.apps.user_profile',
 ]
 
 SITE_ID = 1
@@ -165,3 +166,22 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # all-auth settings
 # TODO remove in the future 
 ACCOUNT_EMAIL_VERIFICATION = 'none'
+
+#This is required otherwise it asks for email server
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# ACCOUNT_EMAIL_REQUIRED = True
+# AUTHENTICATION_METHOD = 'EMAIL'
+# ACCOUNT_EMAIL_VERIFICATION = 'optional'
+
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True   
+ACCOUNT_USERNAME_REQUIRED = False
+
+#Following is added to enable registration with email instead of username
+AUTHENTICATION_BACKENDS = (
+ # Needed to login by username in Django admin, regardless of `allauth`
+ "django.contrib.auth.backends.ModelBackend",
+
+ # `allauth` specific authentication methods, such as login by e-mail
+ "allauth.account.auth_backends.AuthenticationBackend",
+)
