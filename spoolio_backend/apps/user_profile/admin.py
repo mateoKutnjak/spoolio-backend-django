@@ -19,3 +19,5 @@ class UserAdmin(BaseUserAdmin):
 # Re-register UserAdmin
 admin.site.unregister(get_user_model())
 admin.site.register(get_user_model(), UserAdmin)
+
+admin.site.register(models.UserProfile)
