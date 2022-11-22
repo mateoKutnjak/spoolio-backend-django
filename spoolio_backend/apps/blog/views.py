@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 
@@ -13,6 +13,8 @@ class BlogViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.BlogSerializer
     permission_classes = (common_views.ActionBasedPermission,)
     pagination_class = LimitOffsetPagination
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['title', ]
 
     action_permissions = {
         IsAdminUser: ['create', 'update', 'partial_update', 'destroy'],
