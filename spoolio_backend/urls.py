@@ -22,4 +22,5 @@ urlpatterns = [
     path('api/', include('spoolio_backend.apps.blog.urls')),
     path('api/', include('spoolio_backend.apps.print_order.urls')),
     path('api/', include('spoolio_backend.apps.store.urls')),
+    path('api/', include('spoolio_backend.apps.user_profile.urls')),
 ]

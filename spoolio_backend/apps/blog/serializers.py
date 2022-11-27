@@ -1,13 +1,13 @@
 from rest_framework import serializers
 
-from dj_rest_auth.serializers import UserDetailsSerializer
-
 from . import models
+
+from .. authentication import serializers as auth_serializers
 
 
 class BlogSerializer(serializers.ModelSerializer):
 
-    author = UserDetailsSerializer()
+    author = auth_serializers.UserDetailsSerializer()
 
     class Meta:
         model = models.Blog
