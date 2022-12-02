@@ -12,7 +12,7 @@ class Blog(common_models.SoftDeleteModel):
         ('design', 'Design'),
     )
 
-    author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    author = author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
 
     title = models.CharField(max_length=256)
     subtitle = models.CharField(max_length=1024)
@@ -25,3 +25,14 @@ class Blog(common_models.SoftDeleteModel):
 
     def __str__(self):
         return "{}: {}".format(self.author.username, self.title)
+
+    
+class Comment(common_models.SoftDeleteModel):
+
+    author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, null=True)
+    blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
+
+    content = models.TextField()
+
+    def __str__(self):
+        return "{} COMMENT ON {}".format(self.author.username, self.blog.title)

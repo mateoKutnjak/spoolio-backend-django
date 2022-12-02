@@ -24,7 +24,7 @@ class PrintOrder(common_models.SoftDeleteModel):
     user_profile = models.ForeignKey(user_profile_models.UserProfile, on_delete=models.CASCADE)
 
     comment = models.TextField(blank=True, null=True)
-    attachments = models.ManyToManyField(OrderAttachmentFile, blank=True, null=True)
+    attachments = models.ManyToManyField(OrderAttachmentFile, blank=True)
 
     status = models.CharField(max_length=16, choices=ORDER_STATUS_CHOICES, default='pending')
     
