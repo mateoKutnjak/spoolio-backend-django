@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -53,8 +54,11 @@ INSTALLED_APPS = [
 
     'corsheaders',
 
+    'colorfield',
+
     'spoolio_backend.apps.authentication',
     'spoolio_backend.apps.blog',
+    'spoolio_backend.apps.filament',
     'spoolio_backend.apps.print_order',
     'spoolio_backend.apps.store',
     'spoolio_backend.apps.user_profile',
@@ -188,3 +192,8 @@ AUTHENTICATION_BACKENDS = (
  # `allauth` specific authentication methods, such as login by e-mail
  "allauth.account.auth_backends.AuthenticationBackend",
 )
+
+# URL prefix
+STATIC_URL = '/static/'
+# Location where to dump static files
+STATIC_ROOT = os.path.join(BASE_DIR, "static")

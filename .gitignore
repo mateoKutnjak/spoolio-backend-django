@@ -115,3 +115,6 @@ weights/*
 ai/weights/*
 
 **/.DS_Store
+
+# Added by Mateo
+static/

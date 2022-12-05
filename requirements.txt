@@ -1,5 +1,6 @@
 Django
 django-allauth
+django-colorfield
 django-cors-headers
 django-filter
 djangorestframework
