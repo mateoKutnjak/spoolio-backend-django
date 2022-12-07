@@ -8,7 +8,7 @@ from . import views
 router = routers.DefaultRouter()
 router.register('orders', views.PrintOrderViewSet)
 router.register('units', views.PrintOrderUnitViewSet)
-
+router.register('attachment-files', views.AttachmentFileViewSet)
 
 urlpatterns = [
     path('print-orders/', include(router.urls)),

@@ -1,3 +1,5 @@
+from django.contrib.contenttypes.models import ContentType
+
 from rest_framework import serializers
 
 from . import models
@@ -29,4 +31,16 @@ class PrintOrderUnitSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.OrderUnit
+        fields = '__all__'
+
+
+class AttachmentFileSerializer(serializers.ModelSerializer):
+
+    content_type = serializers.SlugRelatedField(
+        queryset=ContentType.objects.all(),
+        slug_field='model',
+    )
+
+    class Meta:
+        model = models.AttachmentFile
         fields = '__all__'

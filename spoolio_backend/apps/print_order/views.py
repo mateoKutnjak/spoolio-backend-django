@@ -19,15 +19,8 @@ class PrintOrderViewSet(viewsets.ModelViewSet):
         IsAdminUser: ['retrieve', 'list', 'update', 'partial_update', 'destroy'],
         common_permissions.IsAdminOrSelf: [],
         IsAuthenticated: [],
-        AllowAny: [ 'create' ]
+        AllowAny: ['create',]
     }
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=201, headers=headers)
 
 
 class PrintOrderUnitViewSet(viewsets.ModelViewSet):
@@ -50,3 +43,18 @@ class PrintOrderUnitViewSet(viewsets.ModelViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=201, headers=headers)
+
+
+class AttachmentFileViewSet(viewsets.ModelViewSet):
+
+    queryset = models.AttachmentFile.objects.all()
+    serializer_class = serializers.AttachmentFileSerializer
+    permission_classes = (common_views.ActionBasedPermission,)
+    pagination_class = LimitOffsetPagination
+
+    action_permissions = {
+        IsAdminUser: ['retrieve', 'list', 'update', 'partial_update', 'destroy'],
+        common_permissions.IsAdminOrSelf: [],
+        IsAuthenticated: [],
+        AllowAny: ['create',]
+    }
