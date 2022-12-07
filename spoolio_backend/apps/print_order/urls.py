@@ -6,9 +6,10 @@ from . import views
 
 
 router = routers.DefaultRouter()
-router.register('print-orders', views.PrintOrderViewSet)
+router.register('orders', views.PrintOrderViewSet)
+router.register('units', views.PrintOrderUnitViewSet)
 
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('print-orders/', include(router.urls)),
 ]

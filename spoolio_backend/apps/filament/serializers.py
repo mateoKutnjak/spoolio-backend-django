@@ -15,3 +15,10 @@ class MaterialSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Material
         fields = '__all__'
+
+
+class InfillSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Infill
+        fields = '__all__'

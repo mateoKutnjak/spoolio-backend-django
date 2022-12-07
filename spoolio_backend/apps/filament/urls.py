@@ -8,6 +8,7 @@ from . import views
 router = routers.DefaultRouter()
 router.register('colors', views.ColorViewSet)
 router.register('materials', views.MaterialViewSet)
+router.register('infills', views.InfillViewSet)
 
 
 urlpatterns = [

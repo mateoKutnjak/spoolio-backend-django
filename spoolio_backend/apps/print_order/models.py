@@ -40,7 +40,7 @@ class PrintOrder(common_models.SoftDeleteModel):
         ('shipped', 'Shipped'),
     )
 
-    user_profile = models.ForeignKey(user_profile_models.UserProfile, on_delete=models.CASCADE)
+    user_profile = models.ForeignKey(user_profile_models.UserProfile, null=True, on_delete=models.SET_NULL)
 
     comment = models.TextField(blank=True, null=True)
 
@@ -51,7 +51,7 @@ class PrintOrder(common_models.SoftDeleteModel):
     status = models.CharField(max_length=16, choices=ORDER_STATUS_CHOICES, default='pending')
     
     def __str__(self):
-        return "[{}] print order by {}".format(self.status, self.user_profile.email)
+        return "[{}] print order by {}".format(self.status, self.user_profile.email if self.user_profile is not None else 'guest')
 
 
 class OrderUnit(models.Model):
@@ -60,9 +60,11 @@ class OrderUnit(models.Model):
 
     material = models.ForeignKey(filament_models.Material, on_delete=models.CASCADE)
     color = models.ForeignKey(filament_models.Color, on_delete=models.CASCADE)
-    infill = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(1.0)])
+    infill = models.ForeignKey(filament_models.Infill, on_delete=models.CASCADE)
 
     quantity = models.PositiveIntegerField()
+
+    file = models.FileField(upload_to="print_order_files")
 
     attachment_files = GenericRelation(AttachmentFile)
     attachment_images = GenericRelation(AttachmentImage)
