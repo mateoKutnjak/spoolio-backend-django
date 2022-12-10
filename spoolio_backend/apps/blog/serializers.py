@@ -16,6 +16,8 @@ class BlogSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
 
+    author = auth_serializers.UserDetailsSerializer()
+
     class Meta:
         model = models.Comment
         fields = '__all__'
