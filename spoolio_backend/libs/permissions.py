@@ -1,14 +1,23 @@
-from rest_framework.permissions import IsAdminUser
+from rest_framework import permissions
 
 
-class IsAdminOrSelf(IsAdminUser):
-    """
-    Allow access to admin users or the user himself.
-    """
+class IsAdminOrSelf(permissions.BasePermission):
+
+    def has_permission(self, request, view):
+        if request.user.is_authenticated:
+            return True
+        
     def has_object_permission(self, request, view, obj):
-        if request.user and request.user.is_staff:
+        if request.user.is_superuser:
             return True
-        elif (request.user and type(obj) == type(request.user) and
-              obj == request.user):
+
+        if request.method in permissions.SAFE_METHODS:
             return True
+
+        if obj.user_profile.user == request.user:
+            return True
+
+        if request.user.is_staff and request.method not in self.edit_methods:
+            return True
+
         return False

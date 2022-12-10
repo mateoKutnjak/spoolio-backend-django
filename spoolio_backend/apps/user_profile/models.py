@@ -23,8 +23,8 @@ class UserProfile(models.Model):
 
     def __str__(self) -> str:
         if self.user == None:
-            return "Guest {}".format(self.email)
-        return "".format(self.user.email)
+            return "[{}] {} [GUEST]".format(self.pk, self.email)
+        return "[{}] {}".format(self.pk, self.user.email)
 
 
 @receiver(post_save, sender=get_user_model())

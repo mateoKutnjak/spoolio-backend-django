@@ -16,11 +16,14 @@ class PrintOrderViewSet(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
 
     action_permissions = {
-        IsAdminUser: ['retrieve', 'list', 'update', 'partial_update', 'destroy'],
-        common_permissions.IsAdminOrSelf: [],
+        IsAdminUser: ['destroy'],
+        common_permissions.IsAdminOrSelf: ['retrieve', 'list', 'update', 'partial_update', ],
         IsAuthenticated: [],
         AllowAny: ['create',]
     }
+
+    def get_queryset(self):
+        return models.PrintOrder.objects.filter(user_profile__user=self.request.user)
 
 
 class PrintOrderUnitViewSet(viewsets.ModelViewSet):
@@ -31,18 +34,11 @@ class PrintOrderUnitViewSet(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
 
     action_permissions = {
-        IsAdminUser: ['retrieve', 'list', 'update', 'partial_update', 'destroy'],
-        common_permissions.IsAdminOrSelf: [],
+        IsAdminUser: ['destroy'],
+        common_permissions.IsAdminOrSelf: ['retrieve', 'list', 'update', 'partial_update', ],
         IsAuthenticated: [],
         AllowAny: ['create']
     }
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=201, headers=headers)
 
 
 class AttachmentFileViewSet(viewsets.ModelViewSet):
@@ -53,8 +49,8 @@ class AttachmentFileViewSet(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
 
     action_permissions = {
-        IsAdminUser: ['retrieve', 'list', 'update', 'partial_update', 'destroy'],
-        common_permissions.IsAdminOrSelf: [],
+        IsAdminUser: ['destroy'],
+        common_permissions.IsAdminOrSelf: ['retrieve', 'list', 'update', 'partial_update', ],
         IsAuthenticated: [],
         AllowAny: ['create',]
     }
