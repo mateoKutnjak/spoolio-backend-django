@@ -20,6 +20,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include('spoolio_backend.apps.authentication.urls')),
     path('api/', include('spoolio_backend.apps.blog.urls')),
+    path('api/', include('spoolio_backend.apps.common.urls')),
     path('api/', include('spoolio_backend.apps.filament.urls')),
     path('api/', include('spoolio_backend.apps.print_order.urls')),
     path('api/', include('spoolio_backend.apps.store.urls')),

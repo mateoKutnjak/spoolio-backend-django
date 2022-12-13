@@ -1,10 +1,13 @@
 from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 
-from ...libs import models as common_models
+from ..common import models as common_models
+
+from ...libs import models as libs_models
 
 
-class Blog(common_models.SoftDeleteModel):
+class Blog(libs_models.SoftDeleteModel):
 
     BLOG_CATEGORY_CHOICES = (
         ('3d-printing', '3D Printing'),
@@ -23,16 +26,8 @@ class Blog(common_models.SoftDeleteModel):
     
     type = models.CharField(max_length=16, choices=BLOG_CATEGORY_CHOICES)
 
+    comments = GenericRelation(common_models.Comment)
+    likes = GenericRelation(common_models.Like)
+
     def __str__(self):
         return "{}: {}".format(self.author.username, self.title)
-
-    
-class Comment(common_models.SoftDeleteModel):
-
-    author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, null=True)
-    blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
-
-    content = models.TextField()
-
-    def __str__(self):
-        return "{} COMMENT ON {}".format(self.author.username, self.blog.title)
