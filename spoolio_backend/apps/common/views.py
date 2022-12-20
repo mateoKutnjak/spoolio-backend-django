@@ -1,6 +1,10 @@
+from django.core.exceptions import ObjectDoesNotExist
+
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
+from rest_framework.response import Response
 
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -16,7 +20,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = (common_views.ActionBasedPermission,)
     pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
-    filterset_class = filters.ContentTypeFilter
+    filterset_class = filters.CommentContentTypeFilter
 
     action_permissions = {
         IsAdminUser: [],
@@ -24,3 +28,38 @@ class CommentViewSet(viewsets.ModelViewSet):
         IsAuthenticated: ['create', 'update', 'partial_update', 'destroy'],
         AllowAny: [ 'retrieve', 'list']
     }
+
+
+class LikeViewSet(viewsets.ModelViewSet):
+
+    queryset = models.Like.objects.all()
+    serializer_class = serializers.LikeSerializer
+    permission_classes = (common_views.ActionBasedPermission,)
+    pagination_class = LimitOffsetPagination
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = filters.LikeContentTypeFilter
+
+    action_permissions = {
+        IsAdminUser: [],
+        common_permissions.IsAdminOrSelf: [],
+        IsAuthenticated: ['create', 'update', 'partial_update', 'destroy'],
+        AllowAny: [ 'retrieve', 'list']
+    }
+
+    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
+    def toggle(self, request, *args, **kwargs):
+        
+        try:
+
+            # * If object exists, lets delete it
+            # * (We cannot propagate to destroy method because we lack pk)
+
+            instance = self.filter_queryset(self.get_queryset()).get()
+            self.perform_destroy(instance)
+            return Response(status=204)
+
+        except ObjectDoesNotExist:
+
+            # * Else lets propagate to delete method
+
+            return self.create(request, args, kwargs)

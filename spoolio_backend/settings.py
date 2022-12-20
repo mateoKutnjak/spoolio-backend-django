@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 import os
+import datetime
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -139,6 +140,11 @@ REST_FRAMEWORK = {
 REST_USE_JWT = True
 JWT_AUTH_COOKIE = 'jwt-auth-cookie'
 JWT_AUTH_REFRESH_COOKIE = 'jwt-auth-refresh-cookie'
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=1),
+}
 
 REST_AUTH_SERIALIZERS = {
     "USER_DETAILS_SERIALIZER": 'spoolio_backend.apps.authentication.serializers.UserDetailsSerializer',
