@@ -15,6 +15,7 @@ class Color(models.Model):
 
 class Material(models.Model):
     name = models.CharField(max_length=16)
+    description = models.CharField(max_length=256)
     density = models.FloatField(validators=[MinValueValidator(0.0)])
     price = models.DecimalField(max_digits=12, decimal_places=2)
     available = models.BooleanField()
