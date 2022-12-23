@@ -12,12 +12,15 @@ class UserProfileInline(admin.StackedInline):
     can_delete = False
     verbose_name_plural = 'user_profile'
 
+
 # Define a new User admin
 class UserAdmin(BaseUserAdmin):
     inlines = (UserProfileInline,)
+
 
 # Re-register UserAdmin
 admin.site.unregister(get_user_model())
 admin.site.register(get_user_model(), UserAdmin)
 
 admin.site.register(models.UserProfile)
+admin.site.register(models.Address)

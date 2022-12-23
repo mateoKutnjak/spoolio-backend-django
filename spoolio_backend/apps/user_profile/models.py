@@ -5,6 +5,23 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 
+class Address(models.Model):
+
+    first_name = models.CharField(max_length=64)
+    last_name = models.CharField(max_length=64)
+    address = models.CharField(max_length=256)
+    state = models.CharField(max_length=128, null=True, blank=True)
+    country = models.CharField(max_length=128)
+    locality = models.CharField(max_length=128)
+    postal_code = models.IntegerField()
+
+    phone_regex = RegexValidator(regex=r'^\+\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
+    phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True) # Validators should be a list
+
+    def __str__(self) -> str:
+        return "{} ... {} ... [{}]".format(self.address, self.postal_code, self.country) 
+
+
 class UserProfile(models.Model):
 
     user = models.OneToOneField(get_user_model(), null=True, blank=True, on_delete=models.CASCADE)
@@ -16,11 +33,11 @@ class UserProfile(models.Model):
     first_name = models.CharField(max_length=64, null=True, blank=True)
     last_name = models.CharField(max_length=64, null=True, blank=True)
 
-    address = models.CharField(max_length=256, null=True, blank=True)
+    shipping_address = models.ForeignKey(Address, related_name='shipping_address', null=True, blank=True, on_delete=models.RESTRICT)
+    billing_address = models.ForeignKey(Address, related_name='billing_address', null=True, blank=True, on_delete=models.RESTRICT)
 
     phone_regex = RegexValidator(regex=r'^\+\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
     phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True) # Validators should be a list
-
 
     def __str__(self) -> str:
         if self.user == None:
