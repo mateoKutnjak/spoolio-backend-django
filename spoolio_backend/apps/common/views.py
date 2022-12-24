@@ -63,3 +63,37 @@ class LikeViewSet(viewsets.ModelViewSet):
             # * Else lets propagate to delete method
 
             return self.create(request, args, kwargs)
+
+
+class ShippingAddressViewSet(viewsets.ModelViewSet):
+
+    queryset = models.ShippingAddress.objects.all()
+    serializer_class = serializers.ShippingAddressSerializer
+    permission_classes = (common_views.ActionBasedPermission,)
+    pagination_class = LimitOffsetPagination
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = filters.LikeContentTypeFilter
+
+    action_permissions = {
+        IsAdminUser: [],
+        common_permissions.IsAdminOrSelf: [],
+        IsAuthenticated: ['create', 'update', 'partial_update', 'retrieve', 'list', 'destroy'],
+        AllowAny: []
+    }
+
+
+class BillingAddressViewSet(viewsets.ModelViewSet):
+
+    queryset = models.BillingAddress.objects.all()
+    serializer_class = serializers.BillingAddressSerializer
+    permission_classes = (common_views.ActionBasedPermission,)
+    pagination_class = LimitOffsetPagination
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = filters.LikeContentTypeFilter
+
+    action_permissions = {
+        IsAdminUser: [],
+        common_permissions.IsAdminOrSelf: [],
+        IsAuthenticated: ['create', 'update', 'partial_update', 'retrieve', 'list', 'destroy'],
+        AllowAny: []
+    }

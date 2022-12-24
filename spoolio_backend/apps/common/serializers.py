@@ -68,3 +68,17 @@ class LikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Like
         fields = '__all__'
+
+
+class ShippingAddressSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.ShippingAddress
+        fields = '__all__'
+
+
+class BillingAddressSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.BillingAddress
+        fields = '__all__'
