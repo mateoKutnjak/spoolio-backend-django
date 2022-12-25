@@ -14,6 +14,9 @@ class AttachmentImageAdmin(GenericTabularInline):
     extra = 0
 
 
+# todo add shipping method innline for print order
+
+
 class OrderUnitAdmin(admin.ModelAdmin):
     inlines = (AttachmentFileAdmin, AttachmentImageAdmin)
 
@@ -28,3 +31,5 @@ admin.site.register(models.AttachmentImage)
 admin.site.register(models.OrderUnit, OrderUnitAdmin)
 
 admin.site.register(models.PrintOrder, OrderAdmin)
+
+admin.site.register(models.ShippingMethod)

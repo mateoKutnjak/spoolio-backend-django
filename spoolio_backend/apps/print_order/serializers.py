@@ -44,3 +44,10 @@ class AttachmentFileSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.AttachmentFile
         fields = '__all__'
+
+
+class ShippingMethodSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.ShippingMethod
+        fields = '__all__'

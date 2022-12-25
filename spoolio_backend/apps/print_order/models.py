@@ -77,3 +77,14 @@ class OrderUnit(models.Model):
     length_unit = models.CharField(max_length=8)
 
     order = models.ForeignKey(PrintOrder, on_delete=models.CASCADE)
+
+
+class ShippingMethod(models.Model):
+
+    provider = models.CharField(max_length=64)
+    description = models.CharField(max_length=128)
+    price = models.DecimalField(max_digits=12, decimal_places=2)
+    available = models.BooleanField()
+
+    def __str__(self) -> str:
+        return "{} ({})".format(self.provider, self.description)
