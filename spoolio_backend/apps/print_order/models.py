@@ -56,6 +56,11 @@ class PrintOrder(common_models.SoftDeleteModel):
 
 class OrderUnit(models.Model):
 
+    LENGTH_UNIT_CHOICES = {
+        'inches': 'inches',
+        'mms': 'mms'
+    }
+
     comment = models.TextField(blank=True, null=True)
 
     material = models.ForeignKey(filament_models.Material, on_delete=models.CASCADE)
@@ -68,5 +73,7 @@ class OrderUnit(models.Model):
 
     attachment_files = GenericRelation(AttachmentFile)
     attachment_images = GenericRelation(AttachmentImage)
+
+    length_unit = models.CharField(max_length=8)
 
     order = models.ForeignKey(PrintOrder, on_delete=models.CASCADE)
