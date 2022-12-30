@@ -97,3 +97,35 @@ class BillingAddressViewSet(viewsets.ModelViewSet):
         IsAuthenticated: ['create', 'update', 'partial_update', 'retrieve', 'list', 'destroy'],
         AllowAny: []
     }
+
+
+class AttachmentFileViewSet(viewsets.ModelViewSet):
+
+    queryset = models.AttachmentFile.objects.all()
+    serializer_class = serializers.AttachmentFileSerializer
+    permission_classes = (common_views.ActionBasedPermission,)
+    pagination_class = LimitOffsetPagination
+
+    action_permissions = {
+        IsAdminUser: ['destroy'],
+        common_permissions.IsAdminOrSelf: ['retrieve', 'list', 'update', 'partial_update', ],
+        IsAuthenticated: [],
+        AllowAny: ['create',]
+    }
+
+
+class ShippingMethodViewSet(viewsets.ReadOnlyModelViewSet):
+
+    queryset = models.ShippingMethod.objects.all()
+    serializer_class = serializers.ShippingMethodSerializer
+    permission_classes = (common_views.ActionBasedPermission,)
+    pagination_class = LimitOffsetPagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['available', ]
+
+    action_permissions = {
+        IsAdminUser: ['create', 'update', 'partial_update', 'destroy'],
+        common_permissions.IsAdminOrSelf: [],
+        IsAuthenticated: [],
+        AllowAny: [ 'retrieve', 'list' ]
+    }

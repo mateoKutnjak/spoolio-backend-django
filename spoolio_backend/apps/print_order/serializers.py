@@ -32,22 +32,3 @@ class PrintOrderUnitSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.OrderUnit
         fields = '__all__'
-
-
-class AttachmentFileSerializer(serializers.ModelSerializer):
-
-    content_type = serializers.SlugRelatedField(
-        queryset=ContentType.objects.all(),
-        slug_field='model',
-    )
-
-    class Meta:
-        model = models.AttachmentFile
-        fields = '__all__'
-
-
-class ShippingMethodSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = models.ShippingMethod
-        fields = '__all__'

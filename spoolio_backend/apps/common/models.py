@@ -70,3 +70,34 @@ class BillingAddress(models.Model):
 
     def __str__(self) -> str:
         return "{} ... {} ... [{}]".format(self.address, self.postal_code, self.country) 
+
+
+class AttachmentFile(models.Model):
+
+    file = models.FileField(upload_to="attachment_files")
+    comment = models.TextField(blank=True, null=True)
+
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey()
+
+
+class AttachmentImage(models.Model):
+
+    image = models.ImageField(upload_to="attachment_images")
+    comment = models.TextField(blank=True, null=True)
+
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey()
+
+
+class ShippingMethod(models.Model):
+
+    provider = models.CharField(max_length=64)
+    description = models.CharField(max_length=128)
+    price = models.DecimalField(max_digits=12, decimal_places=2)
+    available = models.BooleanField()
+
+    def __str__(self) -> str:
+        return "{} ({})".format(self.provider, self.description)

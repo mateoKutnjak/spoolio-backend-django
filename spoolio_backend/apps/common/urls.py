@@ -10,6 +10,8 @@ router.register('comments', views.CommentViewSet)
 router.register('likes', views.LikeViewSet)
 router.register('shipping-addresses', views.ShippingAddressViewSet)
 router.register('billing-addresses', views.BillingAddressViewSet)
+router.register('attachment-files', views.AttachmentFileViewSet)
+router.register('shipping-methods', views.ShippingMethodViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

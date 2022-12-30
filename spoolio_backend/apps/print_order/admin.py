@@ -1,35 +1,17 @@
 from django.contrib import admin
-from django.contrib.contenttypes.admin import GenericTabularInline
 
 from . import models
 
-
-class AttachmentFileAdmin(GenericTabularInline):
-    model = models.AttachmentFile
-    extra = 0
-
-
-class AttachmentImageAdmin(GenericTabularInline):
-    model = models.AttachmentImage
-    extra = 0
-
-
-# todo add shipping method innline for print order
+from ..common import admin as common_admin
 
 
 class OrderUnitAdmin(admin.ModelAdmin):
-    inlines = (AttachmentFileAdmin, AttachmentImageAdmin)
+    inlines = (common_admin.AttachmentFileAdmin, common_admin.AttachmentImageAdmin)
 
 
 class OrderAdmin(admin.ModelAdmin):
-    inlines = (AttachmentFileAdmin, AttachmentImageAdmin)
+    inlines = (common_admin.AttachmentFileAdmin, common_admin.AttachmentImageAdmin)
 
-
-admin.site.register(models.AttachmentFile)
-admin.site.register(models.AttachmentImage)
 
 admin.site.register(models.OrderUnit, OrderUnitAdmin)
-
 admin.site.register(models.PrintOrder, OrderAdmin)
-
-admin.site.register(models.ShippingMethod)
