@@ -21,6 +21,12 @@ class PrintOrder(libs_models.SoftDeleteModel):
 
     user_profile = models.ForeignKey(user_profile_models.UserProfile, null=True, on_delete=models.SET_NULL)
 
+    contact_email = models.EmailField()
+    shipping_address = models.ForeignKey(common_models.ShippingAddress, on_delete=models.RESTRICT)
+    billing_address = models.ForeignKey(common_models.BillingAddress, on_delete=models.RESTRICT)
+    shipping_method = models.ForeignKey(common_models.ShippingMethod, null=True, on_delete=models.SET_NULL)
+    # TODO add payment method
+
     comment = models.TextField(blank=True, null=True)
 
     # Images and PDFs
@@ -30,7 +36,7 @@ class PrintOrder(libs_models.SoftDeleteModel):
     status = models.CharField(max_length=16, choices=ORDER_STATUS_CHOICES, default='pending')
     
     def __str__(self):
-        return "{}: [{}] BY={} STATUS={}".format(self.pk, self.created_at, self.user_profile.email if self.user_profile is not None else 'guest', self.status )
+        return "{}: [{}] BY={} CONTACT_EMAIL={} STATUS={}".format(self.pk, self.created_at, self.user_profile.user.email if self.user_profile is not None else 'guest', self.contact_email, self.status )
 
 
 class OrderUnit(libs_models.SoftDeleteModel):

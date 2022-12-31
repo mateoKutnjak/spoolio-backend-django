@@ -5,26 +5,38 @@ from rest_framework import serializers
 from . import models
 
 
+from .. common import models as common_models, serializers as common_serializers
 from .. user_profile import serializers as user_profile_serializers, models as user_profile_models
 
 
 class PrintOrderSerializer(serializers.ModelSerializer):
 
-    # user_profile = user_profile_serializers.UserProfileSerializer(many=False)
+    user_profile = serializers.PrimaryKeyRelatedField(queryset=user_profile_models.UserProfile.objects.all(), required=False)
+
+    shipping_address = common_serializers.ShippingAddressSerializer()
+    billing_address = common_serializers.BillingAddressSerializer()
+
+    shipping_method = serializers.PrimaryKeyRelatedField(queryset=common_models.ShippingMethod.objects.all(), required=True)
 
     class Meta:
         model = models.PrintOrder
         fields = '__all__'
-        # extra_fields = ['user_profile']
 
-    # def create(self, validated_data):
-    #     # * First create nested object
-    #     user_profile_data = validated_data.pop('user_profile')
-    #     user_profile = user_profile_models.UserProfile.objects.create(**user_profile_data)
-        
-    #     # * Then connect it to main object through FK relationship
-    #     print_order = models.PrintOrder.objects.create(user_profile=user_profile, **validated_data)
-    #     return print_order
+    def create(self, validated_data):
+        shipping_address_data = validated_data.pop('shipping_address')
+        billing_address_data = validated_data.pop('billing_address')
+
+        shipping_address = common_models.ShippingAddress.objects.create(**shipping_address_data)
+        billing_address = common_models.BillingAddress.objects.create(**billing_address_data)
+
+        print_order = models.PrintOrder.objects.create(shipping_address=shipping_address, billing_address=billing_address, **validated_data)
+        return print_order
+
+    def to_representation(self, instance):
+        self.fields['user_profile'] = user_profile_serializers.UserProfileSerializer(read_only=True)
+        self.fields['shipping_method'] = common_serializers.ShippingMethodSerializer(read_only=True)
+
+        return super(PrintOrderSerializer, self).to_representation(instance)
 
 
 class PrintOrderUnitSerializer(serializers.ModelSerializer):
