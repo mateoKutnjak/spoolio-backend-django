@@ -30,10 +30,10 @@ class PrintOrder(libs_models.SoftDeleteModel):
     status = models.CharField(max_length=16, choices=ORDER_STATUS_CHOICES, default='pending')
     
     def __str__(self):
-        return "[{}] print order by {}".format(self.status, self.user_profile.email if self.user_profile is not None else 'guest')
+        return "{}: [{}] BY={} STATUS={}".format(self.pk, self.created_at, self.user_profile.email if self.user_profile is not None else 'guest', self.status )
 
 
-class OrderUnit(models.Model):
+class OrderUnit(libs_models.SoftDeleteModel):
 
     LENGTH_UNIT_CHOICES = {
         'inches': 'inches',
@@ -56,3 +56,6 @@ class OrderUnit(models.Model):
     length_unit = models.CharField(max_length=8)
 
     order = models.ForeignKey(PrintOrder, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return "{}: [{}] {} ATTRIBUTES={},{},{},{}".format(self.pk, self.created_at, self.file, self.material.name, self.color.name, self.infill.percentage*100, self.length_unit)

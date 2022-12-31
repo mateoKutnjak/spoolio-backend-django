@@ -30,4 +30,4 @@ class Blog(libs_models.SoftDeleteModel):
     likes = GenericRelation(common_models.Like)
 
     def __str__(self):
-        return "{}: {}".format(self.author.username, self.title)
+        return "{}: [{}] AUTHOR={}: {}".format(self.pk, self.created_at, self.author.username, self.title)

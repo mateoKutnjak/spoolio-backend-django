@@ -3,8 +3,10 @@ from django.db import models
 
 from colorfield.fields import ColorField
 
+from ...libs import models as libs_models
 
-class Color(models.Model):
+
+class Color(libs_models.SoftDeleteModel):
     name = models.CharField(max_length=32)
     value = ColorField(default='#FF0000')
     available = models.BooleanField()
@@ -13,7 +15,7 @@ class Color(models.Model):
         return "{} ({})".format(self.name, self.value)
 
 
-class Material(models.Model):
+class Material(libs_models.SoftDeleteModel):
     name = models.CharField(max_length=16)
     description = models.CharField(max_length=256)
     density = models.FloatField(validators=[MinValueValidator(0.0)])
@@ -24,7 +26,7 @@ class Material(models.Model):
         return "{} [{} g/cm3] price=${} per gram".format(self.name, self.density, self.price)
 
 
-class Infill(models.Model):
+class Infill(libs_models.SoftDeleteModel):
     name = models.CharField(max_length=16)
     percentage = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(1.0)])
     available = models.BooleanField()

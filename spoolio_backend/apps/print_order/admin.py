@@ -5,12 +5,17 @@ from . import models
 from ..common import admin as common_admin
 
 
+class OrderUnitInline(admin.StackedInline):
+    model = models.OrderUnit
+    extra = 0
+
+
 class OrderUnitAdmin(admin.ModelAdmin):
     inlines = (common_admin.AttachmentFileAdmin, common_admin.AttachmentImageAdmin)
 
 
 class OrderAdmin(admin.ModelAdmin):
-    inlines = (common_admin.AttachmentFileAdmin, common_admin.AttachmentImageAdmin)
+    inlines = (OrderUnitInline, common_admin.AttachmentFileAdmin, common_admin.AttachmentImageAdmin)
 
 
 admin.site.register(models.OrderUnit, OrderUnitAdmin)

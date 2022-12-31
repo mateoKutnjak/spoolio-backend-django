@@ -7,7 +7,7 @@ from django.db import models
 from ...libs import models as libs_models
 
 
-class Like(models.Model):
+class Like(libs_models.SoftDeleteModel):
 
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
 
@@ -19,7 +19,7 @@ class Like(models.Model):
         unique_together = (("user", "content_type", "object_id"),)
 
     def __str__(self):
-        return super(Like, self).__str__() + "by {}, {}: {}".format(self.user, self.content_type, self.content_object)
+        return "{}: [{}] {} (CONTENT_TYPE={}, OBJECT_ID={})".format(self.pk, self.created_at, self.user.email, self.content_type, self.object_id)
 
 
 class Comment(libs_models.SoftDeleteModel):
@@ -35,27 +35,10 @@ class Comment(libs_models.SoftDeleteModel):
     likes = GenericRelation(Like)
 
     def __str__(self):
-        return "{} COMMENT ON {} with ID={}".format(self.user.email, self.content_type, self.object_id)
+        return "{}: [{}] {} (CONTENT_TYPE={}, OBJECT_ID={})".format(self.pk, self.created_at, self.user.email, self.content_type, self.object_id)
 
 
-class ShippingAddress(models.Model):
-
-    first_name = models.CharField(max_length=64)
-    last_name = models.CharField(max_length=64)
-    address = models.CharField(max_length=256)
-    state = models.CharField(max_length=128, null=True, blank=True)
-    country = models.CharField(max_length=128)
-    locality = models.CharField(max_length=128)
-    postal_code = models.IntegerField()
-
-    phone_regex = RegexValidator(regex=r'^\+\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
-    phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True) # Validators should be a list
-
-    def __str__(self) -> str:
-        return "{} ... {} ... [{}]".format(self.address, self.postal_code, self.country) 
-
-
-class BillingAddress(models.Model):
+class ShippingAddress(libs_models.SoftDeleteModel):
 
     first_name = models.CharField(max_length=64)
     last_name = models.CharField(max_length=64)
@@ -69,10 +52,27 @@ class BillingAddress(models.Model):
     phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True) # Validators should be a list
 
     def __str__(self) -> str:
-        return "{} ... {} ... [{}]".format(self.address, self.postal_code, self.country) 
+        return "[{} {}] {}, {} {}, {}".format(self.first_name, self. last_name, self.address, self.locality, self.postal_code, self.country) 
 
 
-class AttachmentFile(models.Model):
+class BillingAddress(libs_models.SoftDeleteModel):
+
+    first_name = models.CharField(max_length=64)
+    last_name = models.CharField(max_length=64)
+    address = models.CharField(max_length=256)
+    state = models.CharField(max_length=128, null=True, blank=True)
+    country = models.CharField(max_length=128)
+    locality = models.CharField(max_length=128)
+    postal_code = models.IntegerField()
+
+    phone_regex = RegexValidator(regex=r'^\+\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
+    phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True) # Validators should be a list
+
+    def __str__(self) -> str:
+        return "[{} {}] {}, {} {}, {}".format(self.first_name, self. last_name, self.address, self.locality, self.postal_code, self.country) 
+
+
+class AttachmentFile(libs_models.SoftDeleteModel):
 
     file = models.FileField(upload_to="attachment_files")
     comment = models.TextField(blank=True, null=True)
@@ -81,8 +81,11 @@ class AttachmentFile(models.Model):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey()
 
+    def __str__(self):
+        return "{}: [{}] {} (CONTENT_TYPE={}, OBJECT_ID={}) has_comment={}".format(self.pk, self.created_at, self.file, self.content_type, self.object_id, bool(self.comment))
 
-class AttachmentImage(models.Model):
+
+class AttachmentImage(libs_models.SoftDeleteModel):
 
     image = models.ImageField(upload_to="attachment_images")
     comment = models.TextField(blank=True, null=True)
@@ -91,8 +94,11 @@ class AttachmentImage(models.Model):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey()
 
+    def __str__(self):
+        return "{}: [{}] {} (CONTENT_TYPE={}, OBJECT_ID={}) has_comment={}".format(self.pk, self.created_at, self.image, self.content_type, self.object_id, bool(self.comment))
 
-class ShippingMethod(models.Model):
+
+class ShippingMethod(libs_models.SoftDeleteModel):
 
     provider = models.CharField(max_length=64)
     description = models.CharField(max_length=128)
@@ -100,4 +106,4 @@ class ShippingMethod(models.Model):
     available = models.BooleanField()
 
     def __str__(self) -> str:
-        return "{} ({})".format(self.provider, self.description)
+        return "{}: {} (${})".format(self.pk, self.provider, self.price)

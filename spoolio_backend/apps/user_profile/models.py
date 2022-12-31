@@ -6,8 +6,10 @@ from django.dispatch import receiver
 
 from ..common import models as common_models
 
+from ... libs import models as libs_models
 
-class UserProfile(models.Model):
+
+class UserProfile(libs_models.SoftDeleteModel):
 
     user = models.OneToOneField(get_user_model(), null=True, blank=True, on_delete=models.CASCADE)
 

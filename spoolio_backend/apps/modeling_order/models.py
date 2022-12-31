@@ -19,4 +19,5 @@ class ModelingOrder(libs_models.SoftDeleteModel):
     attachment_images = GenericRelation(common_models.AttachmentImage)
 
     def __str__(self):
-        return "Order by {}".format(self.user_profile.email if self.user_profile is not None else 'guest')
+        return "{}: [{}] BY={} CONTACT_EMAIL={}".format(self.pk, self.created_at, self.user_profile.email if self.user_profile is not None else 'guest', self.contact_email )
+
