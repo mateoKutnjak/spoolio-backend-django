@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import filters, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 
@@ -13,6 +13,9 @@ class PrintOrderViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.PrintOrderSerializer
     permission_classes = (common_views.ActionBasedPermission,)
     pagination_class = LimitOffsetPagination
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ['created_at']
+    ordering = ['-created_at']
 
     action_permissions = {
         IsAdminUser: ['destroy'],

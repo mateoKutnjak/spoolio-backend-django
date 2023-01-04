@@ -18,6 +18,8 @@ class PrintOrderSerializer(serializers.ModelSerializer):
 
     shipping_method = serializers.PrimaryKeyRelatedField(queryset=common_models.ShippingMethod.objects.all(), required=True)
 
+    unit_count = serializers.SerializerMethodField()
+
     class Meta:
         model = models.PrintOrder
         fields = '__all__'
@@ -37,6 +39,9 @@ class PrintOrderSerializer(serializers.ModelSerializer):
         self.fields['shipping_method'] = common_serializers.ShippingMethodSerializer(read_only=True)
 
         return super(PrintOrderSerializer, self).to_representation(instance)
+
+    def get_unit_count(self, instance):
+        return models.OrderUnit.objects.filter(order=instance.id).count()
 
 
 class PrintOrderUnitSerializer(serializers.ModelSerializer):
