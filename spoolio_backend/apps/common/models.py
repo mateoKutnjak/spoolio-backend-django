@@ -16,7 +16,12 @@ class Like(libs_models.SoftDeleteModel):
     content_object = GenericForeignKey()
 
     class Meta:
-        unique_together = (("user", "content_type", "object_id"),)
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "content_type", "object_id"], 
+                condition=models.Q(is_deleted=False), 
+                name='like_unique_undeleted')
+        ]
 
     def __str__(self):
         return "{}: [{}] {} (CONTENT_TYPE={}, OBJECT_ID={})".format(self.pk, self.created_at, self.user.email, self.content_type, self.object_id)
