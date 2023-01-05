@@ -37,14 +37,15 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_like_count(self, instance):
-        return instance.likes.count()
+        return instance.likes.filter(is_deleted=False).count()
 
     def get_liked_by_me(self, instance):
         try:
             models.Like.objects.get(
                 user=self.context['request'].user, 
                 content_type=ContentType.objects.get_for_model(type(instance)), 
-                object_id=instance.id)
+                object_id=instance.id,
+                is_deleted=False)
             return True
         except ObjectDoesNotExist:
             return False

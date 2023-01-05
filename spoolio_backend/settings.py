@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'spoolio_backend.apps.modeling_order',
     'spoolio_backend.apps.print_order',
     'spoolio_backend.apps.store',
+    'spoolio_backend.apps.store_order',
     'spoolio_backend.apps.user_profile',
 ]
 
