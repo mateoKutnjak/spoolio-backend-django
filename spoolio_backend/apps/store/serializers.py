@@ -35,15 +35,26 @@ class ProductVariationOptionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ProductImageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.ProductImage
+        fields = '__all__'
+
+
 class ProductSerializer(serializers.ModelSerializer):
 
     category = ProductCategorySerializer(read_only=True)
     subcategory = ProductSubcategorySerializer(read_only=True)
 
     productvariationoption_set = ProductVariationOptionSerializer(read_only=True, many=True)
+    productimage_set = ProductImageSerializer(read_only=True, many=True)
 
     comment_count = serializers.SerializerMethodField()
     like_count = serializers.SerializerMethodField()
+
+    starting_price = serializers.SerializerMethodField()
+    ending_price = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Product
@@ -54,6 +65,22 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def get_like_count(self, instance):
         return instance.likes.filter(is_deleted=False).count()
+
+    def get_starting_price(self, instance):
+        queryset = instance.productvariationoptioncombination_set.order_by('price')
+        cheapest_combination = queryset.first()
+
+        if cheapest_combination:
+            return cheapest_combination.price
+        return None
+
+    def get_ending_price(self, instance):
+        queryset = instance.productvariationoptioncombination_set.order_by('price')
+        most_expensive_combination = queryset.last()
+
+        if most_expensive_combination:
+            return most_expensive_combination.price
+        return None
 
 
 class ProductVariationOptionCombinationSerializer(serializers.ModelSerializer):

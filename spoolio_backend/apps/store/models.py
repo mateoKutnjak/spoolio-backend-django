@@ -34,8 +34,6 @@ class Product(libs_models.SoftDeleteModel):
     category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE)
     subcategory = models.ForeignKey(ProductSubcategory, on_delete=models.CASCADE)
 
-    pictures = GenericRelation(common_models.AttachmentImage)
-
     comments = GenericRelation(common_models.Comment)
     likes = GenericRelation(common_models.Like)
     
@@ -57,7 +55,7 @@ class ProductVariationOption(libs_models.SoftDeleteModel):
     description = models.TextField()
 
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    
+
     type = models.ForeignKey(ProductVariation, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -76,3 +74,14 @@ class ProductVariationOptionCombination(models.Model):
     def __str__(self):
         m2m_formatted = "<br/> ".join(str(seg) for seg in self.options.all())
         return format_html("{}: {} <br/> <br/> PRICE={} <br/> SKU={} <br/><br/> Attributes: <br/> {}".format(self.pk, self.product.title, self.price, self.sku, m2m_formatted))
+
+
+class ProductImage(libs_models.SoftDeleteModel):
+
+    image = models.ImageField(upload_to="product_images")
+    comment = models.TextField(blank=True, null=True)
+
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return "{}: {} - {}".format(self.pk, self.product.title, self.comment)
