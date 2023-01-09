@@ -23,11 +23,18 @@ class StoreOrder(libs_models.SoftDeleteModel):
     shipping_address = models.ForeignKey(common_models.ShippingAddress, on_delete=models.RESTRICT)
     billing_address = models.ForeignKey(common_models.BillingAddress, on_delete=models.RESTRICT)
     shipping_method = models.ForeignKey(common_models.ShippingMethod, null=True, on_delete=models.SET_NULL)
-    
-    items = models.ManyToManyField(store_models.ProductVariationOptionCombination)
 
-    status = models.CharField(max_length=16, choices=ORDER_STATUS_CHOICES, default='reviewing')
+    items = models.ManyToManyField(store_models.ProductVariationOptionCombination, through='StoreOrderUnit')
+
+    status = models.CharField(max_length=16, choices=ORDER_STATUS_CHOICES, default='awaiting_payment')
 
     def __str__(self):
         return "{}: [{}] BY={} CONTACT_EMAIL={}".format(self.pk, self.created_at, self.user_profile.email if self.user_profile is not None else 'guest', self.contact_email )
 
+
+class StoreOrderUnit(libs_models.SoftDeleteModel):
+
+    item = models.ForeignKey(store_models.ProductVariationOptionCombination, on_delete=models.CASCADE)
+    order = models.ForeignKey(StoreOrder, on_delete=models.CASCADE)
+    
+    quantity = models.PositiveIntegerField()
