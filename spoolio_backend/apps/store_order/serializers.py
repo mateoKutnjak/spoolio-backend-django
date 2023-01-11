@@ -1,3 +1,5 @@
+from django.db.models import Sum
+
 from rest_framework import serializers
 
 from . import models
@@ -19,13 +21,14 @@ class StoreOrderUnitSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.StoreOrderUnit
         fields = ('order', 'quantity', 'item')
+        depth=1
 
     def to_representation(self, instance):
         self.fields['item'] = store_serializers.ProductVariationOptionCombinationSerializer()
         return super().to_representation(instance)
 
 
-class StoreOrderCreateSerializer(serializers.ModelSerializer):
+class StoreOrderSerializer(serializers.ModelSerializer):
 
     items = StoreOrderUnitSerializer(source='storeorderunit_set', many=True, required=False)
 
@@ -36,6 +39,8 @@ class StoreOrderCreateSerializer(serializers.ModelSerializer):
 
     shipping_method = serializers.PrimaryKeyRelatedField(queryset=common_models.ShippingMethod.objects.all(), required=True)
 
+    total_price = serializers.SerializerMethodField()
+
     class Meta:
         model = models.StoreOrder
         fields = '__all__'
@@ -43,7 +48,7 @@ class StoreOrderCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         shipping_address_data = validated_data.pop('shipping_address')
         billing_address_data = validated_data.pop('billing_address')
-        
+
         items_data = validated_data.pop('storeorderunit_set')
 
         shipping_address = common_models.ShippingAddress.objects.create(**shipping_address_data)
@@ -54,8 +59,11 @@ class StoreOrderCreateSerializer(serializers.ModelSerializer):
             models.StoreOrderUnit.objects.create(order=order, **item_data)
         return order
 
+    def get_total_price(self, instance):
+        return instance.items.all().aggregate(Sum('price'))['price__sum']
+
     def to_representation(self, instance):
         self.fields['user_profile'] = user_profile_serializers.UserProfileSerializer(read_only=True)
         self.fields['shipping_method'] = common_serializers.ShippingMethodSerializer(read_only=True)
 
-        return super(StoreOrderCreateSerializer, self).to_representation(instance)
+        return super(StoreOrderSerializer, self).to_representation(instance)

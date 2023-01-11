@@ -1,6 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 
-from rest_framework import viewsets
+from rest_framework import filters as drf_filters, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
@@ -19,8 +19,10 @@ class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.CommentSerializer
     permission_classes = (common_views.ActionBasedPermission,)
     pagination_class = LimitOffsetPagination
-    filter_backends = (DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend, drf_filters.OrderingFilter)
     filterset_class = filters.CommentContentTypeFilter
+    ordering_fields = ['created_at']
+    ordering = ['-created_at']
 
     action_permissions = {
         IsAdminUser: [],
