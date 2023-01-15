@@ -1,0 +1,44 @@
+version: '3.4'
+
+services:
+
+  db:
+    image: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+      - ./data/postgres/database_scripts/001_create_database_dev.sql:/docker-entrypoint-initdb.d/001_create_database_dev.sql
+    env_file: .env.dev.db
+
+  web_dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    working_dir: /root/app
+    command: bash -c "python3 manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/root/app
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - static_volume:/var/www/spoolio.net/static
+      - media_volume:/var/www/spoolio.net/media
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    env_file: .env.dev
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-exec.datecron.schedule: "@hourly"
+      ofelia.job-exec.datecron.command: "python3 manage.py dbbackup"
+
+  ofelia:
+    image: mcuadros/ofelia:latest
+    depends_on:
+      - web_dev
+    command: daemon --docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:

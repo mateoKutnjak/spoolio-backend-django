@@ -1,0 +1,26 @@
+FROM python:3
+
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+RUN apt-get update && apt-get install -y \
+    binutils \
+    libproj-dev \
+    gdal-bin \
+    ncat \
+    postgresql-client
+
+ENV HOME_DIR "/root"
+
+RUN mkdir -p $HOME_DIR/app
+
+RUN pip3 install --upgrade pip
+
+ADD ./requirements.txt /root
+RUN pip3 install --no-cache-dir -r /root/requirements.txt
+
+# RUN mkdir -p /var/www/toqo.app/static \
+#   && mkdir -p /var/www/toqo.app/media
+
+COPY ./entrypoint.dev.sh /
+ENTRYPOINT ["/entrypoint.dev.sh"]

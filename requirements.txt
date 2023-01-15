@@ -7,3 +7,4 @@ djangorestframework
 djangorestframework-simplejwt
 dj-rest-auth[with_social]
 pillow
+psycopg2-binary

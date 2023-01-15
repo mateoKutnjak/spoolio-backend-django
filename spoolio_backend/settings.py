@@ -25,9 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-rbzx@v4*fs5%tn@l=e4(g&u6--osz8$5xgq*^p(9hc=xbt6hqk'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG') != 'False'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split()
 
 
 # Application definition
@@ -108,8 +108,12 @@ WSGI_APPLICATION = 'spoolio_backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': os.environ.get("SQL_ENGINE"),
+        'NAME': os.environ.get("SQL_DATABASE"),
+        'USER': os.environ.get("SQL_USER"),
+        'HOST': os.environ.get("SQL_HOST"),
+        'PORT': int(os.environ.get("SQL_PORT")),
+        'PASSWORD': os.environ.get("SQL_PASSWORD"),
     }
 }
 
