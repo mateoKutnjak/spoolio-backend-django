@@ -97,6 +97,18 @@ class AttachmentFileSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class AttachmentImageSerializer(serializers.ModelSerializer):
+
+    content_type = serializers.SlugRelatedField(
+        queryset=ContentType.objects.all(),
+        slug_field='model',
+    )
+
+    class Meta:
+        model = models.AttachmentImage
+        fields = '__all__'
+
+
 class ShippingMethodSerializer(serializers.ModelSerializer):
 
     class Meta:

@@ -11,6 +11,7 @@ router.register('likes', views.LikeViewSet)
 router.register('shipping-addresses', views.ShippingAddressViewSet)
 router.register('billing-addresses', views.BillingAddressViewSet)
 router.register('attachment-files', views.AttachmentFileViewSet)
+router.register('attachment-images', views.AttachmentImageViewSet)
 router.register('shipping-methods', views.ShippingMethodViewSet)
 
 urlpatterns = [

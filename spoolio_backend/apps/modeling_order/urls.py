@@ -6,8 +6,8 @@ from . import views
 
 
 router = routers.DefaultRouter()
-router.register('', views.ModelingOrderViewSet)
+router.register('modeling-orders', views.ModelingOrderViewSet)
 
 urlpatterns = [
-    path('modeling-orders/', include(router.urls)),
+    path('', include(router.urls)),
 ]

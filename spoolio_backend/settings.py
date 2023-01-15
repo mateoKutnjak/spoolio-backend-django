@@ -144,8 +144,8 @@ JWT_AUTH_COOKIE = 'jwt-auth-cookie'
 JWT_AUTH_REFRESH_COOKIE = 'jwt-auth-refresh-cookie'
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=5),
-    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=1),
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=75), # TODO change in production
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=7),
 }
 
 REST_AUTH_SERIALIZERS = {

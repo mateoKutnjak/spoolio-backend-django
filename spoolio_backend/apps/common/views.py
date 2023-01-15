@@ -116,6 +116,21 @@ class AttachmentFileViewSet(viewsets.ModelViewSet):
     }
 
 
+class AttachmentImageViewSet(viewsets.ModelViewSet):
+
+    queryset = models.AttachmentImage.objects.all()
+    serializer_class = serializers.AttachmentImageSerializer
+    permission_classes = (common_views.ActionBasedPermission,)
+    pagination_class = LimitOffsetPagination
+
+    action_permissions = {
+        IsAdminUser: ['destroy'],
+        common_permissions.IsAdminOrSelf: ['retrieve', 'list', 'update', 'partial_update', ],
+        IsAuthenticated: [],
+        AllowAny: ['create',]
+    }
+
+
 class ShippingMethodViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = models.ShippingMethod.objects.all()

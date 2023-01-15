@@ -29,7 +29,7 @@ class StoreOrder(libs_models.SoftDeleteModel):
     status = models.CharField(max_length=16, choices=ORDER_STATUS_CHOICES, default='awaiting_payment')
 
     def __str__(self):
-        return "{}: [{}] BY={} CONTACT_EMAIL={}".format(self.pk, self.created_at, self.user_profile.email if self.user_profile is not None else 'guest', self.contact_email )
+        return "{}: [{}] BY={} CONTACT_EMAIL={}".format(self.pk, self.created_at, self.user_profile.user.email if self.user_profile is not None and self.user_profile.user is not None else 'guest', self.contact_email )
 
 
 class StoreOrderUnit(libs_models.SoftDeleteModel):
