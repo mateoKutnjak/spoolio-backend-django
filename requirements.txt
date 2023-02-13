@@ -7,3 +7,6 @@ djangorestframework
 djangorestframework-simplejwt
 dj-rest-auth[with_social]
 pillow
+
+# ! google-api-python-client is used for FIX - remove when resolved (see https://gonzafirewall.medium.com/google-oauth2-and-django-rest-auth-92b0d8f70575)
+google-api-python-client
