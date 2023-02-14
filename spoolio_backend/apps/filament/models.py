@@ -20,10 +20,11 @@ class Material(libs_models.SoftDeleteModel):
     description = models.CharField(max_length=256)
     density = models.FloatField(validators=[MinValueValidator(0.0)])
     price = models.DecimalField(max_digits=12, decimal_places=2)
+    printing_speed = models.FloatField();
     available = models.BooleanField()
 
     def __str__(self) -> str:
-        return "{} [{} g/cm3] price=${} per gram".format(self.name, self.density, self.price)
+        return "{} [{} g/cm3] price=${} per gram, v={} mm/s".format(self.name, self.density, self.price, self.printing_speed)
 
 
 class Infill(libs_models.SoftDeleteModel):
