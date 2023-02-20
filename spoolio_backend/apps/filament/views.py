@@ -58,3 +58,20 @@ class InfillViewSet(viewsets.ReadOnlyModelViewSet):
         IsAuthenticated: [],
         AllowAny: [ 'retrieve', 'list' ]
     }
+
+
+class SpoolViewSet(viewsets.ReadOnlyModelViewSet):
+
+    queryset = models.Spool.objects.all()
+    serializer_class = serializers.SpoolSerializer
+    permission_classes = (common_views.ActionBasedPermission,)
+    pagination_class = LimitOffsetPagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['available', ]
+
+    action_permissions = {
+        IsAdminUser: ['create', 'update', 'partial_update', 'destroy'],
+        common_permissions.IsAdminOrSelf: [],
+        IsAuthenticated: [],
+        AllowAny: [ 'retrieve', 'list' ]
+    }

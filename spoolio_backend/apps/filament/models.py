@@ -34,3 +34,20 @@ class Infill(libs_models.SoftDeleteModel):
 
     def __str__(self) -> str:
         return "{} - {}%".format(self.name, self.percentage * 100)
+    
+
+class Spool(libs_models.SoftDeleteModel):
+    material = models.ForeignKey(Material, on_delete=models.CASCADE)
+    color = models.ForeignKey(Color, on_delete=models.CASCADE)
+    available = models.BooleanField()
+    length = models.FloatField(validators=[MinValueValidator(0.0)])
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["material", "color"], 
+                name='spool_material_color_unique_constraint')
+        ]
+
+    def __str__(self) -> str:
+        return "{} {} - available length: {}".format(self.material.name, self.color.name, self.length)

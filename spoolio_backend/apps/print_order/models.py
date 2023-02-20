@@ -49,9 +49,7 @@ class OrderUnit(libs_models.SoftDeleteModel):
 
     comment = models.TextField(blank=True, null=True)
 
-    material = models.ForeignKey(filament_models.Material, on_delete=models.CASCADE)
-    color = models.ForeignKey(filament_models.Color, on_delete=models.CASCADE)
-    infill = models.ForeignKey(filament_models.Infill, on_delete=models.CASCADE)
+    spool = models.ForeignKey(filament_models.Spool, on_delete=models.CASCADE)
 
     quantity = models.PositiveIntegerField()
 
@@ -65,4 +63,4 @@ class OrderUnit(libs_models.SoftDeleteModel):
     order = models.ForeignKey(PrintOrder, on_delete=models.CASCADE)
 
     def __str__(self):
-        return "{}: [{}] {} ATTRIBUTES={},{},{},{}".format(self.pk, self.created_at, self.file, self.material.name, self.color.name, self.infill.percentage*100, self.length_unit)
+        return "{}: [{}] {} ATTRIBUTES={},{},{}".format(self.pk, self.created_at, self.file, self.spool, self.infill.percentage*100, self.length_unit)
