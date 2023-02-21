@@ -71,6 +71,24 @@ class LikeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class RatingSerializer(serializers.ModelSerializer):
+
+    user = serializers.PrimaryKeyRelatedField(queryset=get_user_model().objects.all())
+
+    content_type = serializers.SlugRelatedField(
+        queryset=ContentType.objects.all(),
+        slug_field='model',
+    )
+
+    class Meta:
+        model = models.Rating
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        self.fields['user'] = auth_serializers.UserDetailsSerializer(read_only=True)
+        return super(RatingSerializer, self).to_representation(instance)
+
+
 class ShippingAddressSerializer(serializers.ModelSerializer):
 
     class Meta:

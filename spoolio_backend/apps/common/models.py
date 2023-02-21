@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
-from django.core.validators import RegexValidator
+from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator
 from django.db import models
 
 from ...libs import models as libs_models
@@ -41,6 +41,33 @@ class Comment(libs_models.SoftDeleteModel):
 
     def __str__(self):
         return "{}: [{}] {} (CONTENT_TYPE={}, OBJECT_ID={})".format(self.pk, self.created_at, self.user.email, self.content_type, self.object_id)
+
+
+class Rating(libs_models.SoftDeleteModel):
+
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey()
+
+    value = models.IntegerField(validators=[
+            MaxValueValidator(5),
+            MinValueValidator(1)
+        ])
+    
+    content = models.TextField(null=True, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "content_type", "object_id"], 
+                condition=models.Q(is_deleted=False), 
+                name='rating_unique_undeleted')
+        ]
+
+    def __str__(self):
+        return "{}: [{}] {} (CONTENT_TYPE={}, OBJECT_ID={}) VALUE={}".format(self.pk, self.created_at, self.user.email, self.content_type, self.object_id, self.value)
 
 
 class ShippingAddress(libs_models.SoftDeleteModel):
