@@ -1,6 +1,7 @@
 from rest_framework import filters, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
+from rest_framework.response import Response
 
 from . import models, serializers
 
@@ -20,7 +21,6 @@ class PrintOrderViewSet(viewsets.ModelViewSet):
     action_permissions = {
         IsAdminUser: ['destroy'],
         common_permissions.IsAdminOrSelf: ['retrieve', 'list', 'update', 'partial_update', ],
-        IsAuthenticated: [],
         AllowAny: ['create',]
     }
 

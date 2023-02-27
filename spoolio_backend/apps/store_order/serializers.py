@@ -1,4 +1,4 @@
-from django.db.models import Sum
+from django.db.models import F, Sum
 
 from rest_framework import serializers
 
@@ -60,7 +60,7 @@ class StoreOrderSerializer(serializers.ModelSerializer):
         return order
 
     def get_total_price(self, instance):
-        return instance.items.all().aggregate(Sum('price'))['price__sum']
+        return instance.items.aggregate(total_price=Sum(F('storeorderunit__quantity') * F('price')))['total_price']
 
     def to_representation(self, instance):
         self.fields['user_profile'] = user_profile_serializers.UserProfileSerializer(read_only=True)

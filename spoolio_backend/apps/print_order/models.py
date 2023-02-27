@@ -10,6 +10,8 @@ from ...libs import models as libs_models
 
 class PrintOrder(libs_models.SoftDeleteModel):
 
+    # ! IMPORTANT ! For every change in server side (django choices) adjust frontend enums (constants.vue)
+
     ORDER_STATUS_CHOICES = (
         ('awaiting_payment', 'Awaiting Payment'),
         ('rejected', 'Rejected'),
@@ -63,4 +65,4 @@ class OrderUnit(libs_models.SoftDeleteModel):
     order = models.ForeignKey(PrintOrder, on_delete=models.CASCADE)
 
     def __str__(self):
-        return "{}: [{}] {} ATTRIBUTES={},{},{}".format(self.pk, self.created_at, self.file, self.spool, self.infill.percentage*100, self.length_unit)
+        return "{}: [{}] {} ATTRIBUTES={},{}".format(self.pk, self.created_at, self.file, self.spool, self.length_unit)

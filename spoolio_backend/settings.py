@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'spoolio_backend.apps.common',
     'spoolio_backend.apps.filament',
     'spoolio_backend.apps.modeling_order',
+    'spoolio_backend.apps.payments',
     'spoolio_backend.apps.print_order',
     'spoolio_backend.apps.store',
     'spoolio_backend.apps.store_order',
