@@ -122,6 +122,8 @@ class AttachmentFileViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.AttachmentFileSerializer
     permission_classes = (common_views.ActionBasedPermission,)
     pagination_class = LimitOffsetPagination
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = filters.AttachmentFileContentTypeFilter
 
     action_permissions = {
         IsAdminUser: ['destroy'],
@@ -137,6 +139,8 @@ class AttachmentImageViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.AttachmentImageSerializer
     permission_classes = (common_views.ActionBasedPermission,)
     pagination_class = LimitOffsetPagination
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = filters.AttachmentImageContentTypeFilter
 
     action_permissions = {
         IsAdminUser: ['destroy'],

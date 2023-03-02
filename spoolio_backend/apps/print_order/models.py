@@ -1,4 +1,5 @@
 from django.contrib.contenttypes.fields import GenericRelation
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from ..common import models as common_models
@@ -52,6 +53,7 @@ class OrderUnit(libs_models.SoftDeleteModel):
     comment = models.TextField(blank=True, null=True)
 
     spool = models.ForeignKey(filament_models.Spool, on_delete=models.CASCADE)
+    infill = models.ForeignKey(filament_models.Infill, on_delete=models.CASCADE)
 
     quantity = models.PositiveIntegerField()
 
@@ -63,6 +65,8 @@ class OrderUnit(libs_models.SoftDeleteModel):
     length_unit = models.CharField(max_length=8)
 
     order = models.ForeignKey(PrintOrder, on_delete=models.CASCADE)
+
+    estimated_price = models.DecimalField(max_digits=12, decimal_places=2)
 
     def __str__(self):
         return "{}: [{}] {} ATTRIBUTES={},{}".format(self.pk, self.created_at, self.file, self.spool, self.length_unit)

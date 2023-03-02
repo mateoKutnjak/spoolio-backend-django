@@ -3,6 +3,8 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.response import Response
 
+from django_filters.rest_framework import DjangoFilterBackend
+
 from . import models, serializers
 
 from ...libs import views as common_views, permissions as common_permissions
@@ -34,6 +36,8 @@ class PrintOrderUnitViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.PrintOrderUnitSerializer
     permission_classes = (common_views.ActionBasedPermission,)
     pagination_class = LimitOffsetPagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['order']
 
     action_permissions = {
         IsAdminUser: ['destroy'],

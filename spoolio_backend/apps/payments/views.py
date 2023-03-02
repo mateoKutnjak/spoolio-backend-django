@@ -18,7 +18,7 @@ def check_print_order_amount(print_order_id: int, amount: float):
     try:
         obj = print_order_models.PrintOrder.objects.get(pk=print_order_id)
     
-        if amount == float(obj.estimated_price) * 100:
+        if amount == obj.estimated_price * 100:
             return True, None
         return False, 'Estimated price and amount requested does not match'
     except ObjectDoesNotExist:
