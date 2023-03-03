@@ -68,5 +68,8 @@ class OrderUnit(libs_models.SoftDeleteModel):
 
     estimated_price = models.DecimalField(max_digits=12, decimal_places=2)
 
+    model_volume = models.FloatField()
+    model_dimensions = models.CharField(max_length=64)
+
     def __str__(self):
         return "{}: [{}] {} ATTRIBUTES={},{}".format(self.pk, self.created_at, self.file, self.spool, self.length_unit)
