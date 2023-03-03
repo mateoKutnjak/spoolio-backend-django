@@ -36,6 +36,7 @@ class PrintOrder(libs_models.SoftDeleteModel):
     attachment_images = GenericRelation(common_models.AttachmentImage)
 
     estimated_price = models.DecimalField(max_digits=12, decimal_places=2)
+    estimated_time = models.PositiveIntegerField()
 
     status = models.CharField(max_length=16, choices=ORDER_STATUS_CHOICES, default='awaiting_payment')
     
@@ -67,6 +68,7 @@ class OrderUnit(libs_models.SoftDeleteModel):
     order = models.ForeignKey(PrintOrder, on_delete=models.CASCADE)
 
     estimated_price = models.DecimalField(max_digits=12, decimal_places=2)
+    estimated_time = models.PositiveIntegerField()
 
     model_volume = models.FloatField()
     model_dimensions = models.CharField(max_length=64)
