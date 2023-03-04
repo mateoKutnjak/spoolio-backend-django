@@ -13,6 +13,7 @@ class StoreOrder(libs_models.SoftDeleteModel):
     ORDER_STATUS_CHOICES = (
         ('rejected', 'Rejected'),
         ('awaiting_payment', 'Awaiting Payment'),
+        ('in_progress', 'In progress'),
         ('shipped', 'Shipped'),
         ('delivered', 'Delivered'),
     )

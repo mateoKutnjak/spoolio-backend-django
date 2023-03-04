@@ -19,9 +19,9 @@ class StoreOrderViewSet(viewsets.ModelViewSet):
     ordering = ['-created_at']
     
     action_permissions = {
-        IsAdminUser: ['update', 'partial_update', 'destroy'],
+        IsAdminUser: ['update', 'destroy'],
         common_permissions.IsAdminOrSelf: [],
-        IsAuthenticated: ['retrieve', 'list'],
+        IsAuthenticated: ['retrieve', 'list', 'partial_update'],
         AllowAny: ['create']
     }
 
