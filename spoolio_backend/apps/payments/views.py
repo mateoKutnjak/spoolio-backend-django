@@ -15,6 +15,8 @@ from .. store_order import models as store_order_models
 
 stripe.api_key = 'sk_test_51MUVqECWTJUk8OjZT2a80T7zFcODaz7NUzYjbTY6I0ExlSGtltbkqe2PSzOwddIANkxcJsEtlASmlkXLVPiIQpXh00jLrQTUSt'
 
+# * WHen checking price this is allowed difference (in cents)
+EPSILON = 3 
 
 def check_print_order_amount(print_order_id: int, amount: float):
 
@@ -31,10 +33,7 @@ def check_print_order_amount(print_order_id: int, amount: float):
         # * Stripe amount is measured x100
         stripe_amount = int(total_price * 100)
 
-        import pdb
-        pdb.set_trace()
-
-        if amount == total_price:
+        if abs(amount - total_price) <= EPSILON:
             return True, stripe_amount, None
         return False, None, 'Estimated price and amount requested does not match'
     except ObjectDoesNotExist:
@@ -55,7 +54,7 @@ def check_modeling_order_amount(modeling_order_id: int, amount: float):
         # * Stripe amount is measured x100
         stripe_amount = int(total_price * 100)
 
-        if amount == total_price:
+        if abs(amount - total_price) <= EPSILON:
             return True, stripe_amount, None
         return False, None, 'Estimated price and amount requested does not match'
     except ObjectDoesNotExist:
@@ -78,7 +77,7 @@ def check_store_order_amount(store_order_id: int, amount: float):
         # * Stripe amount is measured x100
         stripe_amount = int(total_price * 100)
 
-        if amount == total_price:
+        if abs(amount - total_price) <= EPSILON:
             return True, stripe_amount, None
         return False, None, 'Estimated price and amount requested does not match'
     except ObjectDoesNotExist:
@@ -119,5 +118,5 @@ def create_payment(request):
         })
     except Exception as e:
         print(e)
-        return JsonResponse(data={'error': str(e)}, status=403) #, 403
+        return JsonResponse(data={'error': str(e)}, status=403)
     
