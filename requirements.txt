@@ -2,11 +2,15 @@ Django
 django-allauth
 django-colorfield
 django-cors-headers
+django-dbbackup
 django-filter
 djangorestframework
 djangorestframework-simplejwt
 dj-rest-auth[with_social]
+gunicorn
 pillow
+psycopg2-binary
+python-decouple
 stripe
 
 # ! google-api-python-client is used for FIX - remove when resolved (see https://gonzafirewall.medium.com/google-oauth2-and-django-rest-auth-92b0d8f70575)

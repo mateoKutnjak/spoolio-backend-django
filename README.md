@@ -34,7 +34,7 @@
 
 ### Production
 
-Running production has to be done on hosting service instance (for example Digital Ocean Ubuntu machine)
+Running production has to be done on hosting service instance (for example Digital Ocean Ubuntu machine) through docker-compose.
 
 ## TODOs
 

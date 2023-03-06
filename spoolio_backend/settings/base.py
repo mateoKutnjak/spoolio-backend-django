@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'dj_rest_auth',
     'dj_rest_auth.registration',
 
+    'dbbackup',
+
     'django_filters',
 
     'corsheaders',
