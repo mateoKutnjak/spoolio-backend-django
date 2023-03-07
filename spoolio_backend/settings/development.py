@@ -5,6 +5,8 @@ from .base import *
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 # SECURITY WARNING: don't run with debug turned on in production!
+SECRET_KEY = 'SECRET_KEY'
+
 DEBUG = True
 
 ALLOWED_HOSTS = []
