@@ -4,7 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator
 from django.db import models
 
-from ...libs import models as libs_models
+from ...libs import models as libs_models, storage_backends
 
 
 class Like(libs_models.SoftDeleteModel):
@@ -106,7 +106,7 @@ class BillingAddress(libs_models.SoftDeleteModel):
 
 class AttachmentFile(libs_models.SoftDeleteModel):
 
-    file = models.FileField(upload_to="attachment_files")
+    file = models.FileField(storage=storage_backends.PrivateMediaStorage(), upload_to='attachment-files/')
     comment = models.TextField(blank=True, null=True)
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
@@ -119,7 +119,7 @@ class AttachmentFile(libs_models.SoftDeleteModel):
 
 class AttachmentImage(libs_models.SoftDeleteModel):
 
-    image = models.ImageField(upload_to="attachment_images")
+    image = models.ImageField(storage=storage_backends.PrivateMediaStorage(), upload_to='attachment-images/')
     comment = models.TextField(blank=True, null=True)
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)

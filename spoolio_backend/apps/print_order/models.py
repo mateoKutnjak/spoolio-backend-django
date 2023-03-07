@@ -6,8 +6,7 @@ from ..common import models as common_models
 from ..filament import models as filament_models
 from ..user_profile import models as user_profile_models
 
-from ...libs import models as libs_models
-
+from ...libs import models as libs_models, storage_backends
 
 class PrintOrder(libs_models.SoftDeleteModel):
 
@@ -58,7 +57,7 @@ class OrderUnit(libs_models.SoftDeleteModel):
 
     quantity = models.PositiveIntegerField()
 
-    file = models.FileField(upload_to="print_order_files")
+    file = models.FileField(storage=storage_backends.PrivateMediaStorage(), upload_to='print_order_files')
 
     attachment_files = GenericRelation(common_models.AttachmentFile)
     attachment_images = GenericRelation(common_models.AttachmentImage)

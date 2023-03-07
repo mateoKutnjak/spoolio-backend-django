@@ -1,9 +1,11 @@
+boto3
 Django
 django-allauth
 django-colorfield
 django-cors-headers
 django-dbbackup
 django-filter
+django-storages
 djangorestframework
 djangorestframework-simplejwt
 dj-rest-auth[with_social]
