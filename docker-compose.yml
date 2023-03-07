@@ -29,7 +29,7 @@ services:
     env_file: .env.production
     labels:
       ofelia.enabled: "true"
-      ofelia.job-exec.datecron.schedule: "@every 30s"
+      ofelia.job-exec.datecron.schedule: "@every 2h"
       ofelia.job-exec.datecron.command: "python3 manage.py dbbackup"
       ofelia.job-exec.datecron.container: 'web'
       ofelia.job-exec.datecron.user: 'spoolio_web_user' # without it there is not access to installed user packages (Django eg)
@@ -41,6 +41,17 @@ services:
     command: daemon --docker
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    depends_on:
+      - web
+    volumes:
+      - type: bind
+        source: ./data/nginx/default.conf
+        target: /etc/nginx/conf.d/default.conf
 
 volumes:
   postgres_data:
