@@ -36,6 +36,23 @@
 
 Running production has to be done on hosting service instance (for example Digital Ocean Ubuntu machine) through docker-compose.
 
+#### From scratch
+
+- Create Ubuntu instance (droplet) on Digital Ocean
+  - Enable SSH key authentication
+- Connect to running instance with VS Code using `ssh root@<DROPLET_IP>`
+- [OPTIONAL] Install `zsh` with command `apt install -y zsh`
+- [OPTIONAL] Install `oh-my-zsh` with command `sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"`
+- Install Docker by following this [commands in step 1](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04#step-1-installing-docker)
+- Install docker-compose by following this [commands in step 1](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-20-04#step-1-installing-docker-compose)
+- `git clone git@github.com:mateoKutnjak/spoolio-backend-django.git`
+  - if error `Permission denied (publickey)`
+    - generate SSH key pair with command `ssh-keygen` and press ENTER for every question without any inputs
+    - copy terminal output of command `cat .ssh/id_rsa.pub` and add new SSH key to github settings
+    - `git clone` again
+- dont forget to checkout to branch you need
+- copy environment files with command `scp .env.development .env.production .env.production.db root@<DROPLET_IP>:<PATH_TO_PROJECT_ROOT>`
+
 ## TODOs
 
 - To which branch should be checkout when cloning project for development/production?
