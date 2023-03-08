@@ -51,6 +51,10 @@ services:
       - web
     volumes:
       - ./data/nginx/conf/:/etc/nginx/conf.d/:ro
+      - type: bind
+        source: ./data/nginx/nginx.conf
+        target: /etc/nginx/nginx.conf
+
       - ./data/certbot/www:/var/www/certbot/:ro
       - ./data/certbot/conf/:/etc/nginx/ssl/:ro
     restart: always
