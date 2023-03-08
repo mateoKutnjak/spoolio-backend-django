@@ -2,34 +2,17 @@
 
 ## How to run it?
 
-- Clone project from github
-
-`git clone https://github.com/mateoKutnjak/spoolio-backend-django.git`
-
-- Checkout to branch [TODO]
-
-`git checkout [TODO]`
-
 ### Development
 
 - Checkout to branch [TODO]
-
 `git checkout [TODO]`
-
 - In root directory of project setup a python virtual environment
-
 `python3 -m venv venv`
-
 - Activate virual environment
-
 `source venv/bin/activate`
-
 - Install dependencies
-
 `pip3 install -r requirements.txt`
-
 - Run Django server
-
 `python3 manage.py runserver`
 
 ### Production
@@ -50,8 +33,17 @@ Running production has to be done on hosting service instance (for example Digit
     - generate SSH key pair with command `ssh-keygen` and press ENTER for every question without any inputs
     - copy terminal output of command `cat .ssh/id_rsa.pub` and add new SSH key to github settings
     - `git clone` again
-- dont forget to checkout to branch you need
+- dont forget to `git checkout <branch_name>`
 - copy environment files with command `scp .env.development .env.production .env.production.db root@<DROPLET_IP>:<PATH_TO_PROJECT_ROOT>`
+- build docker images using `docker-compose build`
+
+#### Start docker-compose services
+
+- Using command `docker-compose up` all services are started
+
+#### Renewing certbot
+
+Using this [guide](https://mindsers.blog/post/https-using-nginx-certbot-docker/) certbot was set up. It also has part for renewing through `docker-compose` service. It needs to be renewed every 90 days.
 
 ## TODOs
 
