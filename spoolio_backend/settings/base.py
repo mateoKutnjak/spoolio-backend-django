@@ -125,16 +125,16 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
 }
 
-REST_USE_JWT = True
-JWT_AUTH_COOKIE = 'jwt-auth-cookie'
-JWT_AUTH_REFRESH_COOKIE = 'jwt-auth-refresh-cookie'
-
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=75), # TODO change in production
     'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=7),
 }
 
-REST_AUTH_SERIALIZERS = {
+REST_AUTH = {
+    'USE_JWT': True,
+    'JWT_AUTH_COOKIE': 'jwt-auth-cookie',
+    'JWT_AUTH_REFRESH_COOKIE': 'jwt-auth-refresh-cookie',
+
     "USER_DETAILS_SERIALIZER": 'spoolio_backend.apps.authentication.serializers.UserDetailsSerializer',
 }
 
@@ -143,6 +143,7 @@ CORS_ORIGIN_WHITELIST = (
         'http://127.0.0.1:3000',
         'http://localhost',
         'http://127.0.0.1',
+        'https://spoolio.net'
 )
 
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None
