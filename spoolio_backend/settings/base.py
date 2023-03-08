@@ -134,6 +134,7 @@ REST_AUTH = {
     'USE_JWT': True,
     'JWT_AUTH_COOKIE': 'jwt-auth-cookie',
     'JWT_AUTH_REFRESH_COOKIE': 'jwt-auth-refresh-cookie',
+    'JWT_AUTH_HTTPONLY': False,
 
     "USER_DETAILS_SERIALIZER": 'spoolio_backend.apps.authentication.serializers.UserDetailsSerializer',
 }
