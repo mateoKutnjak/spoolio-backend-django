@@ -13,7 +13,7 @@ SECRET_KEY = env_config('SECRET_KEY')
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', 'spoolio.net']
+ALLOWED_HOSTS = ['*'] # TODO cahnge this later, old values: ['localhost', 'spoolio.net']
 
 DATABASES = {
     'default': {

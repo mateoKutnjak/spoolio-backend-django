@@ -141,7 +141,13 @@ REST_AUTH_SERIALIZERS = {
 CORS_ORIGIN_WHITELIST = (
         'http://localhost:3000',
         'http://127.0.0.1:3000',
+        'http://localhost',
+        'http://127.0.0.1',
 )
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
+
+CSRF_TRUSTED_ORIGINS = ['http://207.154.220.64', 'https://spoolium.com', 'https://spoolio.net']
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
