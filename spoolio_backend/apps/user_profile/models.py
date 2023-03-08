@@ -30,9 +30,3 @@ class UserProfile(libs_models.SoftDeleteModel):
         if self.user == None:
             return "[{}] {} [GUEST]".format(self.pk, self.email)
         return "[{}] {}".format(self.pk, self.user.email)
-
-
-@receiver(post_save, sender=get_user_model())
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        UserProfile.objects.create(user=instance)
