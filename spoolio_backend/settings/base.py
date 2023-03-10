@@ -140,11 +140,7 @@ REST_AUTH = {
 }
 
 CORS_ORIGIN_WHITELIST = (
-        'http://localhost:3000',
-        'http://127.0.0.1:3000',
-        'http://localhost',
-        'http://127.0.0.1',
-        'https://spoolio.net'
+    'https://spoolio.net'
 )
 
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None
