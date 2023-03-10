@@ -51,3 +51,11 @@ STATIC_URL = '{}/{}/'.format(AWS_S3_ENDPOINT_URL, "static")
 
 DEFAULT_FILE_STORAGE = 'spoolio_backend.libs.storage_backends.PublicMediaStorage'
 PRIVATE_FILE_STORAGE = 'spoolio_backend.libs.storage_backends.PrivateMediaStorage'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtppro.zoho.eu'
+EMAIL_HOST_USER = 'info@spoolio.net'
+EMAIL_HOST_PASSWORD = env_config('EMAIL_HOST_PASSWORD')
+EMAIL_PORT = 587
+EMAIL_USE_SSL = False
+EMAIL_USE_TLS = True
