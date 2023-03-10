@@ -31,6 +31,10 @@ DBBACKUP_STORAGE_OPTIONS = {
     "location": "backups/"
 }
 
+CORS_ORIGIN_WHITELIST = [
+    'https://spoolio.net'
+]
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 

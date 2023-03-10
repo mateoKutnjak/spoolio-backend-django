@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'spoolio_backend.apps.blog',
     'spoolio_backend.apps.common',
     'spoolio_backend.apps.filament',
+    'spoolio_backend.apps.invitation_token',
     'spoolio_backend.apps.modeling_order',
     'spoolio_backend.apps.payments',
     'spoolio_backend.apps.print_order',
@@ -137,11 +138,8 @@ REST_AUTH = {
     'JWT_AUTH_HTTPONLY': False,
 
     "USER_DETAILS_SERIALIZER": 'spoolio_backend.apps.authentication.serializers.UserDetailsSerializer',
+    'REGISTER_SERIALIZER': 'spoolio_backend.apps.authentication.serializers.InvitationTokenRequiredRegisterSerializer'
 }
-
-CORS_ORIGIN_WHITELIST = [
-    'https://spoolio.net'
-]
 
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 
