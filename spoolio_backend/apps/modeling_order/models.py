@@ -1,10 +1,11 @@
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
+from django.db.models import signals
 
 from .. common import models as common_models
 from .. user_profile import models as user_profile_models
 
-from ... libs import models as libs_models
+from ... libs import models as libs_models, signals as libs_signals
 
 
 class ModelingOrder(libs_models.SoftDeleteModel):
@@ -35,3 +36,5 @@ class ModelingOrder(libs_models.SoftDeleteModel):
     def __str__(self):
         return "{}: [{}] BY={} CONTACT_EMAIL={}".format(self.pk, self.created_at, self.user_profile.user.email if self.user_profile is not None and self.user_profile.user is not None else 'guest', self.contact_email )
 
+
+signals.pre_save.connect(receiver=libs_signals.send_email_on_order_status_change, sender=ModelingOrder)

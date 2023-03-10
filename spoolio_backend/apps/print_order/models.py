@@ -1,12 +1,14 @@
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models import signals
 
 from ..common import models as common_models
 from ..filament import models as filament_models
 from ..user_profile import models as user_profile_models
 
-from ...libs import models as libs_models, storage_backends
+from ...libs import models as libs_models, signals as libs_signals, storage_backends
+
 
 class PrintOrder(libs_models.SoftDeleteModel):
 
@@ -74,3 +76,6 @@ class OrderUnit(libs_models.SoftDeleteModel):
 
     def __str__(self):
         return "{}: [{}] {} ATTRIBUTES={},{}".format(self.pk, self.created_at, self.file, self.spool, self.length_unit)
+
+
+signals.pre_save.connect(receiver=libs_signals.send_email_on_order_status_change, sender=PrintOrder)
