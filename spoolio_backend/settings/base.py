@@ -139,9 +139,9 @@ REST_AUTH = {
     "USER_DETAILS_SERIALIZER": 'spoolio_backend.apps.authentication.serializers.UserDetailsSerializer',
 }
 
-CORS_ORIGIN_WHITELIST = (
+CORS_ORIGIN_WHITELIST = [
     'https://spoolio.net'
-)
+]
 
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 
