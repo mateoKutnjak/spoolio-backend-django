@@ -17,6 +17,6 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     action_permissions = {
         IsAdminUser: ['destroy'],
         common_permissions.IsAdminOrSelf: [],
-        IsAuthenticated: ['create', 'update', 'partial_update'],
-        AllowAny: [ 'retrieve', 'list']
+        IsAuthenticated: ['create', 'update', 'partial_update', 'retrieve', 'list'],
+        AllowAny: []
     }

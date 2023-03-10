@@ -41,7 +41,7 @@ Running production has to be done on hosting service instance (for example Digit
 
 - Using command `docker-compose up` all services are started
 
-#### Renewing certbot
+#### Certbot
 
 Using this [guide](https://mindsers.blog/post/https-using-nginx-certbot-docker/) certbot was set up. It also has part for renewing through `docker-compose` service. It needs to be renewed every 90 days.
 
