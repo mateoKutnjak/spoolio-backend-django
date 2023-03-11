@@ -143,8 +143,6 @@ REST_AUTH = {
 
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 
-CSRF_TRUSTED_ORIGINS = ['https://spoolio.net', 'https://api.spoolio.net']
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 

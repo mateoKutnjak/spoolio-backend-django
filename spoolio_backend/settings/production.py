@@ -37,6 +37,8 @@ CORS_ORIGIN_WHITELIST = [
     'https://spoolio.net'
 ]
 
+CSRF_TRUSTED_ORIGINS = ['https://spoolio.net', 'https://api.spoolio.net']
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
