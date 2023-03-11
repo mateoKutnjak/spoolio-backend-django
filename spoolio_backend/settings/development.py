@@ -23,6 +23,7 @@ DATABASES = {
     }
 }
 
+# ****** CORS ******* 
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000'
 ]
@@ -31,7 +32,8 @@ CORS_ORIGIN_WHITELIST = [
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 if env_config('USE_SPACES', default=False, cast=bool):
-    
+
+    # ****** Digital Ocean Spaces ******* 
     AWS_ACCESS_KEY_ID = env_config('SPACES_ACCESS_KEY')
     AWS_SECRET_ACCESS_KEY = env_config('SPACES_ACCESS_KEY_SECRET')
 
@@ -52,6 +54,7 @@ if env_config('USE_SPACES', default=False, cast=bool):
 
 else:
 
+    # ****** Local media/static files ******* 
     STATIC_URL = 'static/'
     STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
@@ -60,3 +63,6 @@ else:
 
     MEDIA_URL_1 = 'media-private/'
     MEDIA_ROOT_1  = os.path.join(BASE_DIR, 'media-private/')
+
+# ****** Stripe ******* 
+STRIPE_API_KEY = env_config('STRIPE_API_KEY')

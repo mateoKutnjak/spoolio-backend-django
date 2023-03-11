@@ -26,11 +26,13 @@ DATABASES = {
     }
 }
 
+# ****** django-dbbackup ******* 
 DBBACKUP_STORAGE = "django.core.files.storage.FileSystemStorage"
 DBBACKUP_STORAGE_OPTIONS = {
     "location": "backups/"
 }
 
+# ****** CORS ******* 
 CORS_ORIGIN_WHITELIST = [
     'https://spoolio.net'
 ]
@@ -38,6 +40,7 @@ CORS_ORIGIN_WHITELIST = [
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
+# ****** Digital Ocean Spaces ******* 
 AWS_ACCESS_KEY_ID = env_config('SPACES_ACCESS_KEY')
 AWS_SECRET_ACCESS_KEY = env_config('SPACES_ACCESS_KEY_SECRET')
 
@@ -56,6 +59,7 @@ STATIC_URL = '{}/{}/'.format(AWS_S3_ENDPOINT_URL, "static")
 DEFAULT_FILE_STORAGE = 'spoolio_backend.libs.storage_backends.PublicMediaStorage'
 PRIVATE_FILE_STORAGE = 'spoolio_backend.libs.storage_backends.PrivateMediaStorage'
 
+# ****** Email ******* 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtppro.zoho.eu'
 EMAIL_HOST_USER = 'info@spoolio.net'
@@ -63,3 +67,6 @@ EMAIL_HOST_PASSWORD = env_config('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = 587
 EMAIL_USE_SSL = False
 EMAIL_USE_TLS = True
+
+# ****** Stripe ******* 
+STRIPE_API_KEY = env_config('STRIPE_API_KEY')

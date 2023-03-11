@@ -1,6 +1,7 @@
 import math
 from typing import Callable
 
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import F, Sum
 from django.http import JsonResponse
@@ -13,10 +14,12 @@ from .. modeling_order import models as modeling_order_models
 from .. print_order import models as print_order_models
 from .. store_order import models as store_order_models
 
-stripe.api_key = 'sk_test_51MUVqECWTJUk8OjZT2a80T7zFcODaz7NUzYjbTY6I0ExlSGtltbkqe2PSzOwddIANkxcJsEtlASmlkXLVPiIQpXh00jLrQTUSt'
+
+stripe.api_key = settings.STRIPE_API_KEY
 
 # * WHen checking price this is allowed difference (in cents)
 EPSILON = 3 
+
 
 def check_print_order_amount(print_order_id: int, amount: float):
 
