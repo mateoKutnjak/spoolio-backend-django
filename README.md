@@ -45,6 +45,10 @@ Running production has to be done on hosting service instance (for example Digit
 
 Using this [guide](https://mindsers.blog/post/https-using-nginx-certbot-docker/) certbot was set up. It also has part for renewing through `docker-compose` service. It needs to be renewed every 90 days.
 
+#### Stripe
+
+Django backend uses `secret` API key from Stripe developer webpage to create payment intents.
+
 ## TODOs
 
 - To which branch should be checkout when cloning project for development/production?

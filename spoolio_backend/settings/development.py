@@ -65,4 +65,4 @@ else:
     MEDIA_ROOT_1  = os.path.join(BASE_DIR, 'media-private/')
 
 # ****** Stripe ******* 
-STRIPE_API_KEY = env_config('STRIPE_API_KEY')
+STRIPE_API_KEY = env_config('STRIPE_SECRET_KEY_TEST')

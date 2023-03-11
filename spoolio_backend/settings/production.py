@@ -69,4 +69,4 @@ EMAIL_USE_SSL = False
 EMAIL_USE_TLS = True
 
 # ****** Stripe ******* 
-STRIPE_API_KEY = env_config('STRIPE_API_KEY')
+STRIPE_API_KEY = env_config('STRIPE_SECRET_KEY_LIVE')
