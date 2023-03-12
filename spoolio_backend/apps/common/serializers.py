@@ -106,7 +106,7 @@ class BillingAddressSerializer(serializers.ModelSerializer):
         return super().validate(attrs)
 
     def validate(self, attrs):
-        if attrs['type'] == models.BillingAddress.TYPE_INDIVIDUAL:
+        if attrs.get('type') == models.BillingAddress.TYPE_INDIVIDUAL:
 
             # * For TYPE_INDIVIDUAL followind fields are required which
             # * are not set as required in models.py:
@@ -128,7 +128,7 @@ class BillingAddressSerializer(serializers.ModelSerializer):
             
             return super().validate(attrs)
     
-        elif attrs['type'] == models.BillingAddress.TYPE_COMPANY:
+        elif attrs.get('type') == models.BillingAddress.TYPE_COMPANY:
 
             # * For TYPE_COMPANY followind fields are required which
             # * are not set as required in models.py:

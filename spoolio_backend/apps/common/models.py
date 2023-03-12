@@ -97,7 +97,7 @@ class BillingAddress(libs_models.SoftDeleteModel):
         (TYPE_COMPANY, TYPE_COMPANY.capitalize()),
     )
 
-    type = models.CharField(max_length=16, choices=CHOICES_TYPE, default=TYPE_INDIVIDUAL)
+    type = models.CharField(max_length=16, choices=CHOICES_TYPE)
 
     first_name = models.CharField(max_length=64, null=True, blank=True)
     last_name = models.CharField(max_length=64, null=True, blank=True)
