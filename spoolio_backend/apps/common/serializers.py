@@ -102,6 +102,63 @@ class BillingAddressSerializer(serializers.ModelSerializer):
         model = models.BillingAddress
         fields = '__all__'
 
+    def validate(self, attrs):
+        return super().validate(attrs)
+
+    def validate(self, attrs):
+        if attrs['type'] == models.BillingAddress.TYPE_INDIVIDUAL:
+
+            # * For TYPE_INDIVIDUAL followind fields are required which
+            # * are not set as required in models.py:
+            # *
+            # * first_name
+            # * last_name
+            # *
+            # * Rest of the fields needed are required in models.py
+
+            validation_errors = {}
+
+            if not attrs.get('first_name'):
+                validation_errors['first_name'] = 'This field is required'
+            if not attrs.get('last_name'):
+                validation_errors['last_name'] = 'This field is required'
+
+            if validation_errors:
+                raise serializers.ValidationError(validation_errors)
+            
+            return super().validate(attrs)
+    
+        elif attrs['type'] == models.BillingAddress.TYPE_COMPANY:
+
+            # * For TYPE_COMPANY followind fields are required which
+            # * are not set as required in models.py:
+            # *
+            # * company_name
+            # * contact_first_name
+            # * contact_last_name
+            # * vat_id
+            # *
+            # * Rest of the fields needed are required in models.py
+
+            validation_errors = {}
+
+            if not attrs.get('company_name'):
+                validation_errors['company_name'] = 'This field is required'
+            if not attrs.get('contact_first_name'):
+                validation_errors['contact_first_name'] = 'This field is required'
+            if not attrs.get('contact_last_name'):
+                validation_errors['contact_last_name'] = 'This field is required'
+            if not attrs.get('vat_id'):
+                validation_errors['vat_id'] = 'This field is required'
+
+            if validation_errors:
+                raise serializers.ValidationError(validation_errors)
+            
+            return super().validate(attrs)
+        
+        else:
+            raise serializers.ValidationError("Billing address type not recognized")
+
 
 class AttachmentFileSerializer(serializers.ModelSerializer):
 
