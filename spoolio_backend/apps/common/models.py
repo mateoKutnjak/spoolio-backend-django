@@ -108,7 +108,7 @@ class BillingAddress(libs_models.SoftDeleteModel):
     postal_code = models.IntegerField()
 
     phone_regex = RegexValidator(regex=r'^\+\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
-    vat_id_regex = RegexValidator(regex=r'(?:(AT)\s*(U\d{8}))|(?:(BE)\s*(0?\d{*}))|(?:(CZ)\s*(\d{8,10}))|(?:(DE)\s*(\d{9}))|(?:(CY)\s*(\d{8}[A-Z]))|(?:(DK)\s*(\d{8}))|(?:(EE)\s*(\d{9}))|(?:(GR)\s*(\d{9}))|(?:(ES|NIF:?)\s*([0-9A-Z]\d{7}[0-9A-Z]))|(?:(FI)\s*(\d{8}))|(?:(FR)\s*([0-9A-Z]{2}\d{9}))|(?:(GB)\s*((\d{9}|\d{12})~(GD|HA)\d{3}))|(?:(HU)\s*(\d{8}))|(?:(IE)\s*(\d[A-Z0-9\\+\\*]\d{5}[A-Z]))|(?:(IT)\s*(\d{11}))|(?:(LT)\s*((\d{9}|\d{12})))|(?:(LU)\s*(\d{8}))|(?:(LV)\s*(\d{11}))|(?:(MT)\s*(\d{8}))|(?:(NL)\s*(\d{9}B\d{2}))|(?:(PL)\s*(\d{10}))|(?:(PT)\s*(\d{9}))|(?:(SE)\s*(\d{12}))|(?:(SI)\s*(\d{8}))|(?:(SK)\s*(\d{10}))|(?:\D|^)(\d{11})(?:\D|$)|(?:(CHE)(-|\s*)(\d{3}\.\d{3}\.\d{3}))|(?:(SM)\s*(\d{5}))', message="VAT ID is not valid accourding to regular expression rules")
+    vat_id_regex = RegexValidator(regex=r'^((AT)?U[0-9]{8}|(BE)?0[0-9]{9}|(BG)?[0-9]{9,10}|(HR)?[0-9]{11}|(CY)?[0-9]{8}L|(CZ)?[0-9]{8,10}|(DE)?[0-9]{9}|(DK)?[0-9]{8}|(EE)?[0-9]{9}|(EL|GR)?[0-9]{9}|ES[A-Z][0-9]{7}(?:[0-9]|[A-Z])|(FI)?[0-9]{8}|(FR)?[0-9A-Z]{2}[0-9]{9}|(GB)?([0-9]{9}([0-9]{3})?|[A-Z]{2}[0-9]{3})|(HU)?[0-9]{8}|(IE)?[0-9]S[0-9]{5}L|(IT)?[0-9]{11}|(LT)?([0-9]{9}|[0-9]{12})|(LU)?[0-9]{8}|(LV)?[0-9]{11}|(MT)?[0-9]{8}|(NL)?[0-9]{9}B[0-9]{2}|(PL)?[0-9]{10}|(PT)?[0-9]{9}|(RO)?[0-9]{2,10}|(SE)?[0-9]{12}|(SI)?[0-9]{8}|(SK)?[0-9]{10})$', message="VAT ID is not valid accourding to regular expression rules")
 
     phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True) # Validators should be a list
 
