@@ -75,7 +75,7 @@ class ProductSerializer(serializers.ModelSerializer):
         return instance.comments.filter(is_deleted=False).count()
 
     def get_like_count(self, instance):
-        return instance.likes.filter(is_deleted=False).count()
+        return instance.likes.all().count()
     
     def get_rating_count(self, instance):
         return instance.ratings.filter(is_deleted=False).count()

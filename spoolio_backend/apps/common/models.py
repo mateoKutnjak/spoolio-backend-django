@@ -7,7 +7,7 @@ from django.db import models
 from ...libs import models as libs_models, storage_backends
 
 
-class Like(libs_models.SoftDeleteModel):
+class Like(models.Model):
 
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
 
@@ -19,12 +19,11 @@ class Like(libs_models.SoftDeleteModel):
         constraints = [
             models.UniqueConstraint(
                 fields=["user", "content_type", "object_id"], 
-                condition=models.Q(is_deleted=False), 
-                name='like_unique_undeleted')
+                name='like_unique')
         ]
 
     def __str__(self):
-        return "{}: [{}] {} (CONTENT_TYPE={}, OBJECT_ID={})".format(self.pk, self.created_at, self.user.email, self.content_type, self.object_id)
+        return "{}: [{}] (CONTENT_TYPE={}, OBJECT_ID={})".format(self.pk, self.user.email, self.content_type, self.object_id)
 
 
 class Comment(libs_models.SoftDeleteModel):

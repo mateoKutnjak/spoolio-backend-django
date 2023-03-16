@@ -37,7 +37,7 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_like_count(self, instance):
-        return instance.likes.filter(is_deleted=False).count()
+        return instance.likes.all().count()
 
     def get_liked_by_me(self, instance):
         try:
