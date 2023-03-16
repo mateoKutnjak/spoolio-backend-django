@@ -6,6 +6,7 @@ from . import models
 
 
 from .. common import models as common_models, serializers as common_serializers
+from .. filament import models as filament_models, serializers as filament_serializers
 from .. user_profile import serializers as user_profile_serializers, models as user_profile_models
 
 
@@ -45,6 +46,15 @@ class PrintOrderSerializer(serializers.ModelSerializer):
 
 
 class PrintOrderUnitSerializer(serializers.ModelSerializer):
+
+    spool = serializers.PrimaryKeyRelatedField(queryset=filament_models.Spool.objects.all(), required=False)
+    infill = serializers.PrimaryKeyRelatedField(queryset=filament_models.Infill.objects.all())
+
+    def to_representation(self, instance):
+        self.fields['spool'] = filament_serializers.SpoolSerializer(read_only=True)
+        self.fields['infill'] = filament_serializers.InfillSerializer(read_only=True)
+
+        return super(PrintOrderUnitSerializer, self).to_representation(instance)
 
     class Meta:
         model = models.OrderUnit

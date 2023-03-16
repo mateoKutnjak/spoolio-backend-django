@@ -36,6 +36,7 @@ class Product(libs_models.SoftDeleteModel):
 
     comments = GenericRelation(common_models.Comment)
     likes = GenericRelation(common_models.Like)
+    ratings = GenericRelation(common_models.Rating)
     
     def __str__(self):
         return "{}: {} [{}/{}]".format(self.pk, self.title, self.category.name, self.subcategory.name)

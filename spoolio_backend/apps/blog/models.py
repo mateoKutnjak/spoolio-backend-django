@@ -4,7 +4,7 @@ from django.db import models
 
 from ..common import models as common_models
 
-from ...libs import models as libs_models
+from ...libs import models as libs_models, storage_backends
 
 
 class Blog(libs_models.SoftDeleteModel):
@@ -22,7 +22,7 @@ class Blog(libs_models.SoftDeleteModel):
 
     content = models.TextField()
 
-    picture = models.ImageField(upload_to='blog_images/', null=True, blank=True)
+    picture = models.ImageField(storage=storage_backends.PublicMediaStorage(), upload_to='blog_images/', null=True, blank=True)
     
     type = models.CharField(max_length=16, choices=BLOG_CATEGORY_CHOICES)
 

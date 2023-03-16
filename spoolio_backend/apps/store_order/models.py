@@ -1,11 +1,12 @@
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
+from django.db.models import signals
 
 from .. common import models as common_models
 from .. store import models as store_models
 from .. user_profile import models as user_profile_models
 
-from ... libs import models as libs_models
+from ... libs import models as libs_models, signals as libs_signals
 
 
 class StoreOrder(libs_models.SoftDeleteModel):
@@ -13,6 +14,7 @@ class StoreOrder(libs_models.SoftDeleteModel):
     ORDER_STATUS_CHOICES = (
         ('rejected', 'Rejected'),
         ('awaiting_payment', 'Awaiting Payment'),
+        ('in_progress', 'In progress'),
         ('shipped', 'Shipped'),
         ('delivered', 'Delivered'),
     )
@@ -38,3 +40,6 @@ class StoreOrderUnit(libs_models.SoftDeleteModel):
     order = models.ForeignKey(StoreOrder, on_delete=models.CASCADE)
     
     quantity = models.PositiveIntegerField()
+
+
+signals.pre_save.connect(receiver=libs_signals.send_email_on_order_status_change, sender=StoreOrder)

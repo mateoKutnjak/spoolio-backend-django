@@ -27,3 +27,39 @@ class LikeContentTypeFilter(django_filters.FilterSet):
         to_field_name="model",
         queryset=ContentType.objects.all(),
     )
+
+
+class RatingContentTypeFilter(django_filters.FilterSet):
+    class Meta:
+        model = models.Rating
+        fields = ("content_type", "object_id")
+
+    content_type = django_filters.ModelChoiceFilter(
+        field_name="content_type",
+        to_field_name="model",
+        queryset=ContentType.objects.all(),
+    )
+
+
+class AttachmentFileContentTypeFilter(django_filters.FilterSet):
+    class Meta:
+        model = models.AttachmentFile
+        fields = ("content_type", "object_id")
+
+    content_type = django_filters.ModelChoiceFilter(
+        field_name="content_type",
+        to_field_name="model",
+        queryset=ContentType.objects.all(),
+    )
+
+
+class AttachmentImageContentTypeFilter(django_filters.FilterSet):
+    class Meta:
+        model = models.AttachmentImage
+        fields = ("content_type", "object_id")
+
+    content_type = django_filters.ModelChoiceFilter(
+        field_name="content_type",
+        to_field_name="model",
+        queryset=ContentType.objects.all(),
+    )

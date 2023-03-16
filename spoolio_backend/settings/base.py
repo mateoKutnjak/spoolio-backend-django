@@ -15,20 +15,11 @@ import datetime
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-rbzx@v4*fs5%tn@l=e4(g&u6--osz8$5xgq*^p(9hc=xbt6hqk'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG') != 'False'
-
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split()
-
 
 # Application definition
 
@@ -47,9 +38,14 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 
     'dj_rest_auth',
     'dj_rest_auth.registration',
+
+    'storages',
+
+    'dbbackup',
 
     'django_filters',
 
@@ -61,7 +57,9 @@ INSTALLED_APPS = [
     'spoolio_backend.apps.blog',
     'spoolio_backend.apps.common',
     'spoolio_backend.apps.filament',
+    'spoolio_backend.apps.invitation_token',
     'spoolio_backend.apps.modeling_order',
+    'spoolio_backend.apps.payments',
     'spoolio_backend.apps.print_order',
     'spoolio_backend.apps.store',
     'spoolio_backend.apps.store_order',
@@ -103,21 +101,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'spoolio_backend.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': os.environ.get("SQL_ENGINE"),
-        'NAME': os.environ.get("SQL_DATABASE"),
-        'USER': os.environ.get("SQL_USER"),
-        'HOST': os.environ.get("SQL_HOST"),
-        'PORT': int(os.environ.get("SQL_PORT")),
-        'PASSWORD': os.environ.get("SQL_PASSWORD"),
-    }
-}
-
-
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
@@ -143,23 +126,22 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
 }
 
-REST_USE_JWT = True
-JWT_AUTH_COOKIE = 'jwt-auth-cookie'
-JWT_AUTH_REFRESH_COOKIE = 'jwt-auth-refresh-cookie'
-
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=75), # TODO change in production
     'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=7),
 }
 
-REST_AUTH_SERIALIZERS = {
+REST_AUTH = {
+    'USE_JWT': True,
+    'JWT_AUTH_COOKIE': 'jwt-auth-cookie',
+    'JWT_AUTH_REFRESH_COOKIE': 'jwt-auth-refresh-cookie',
+    'JWT_AUTH_HTTPONLY': False,
+
     "USER_DETAILS_SERIALIZER": 'spoolio_backend.apps.authentication.serializers.UserDetailsSerializer',
+    'REGISTER_SERIALIZER': 'spoolio_backend.apps.authentication.serializers.InvitationTokenRequiredRegisterSerializer'
 }
 
-CORS_ORIGIN_WHITELIST = (
-        'http://localhost:3000',
-        'http://127.0.0.1:3000',
-)
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
@@ -175,8 +157,6 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
-
-STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -205,8 +185,3 @@ AUTHENTICATION_BACKENDS = (
  # `allauth` specific authentication methods, such as login by e-mail
  "allauth.account.auth_backends.AuthenticationBackend",
 )
-
-# URL prefix
-STATIC_URL = '/static/'
-# Location where to dump static files
-STATIC_ROOT = os.path.join(BASE_DIR, "static")

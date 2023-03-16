@@ -3,38 +3,36 @@ version: '3.7'
 services:
 
   db:
-    image: postgres
+    image: postgres:11.9
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-      - ./data/postgres/database_scripts/001_create_database_prod.sql:/docker-entrypoint-initdb.d/001_create_database_prod.sql
-    env_file: .env.prod.db
+      - ./data/postgres/database_scripts/001_create_database.sql:/docker-entrypoint-initdb.d/001_create_database.sql
+    env_file:
+      - .env.production.db
 
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile.prod
-    working_dir: /home/spoolio_backend/app
-    # * --capture-output --enable-stdio-inheritance is needed because of Django logging
+    build: .
+    working_dir: /home/spoolio_web_user/app
+
     # todo add gunicorn logging files (permission denied) --access-logfile /var/log/access_file_g.log --error-logfile /var/log/error_file_g.log
-    command: bash -c "gunicorn -b 0.0.0.0:8000 spoolio_backend.wsgi --capture-output --enable-stdio-inheritance"
+
+    command: bash -c " gunicorn -b 0.0.0.0:8000 spoolio_backend.wsgi --capture-output --enable-stdio-inheritance"
     volumes:
-      - .:/home/spoolio_backend/app
+      - .:/home/spoolio_web_user/app
       - /tmp/.X11-unix:/tmp/.X11-unix
-      - static_volume:/var/www/spoolio.net/static
-      - media_volume:/var/www/spoolio.net/media
-    expose:
-      - 8000
+      # - static_volume:/var/www/toqo.app/static
+      # - media_volume:/var/www/toqo.app/media
+    ports:
+      - "8000:8000"
     depends_on:
       - db
-    links:
-      - db
-    env_file: .env.prod
+    env_file: .env.production
     labels:
       ofelia.enabled: "true"
-      ofelia.job-exec.datecron.schedule: "@every 6h"
-      ofelia.job-exec.datecron.command: "python3 spoolio_backend/manage.py dbbackup"
+      ofelia.job-exec.datecron.schedule: "@every 2h"
+      ofelia.job-exec.datecron.command: "python3 manage.py dbbackup"
       ofelia.job-exec.datecron.container: 'web'
-      ofelia.job-exec.datecron.user: 'toqo' # without it there is not access to installed user packages (Django eg)
+      ofelia.job-exec.datecron.user: 'spoolio_web_user' # without it there is not access to installed user packages (Django eg)
 
   ofelia:
     image: mcuadros/ofelia:latest
@@ -46,31 +44,27 @@ services:
 
   nginx:
     image: nginx:latest
-    volumes:
-      - static_volume:/var/www/spoolio.net/static
-      - media_volume:/var/www/spoolio.net/media
-      # - ./data/certbot/conf:/etc/letsencrypt/:ro
-      # - ./data/certbot/www:/var/www/certbot/:ro
-      - ./data/nginx/nginxconfig.io/:/etc/nginx/nginxconfig.io
-      - ./data/nginx/sites-available/:/etc/nginx/sites-available
-      - ./data/nginx/sites-enabled/:/etc/nginx/sites-enabled
-      # Volumes type bind used for single file copying
-      - type: bind
-        source: ./data/nginx/dhparam.pem
-        target: /etc/nginx/dhparam.pem
-      - type: bind
-        source: ./data/nginx/nginx.conf
-        target: /etc/nginx/nginx.conf
-    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
     ports:
       - "80:80"
       - "443:443"
     depends_on:
       - web
-    restart: unless-stopped
+    volumes:
+      - ./data/nginx/conf/:/etc/nginx/conf.d/:ro
+      - ./data/certbot/www:/var/www/certbot/:ro
+      - ./data/certbot/conf/:/etc/nginx/ssl/:ro
+
+      - type: bind
+        source: ./data/nginx/nginx.conf
+        target: /etc/nginx/nginx.conf
+
+    restart: always
+
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ./data/certbot/www/:/var/www/certbot/:rw
+      - ./data/certbot/conf/:/etc/letsencrypt/:rw
 
 volumes:
   postgres_data:
-  redisdata:
-  static_volume:
-  media_volume:

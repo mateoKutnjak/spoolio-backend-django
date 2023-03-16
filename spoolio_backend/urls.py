@@ -25,6 +25,7 @@ urlpatterns = [
     path('api/', include('spoolio_backend.apps.common.urls')),
     path('api/', include('spoolio_backend.apps.filament.urls')),
     path('api/', include('spoolio_backend.apps.modeling_order.urls')),
+    path('api/', include('spoolio_backend.apps.payments.urls')),
     path('api/', include('spoolio_backend.apps.print_order.urls')),
     path('api/', include('spoolio_backend.apps.store.urls')),
     path('api/', include('spoolio_backend.apps.store_order.urls')),

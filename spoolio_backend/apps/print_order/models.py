@@ -1,14 +1,18 @@
 from django.contrib.contenttypes.fields import GenericRelation
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models import signals
 
 from ..common import models as common_models
 from ..filament import models as filament_models
 from ..user_profile import models as user_profile_models
 
-from ...libs import models as libs_models
+from ...libs import models as libs_models, signals as libs_signals, storage_backends
 
 
 class PrintOrder(libs_models.SoftDeleteModel):
+
+    # ! IMPORTANT ! For every change in server side (django choices) adjust frontend enums (constants.vue)
 
     ORDER_STATUS_CHOICES = (
         ('awaiting_payment', 'Awaiting Payment'),
@@ -33,6 +37,7 @@ class PrintOrder(libs_models.SoftDeleteModel):
     attachment_images = GenericRelation(common_models.AttachmentImage)
 
     estimated_price = models.DecimalField(max_digits=12, decimal_places=2)
+    estimated_time = models.PositiveIntegerField()
 
     status = models.CharField(max_length=16, choices=ORDER_STATUS_CHOICES, default='awaiting_payment')
     
@@ -49,13 +54,12 @@ class OrderUnit(libs_models.SoftDeleteModel):
 
     comment = models.TextField(blank=True, null=True)
 
-    material = models.ForeignKey(filament_models.Material, on_delete=models.CASCADE)
-    color = models.ForeignKey(filament_models.Color, on_delete=models.CASCADE)
+    spool = models.ForeignKey(filament_models.Spool, on_delete=models.CASCADE)
     infill = models.ForeignKey(filament_models.Infill, on_delete=models.CASCADE)
 
     quantity = models.PositiveIntegerField()
 
-    file = models.FileField(upload_to="print_order_files")
+    file = models.FileField(storage=storage_backends.PrivateMediaStorage(), upload_to='print_order_files')
 
     attachment_files = GenericRelation(common_models.AttachmentFile)
     attachment_images = GenericRelation(common_models.AttachmentImage)
@@ -64,5 +68,14 @@ class OrderUnit(libs_models.SoftDeleteModel):
 
     order = models.ForeignKey(PrintOrder, on_delete=models.CASCADE)
 
+    estimated_price = models.DecimalField(max_digits=12, decimal_places=2)
+    estimated_time = models.PositiveIntegerField()
+
+    model_volume = models.FloatField()
+    model_dimensions = models.CharField(max_length=64)
+
     def __str__(self):
-        return "{}: [{}] {} ATTRIBUTES={},{},{},{}".format(self.pk, self.created_at, self.file, self.material.name, self.color.name, self.infill.percentage*100, self.length_unit)
+        return "{}: [{}] {} ATTRIBUTES={},{}".format(self.pk, self.created_at, self.file, self.spool, self.length_unit)
+
+
+signals.pre_save.connect(receiver=libs_signals.send_email_on_order_status_change, sender=PrintOrder)
