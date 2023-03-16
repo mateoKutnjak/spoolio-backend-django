@@ -13,7 +13,7 @@ from . import models, serializers, filters
 from ...libs import views as common_views, permissions as common_permissions
 
 
-class CommentViewSet(viewsets.ModelViewSet):
+class CommentViewSet(viewsets.ModelViewSet, common_permissions.IsAdminOrObjectOwnerPermissionMixin):
 
     queryset = models.Comment.objects.all()
     serializer_class = serializers.CommentSerializer
@@ -26,13 +26,16 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     action_permissions = {
         IsAdminUser: [],
-        common_permissions.IsAdminOrSelf: [],
-        IsAuthenticated: ['create', 'update', 'partial_update', 'destroy'],
+        common_permissions.IsAdminOrSelf: ['update', 'partial_update', 'destroy'],
+        IsAuthenticated: ['create'],
         AllowAny: [ 'retrieve', 'list']
     }
 
+    def get_object_owner(self, obj):
+        return obj.user
 
-class LikeViewSet(viewsets.ModelViewSet):
+
+class LikeViewSet(viewsets.ModelViewSet, common_permissions.IsAdminOrObjectOwnerPermissionMixin):
 
     queryset = models.Like.objects.all()
     serializer_class = serializers.LikeSerializer
@@ -43,12 +46,15 @@ class LikeViewSet(viewsets.ModelViewSet):
 
     action_permissions = {
         IsAdminUser: [],
-        common_permissions.IsAdminOrSelf: [],
-        IsAuthenticated: ['create', 'update', 'partial_update', 'destroy'],
+        common_permissions.IsAdminOrSelf: ['update', 'partial_update', 'destroy'],
+        IsAuthenticated: ['create'],
         AllowAny: [ 'retrieve', 'list']
     }
 
-    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
+    def get_object_owner(self, obj):
+        return obj.user
+
+    @action(detail=False, methods=['post'], permission_classes=[common_permissions.IsAdminOrSelf])
     def toggle(self, request, *args, **kwargs):
         
         try:
@@ -62,12 +68,12 @@ class LikeViewSet(viewsets.ModelViewSet):
 
         except ObjectDoesNotExist:
 
-            # * Else lets propagate to delete method
+            # * Else lets propagate to create method
 
             return self.create(request, args, kwargs)
 
 
-class RatingViewSet(viewsets.ModelViewSet):
+class RatingViewSet(viewsets.ModelViewSet, common_permissions.IsAdminOrObjectOwnerPermissionMixin):
 
     queryset = models.Rating.objects.all()
     serializer_class = serializers.RatingSerializer
@@ -80,10 +86,13 @@ class RatingViewSet(viewsets.ModelViewSet):
 
     action_permissions = {
         IsAdminUser: [],
-        common_permissions.IsAdminOrSelf: [],
-        IsAuthenticated: ['create', 'update', 'partial_update', 'destroy'],
+        common_permissions.IsAdminOrSelf: ['update', 'partial_update', 'destroy'],
+        IsAuthenticated: ['create'],
         AllowAny: [ 'retrieve', 'list']
     }
+
+    def get_object_owner(self, obj):
+        return obj.user
 
 
 class ShippingAddressViewSet(viewsets.ModelViewSet):
@@ -94,9 +103,9 @@ class ShippingAddressViewSet(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
 
     action_permissions = {
-        IsAdminUser: [],
+        IsAdminUser: ['update', 'partial_update', 'destroy'],
         common_permissions.IsAdminOrSelf: [],
-        IsAuthenticated: ['create', 'update', 'partial_update', 'retrieve', 'list', 'destroy'],
+        IsAuthenticated: ['create', 'retrieve', 'list'],
         AllowAny: []
     }
 
@@ -109,14 +118,14 @@ class BillingAddressViewSet(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
 
     action_permissions = {
-        IsAdminUser: [],
+        IsAdminUser: ['update', 'partial_update', 'destroy',],
         common_permissions.IsAdminOrSelf: [],
-        IsAuthenticated: ['create', 'update', 'partial_update', 'retrieve', 'list', 'destroy'],
+        IsAuthenticated: ['create', 'retrieve', 'list',],
         AllowAny: []
     }
 
 
-class AttachmentFileViewSet(viewsets.ModelViewSet):
+class AttachmentFileViewSet(viewsets.ModelViewSet, common_permissions.IsAdminOrObjectOwnerPermissionMixin):
 
     queryset = models.AttachmentFile.objects.all()
     serializer_class = serializers.AttachmentFileSerializer
@@ -132,8 +141,11 @@ class AttachmentFileViewSet(viewsets.ModelViewSet):
         AllowAny: ['create',]
     }
 
+    def get_object_owner(self, obj):
+        return obj.user
 
-class AttachmentImageViewSet(viewsets.ModelViewSet):
+
+class AttachmentImageViewSet(viewsets.ModelViewSet, common_permissions.IsAdminOrObjectOwnerPermissionMixin):
 
     queryset = models.AttachmentImage.objects.all()
     serializer_class = serializers.AttachmentImageSerializer
@@ -149,19 +161,14 @@ class AttachmentImageViewSet(viewsets.ModelViewSet):
         AllowAny: ['create',]
     }
 
+    def get_object_owner(self, obj):
+        return obj.user
+
 
 class ShippingMethodViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = models.ShippingMethod.objects.all()
     serializer_class = serializers.ShippingMethodSerializer
-    permission_classes = (common_views.ActionBasedPermission,)
     pagination_class = LimitOffsetPagination
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['available', ]
-
-    action_permissions = {
-        IsAdminUser: ['create', 'update', 'partial_update', 'destroy'],
-        common_permissions.IsAdminOrSelf: [],
-        IsAuthenticated: [],
-        AllowAny: [ 'retrieve', 'list' ]
-    }
