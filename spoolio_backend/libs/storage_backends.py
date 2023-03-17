@@ -7,9 +7,13 @@ from decouple import Config, RepositoryEnv
 from storages.backends.s3boto3 import S3Boto3Storage
 
 
-env_file = os.path.join(settings.BASE_DIR, '.env.development')
-env_config = Config(RepositoryEnv(env_file))
+if settings.DEBUG:
+    env_filename = '.env.development'
+else:
+    env_filename = '.env.production'
 
+env_file = os.path.join(settings.BASE_DIR, env_filename)
+env_config = Config(RepositoryEnv(env_file))
 
 if env_config('USE_SPACES', default=False, cast=bool):
     class StaticStorage(S3Boto3Storage):
