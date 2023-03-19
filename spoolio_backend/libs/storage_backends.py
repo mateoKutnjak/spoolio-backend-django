@@ -9,13 +9,14 @@ from storages.backends.s3boto3 import S3Boto3Storage
 
 if settings.DEBUG:
     env_filename = '.env.development'
+    env_file = os.path.join(settings.BASE_DIR, env_filename)
+    env_config = Config(RepositoryEnv(env_file))
+
+    use_spaces = env_config('USE_SPACES', default=False, cast=bool)
 else:
-    env_filename = '.env.production'
+    use_spaces = True
 
-env_file = os.path.join(settings.BASE_DIR, env_filename)
-env_config = Config(RepositoryEnv(env_file))
-
-if env_config('USE_SPACES', default=False, cast=bool):
+if use_spaces:
     class StaticStorage(S3Boto3Storage):
         location = 'static'
 
@@ -34,5 +35,5 @@ if env_config('USE_SPACES', default=False, cast=bool):
 else:
 
     StaticStorage = lambda: FileSystemStorage(location='static') 
-    PublicMediaStorage = lambda: FileSystemStorage(location='media-public') 
-    PrivateMediaStorage = lambda: FileSystemStorage(location='media-private')
+    PublicMediaStorage = lambda: FileSystemStorage(location='media') 
+    PrivateMediaStorage = lambda: FileSystemStorage(location='media')

@@ -60,11 +60,8 @@ else:
     STATIC_URL = 'static/'
     STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
-    MEDIA_URL = 'media-public/'
-    MEDIA_ROOT  = os.path.join(BASE_DIR, 'media-public/')
-
-    MEDIA_URL_1 = 'media-private/'
-    MEDIA_ROOT_1  = os.path.join(BASE_DIR, 'media-private/')
+    MEDIA_URL = 'media/'
+    MEDIA_ROOT  = os.path.join(BASE_DIR, 'media')
 
 # ****** Stripe ******* 
 STRIPE_API_KEY = env_config('STRIPE_SECRET_KEY_TEST')
