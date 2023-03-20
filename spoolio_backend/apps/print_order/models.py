@@ -14,13 +14,19 @@ class PrintOrder(libs_models.SoftDeleteModel):
 
     # ! IMPORTANT ! For every change in server side (django choices) adjust frontend enums (constants.vue)
 
+    STATUS_AWAITING_PAYMENT = 'awaiting_payment'
+    STATUS_REJECTED = 'rejected'
+    STATUS_IN_PROGRESS = 'in_progress'
+    STATUS_SHIPPED = 'shipped'
+    STATUS_DELIVERED = 'delivered'
+
     ORDER_STATUS_CHOICES = (
-        ('awaiting_payment', 'Awaiting Payment'),
-        ('rejected', 'Rejected'),
-        ('in_progress', 'In progress'),
-        ('shipped', 'Shipped'),
-        ('delivered', 'Delivered'),
-     )
+        (STATUS_AWAITING_PAYMENT, STATUS_AWAITING_PAYMENT.replace('_', ' ').capitalize()),
+        (STATUS_REJECTED, STATUS_REJECTED.replace('_', ' ').capitalize()),
+        (STATUS_IN_PROGRESS, STATUS_IN_PROGRESS.replace('_', ' ').capitalize()),
+        (STATUS_SHIPPED, STATUS_SHIPPED.replace('_', ' ').capitalize()),
+        (STATUS_DELIVERED, STATUS_DELIVERED.replace('_', ' ').capitalize()),
+    )
 
     user_profile = models.ForeignKey(user_profile_models.UserProfile, null=True, on_delete=models.SET_NULL)
 

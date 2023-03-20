@@ -62,7 +62,9 @@ class LikeViewSet(viewsets.ModelViewSet, common_permissions.IsAdminOrObjectOwner
             # * If object exists, lets delete it
             # * (We cannot propagate to destroy method because we lack pk)
 
-            instance = self.get_queryset().filter(user=self.request.user).get()
+            # * self.filter_queryset filters by content_type and object_id
+            # * so we add additional filtering by request.user
+            instance = self.filter_queryset(self.get_queryset()).filter(user=self.request.user).get()
             self.perform_destroy(instance)
             return Response(status=204)
 

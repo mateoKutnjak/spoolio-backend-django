@@ -3,8 +3,11 @@ from typing import Callable
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.mail import send_mail
 from django.db.models import F, Sum
 from django.http import JsonResponse
+
+import logging.config
 
 from rest_framework.decorators import api_view
 
@@ -14,6 +17,8 @@ from .. modeling_order import models as modeling_order_models
 from .. print_order import models as print_order_models
 from .. store_order import models as store_order_models
 
+
+logger = logging.getLogger(__name__)
 
 stripe.api_key = settings.STRIPE_API_KEY
 
@@ -87,6 +92,44 @@ def check_store_order_amount(store_order_id: int, amount: float):
         return False, None, 'Print order with this id does not exist'
 
 
+def update_order_status(order_id: int, order_type: str):
+
+    order_not_found = False
+
+    if order_type == 'printing':
+        try:
+            obj = print_order_models.PrintOrder.objects.get(pk=order_id)
+            obj.status = print_order_models.PrintOrder.STATUS_IN_PROGRESS
+            obj.save()
+        except ObjectDoesNotExist:
+            order_not_found = True
+    elif order_type == 'modeling':
+        try:
+            obj = modeling_order_models.ModelingOrder.objects.get(pk=order_id)
+            obj.status = modeling_order_models.ModelingOrder.STATUS_IN_PROGRESS
+            obj.save()
+        except ObjectDoesNotExist:
+            order_not_found = True
+    elif order_type == 'store':
+        try:
+            obj = store_order_models.StoreOrder.objects.get(pk=order_id)
+            obj.status = store_order_models.StoreOrder.STATUS_IN_PROGRESS
+            obj.save()
+        except ObjectDoesNotExist:
+            order_not_found = True
+    else:
+        raise Exception('Cannot update order [id={}] status. Order type {} not recognized.'.format(order_id, order_type))
+
+    if order_not_found:
+        send_mail(
+            'Manual intervention needed',
+            'Trying to update {} order no.{} status as payment has been just made, but this order has not been found in DB'.format(order_type, order_id),
+            'bot@spoolio.net',
+            ['spoolio.web@gmail.com'],
+            fail_silently=False,
+        )
+
+
 @api_view(['POST'])
 def create_payment(request):
 
@@ -113,6 +156,10 @@ def create_payment(request):
             automatic_payment_methods={
                 'enabled': False,
             },
+            metadata={
+                'order_id': int(request.data['id']),
+                'service': request.data['service'],
+            }
             # payment_method_types=['card'],
         )
 
@@ -122,4 +169,21 @@ def create_payment(request):
     except Exception as e:
         print(e)
         return JsonResponse(data={'error': str(e)}, status=403)
+
+
+@api_view(['POST'])
+def stripe_webhooks(request):
+
+    event = request.data
     
+    # ? See https://stripe.com/docs/webhooks/quickstart 
+    # ? if endpoint_secret is defined 
+
+    logger.info('Stripe webhook of type {} received'.format(event['type']))
+
+    # Handle the event
+    if event['type'] == 'charge.succeeded':
+        metadata = event['data']['object']['metadata']
+        update_order_status(metadata.get('order_id'), metadata.get('service'))
+
+    return JsonResponse({"success": True})
