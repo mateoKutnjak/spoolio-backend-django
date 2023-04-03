@@ -59,3 +59,8 @@ class PrintOrderUnitSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.OrderUnit
         fields = '__all__'
+
+
+class PrintOrderUnitSlicerEstimationSerializer(PrintOrderUnitSerializer):
+
+    order = serializers.PrimaryKeyRelatedField(queryset=models.PrintOrder.objects.all(), required=False)
