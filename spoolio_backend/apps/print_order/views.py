@@ -1,16 +1,12 @@
 from django.contrib.auth.models import AnonymousUser
 
 from rest_framework import filters, viewsets
-from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
-from rest_framework.response import Response
 
 from django_filters.rest_framework import DjangoFilterBackend
 
 from . import models, serializers
-
-from .. filament import models as filament_models
 
 from ...libs import views as common_views, permissions as common_permissions
 
@@ -69,16 +65,3 @@ class PrintOrderUnitViewSet(viewsets.ModelViewSet, common_permissions.IsAdminOrO
             return obj.user_profile.user or AnonymousUser
         return AnonymousUser
     
-    @action(detail=False, methods=['post'], permission_classes=[AllowAny], url_path='slicer-estimate', serializer_class=serializers.PrintOrderUnitSlicerEstimationSerializer)
-    def slicer_estimate(self, request, *args, **kwargs):
-
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        serializer_data_copy = serializer.data
-
-        # TODO perform slicer call to get time and price estimation
-        # TODO fill estimated_price and estimated_time like this:
-        # TODO -> serializer_data_copy['estimated_price'] = '9000'
-
-        return Response(data=serializer_data_copy, status=200)
