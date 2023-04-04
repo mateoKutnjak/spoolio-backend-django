@@ -77,8 +77,15 @@ class OrderUnit(libs_models.SoftDeleteModel):
     estimated_price = models.DecimalField(max_digits=12, decimal_places=2)
     estimated_time = models.PositiveIntegerField()
 
-    model_volume = models.FloatField()
-    model_dimensions = models.CharField(max_length=64)
+    model_volume = models.FloatField(help_text='Volume with length_unit unit. Format: "x,y,z"')
+    model_dimensions = models.CharField(max_length=128, help_text='Dimensions with length_unit unit.')
+
+    model_rotation = models.CharField(max_length=128, help_text='Rotation chosen by user on frontend. Format: "x,y,z"')
+    optimal_rotation = models.CharField(max_length=128, help_text='Rotation determined by Threejs on frontend to be optimal. Format: "x,y,z"')
+    use_optimal_rotation = models.BooleanField(help_text='If true then optimal_rotation should bu used, else use model_rotation')
+
+    length_unit = models.CharField(max_length=8, help_text='mms or inches')
+    rotation_unit = models.CharField(max_length=12, help_text="degrees or radians")
 
     def __str__(self):
         return "{}: [{}] {} ATTRIBUTES={},{}".format(self.pk, self.created_at, self.file, self.spool, self.length_unit)
