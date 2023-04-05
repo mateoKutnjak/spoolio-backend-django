@@ -93,7 +93,31 @@ def slicer_estimation(request):
         if flag_command[1]:
             base_command += " {} {}".format(flag_command[0], flag_command[1])
 
-    r = subprocess.check_output(base_command, shell=True)
+    try:
+        complete_process = subprocess.run(base_command, shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
+        
+        if complete_process.returncode == 1:
+        
+            error_message = 'Error occurred in subprocess command'
+
+            output_lines = str(complete_process.stdout).split('\\n')
+            for output_line in output_lines:
+                if output_line.startswith('error'):
+                    output_line_split = output_line.split(': ', 1)
+
+                    if len(output_line) > 1:
+                        error_message = output_line_split[1]
+            
+            if os.path.isfile(upload_path):
+                os.remove(upload_path)
+
+            return Response(data={'message': error_message}, status=400)
+        
+    except subprocess.CalledProcessError as e:
+        if os.path.isfile(upload_path):
+            os.remove(upload_path)
+
+        return Response(data={'message': e}, status=400)
     
     # ***************************************** #
     # *** .gcode file estimation extraction *** #
@@ -104,15 +128,11 @@ def slicer_estimation(request):
     if not gcode_paths:
         if os.path.isfile(upload_path):
             os.remove(upload_path)
-        if os.path.isfile(gcode_path):
-            os.remove(gcode_path)
 
         return Response(data={'message': '.gcode files not found in directory'}, status=400)
     if len(gcode_paths) > 1:
         if os.path.isfile(upload_path):
             os.remove(upload_path)
-        if os.path.isfile(gcode_path):
-            os.remove(gcode_path)
 
         return Response(data={'message': 'Duplicated .gcode files'}, status=400)
     
