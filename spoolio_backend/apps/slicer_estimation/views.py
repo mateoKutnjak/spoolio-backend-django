@@ -23,6 +23,10 @@ def slicer_estimation(request):
 
     serializer_data_copy = serializer.data
 
+    # ************************************ #
+    # *** STL and config.ini filepaths *** #
+    # ************************************ #
+
     config_dir = os.path.join(settings.BASE_DIR, 'data', 'prusa-slicer')
     config_path = os.path.join(config_dir, 'config.ini')
     upload_dir = os.path.join('/home/mateo/Downloads/') # ! Watch out for dir owner and permissions - not working for /tmp
@@ -33,13 +37,83 @@ def slicer_estimation(request):
     upload_filename_without_suffix = os.path.splitext(upload_filename)[0]
     upload_path = os.path.join(upload_dir, upload_filename)
 
-    r = subprocess.check_output('prusa-slicer --load {} --slice {}'.format(config_path, upload_path), shell=True)
+    # ********************************************** #
+    # *** print order item attributes extracting *** #
+    # ********************************************** #
+
+    filament_cost = ('--filament-cost', serializer_data_copy['spool']['material'].get('filament_cost'))
+    filament_density = ('--filament-density', serializer_data_copy['spool']['material'].get('filament_density'))
+    extrusion_multiplier = ('--extrusion-multiplier', serializer_data_copy['spool']['material'].get('extrusion_multiplier'))
+    filament_deretract_speed = ('--filament-deretract-speed', serializer_data_copy['spool']['material'].get('extrusion_multiplier'))
+    filament_max_volumetric_speed = ('--filament-max-volumetric-speed', serializer_data_copy['spool']['material'].get('extrusion_multiplier'))
+    filament_retract_length = ('--filament-retract-length', serializer_data_copy['spool']['material'].get('extrusion_multiplier'))
+    filament_retract_lift = ('--filament-retract-lift', serializer_data_copy['spool']['material'].get('extrusion_multiplier'))
+    fill_density = ('--fill-density', str(serializer_data_copy['infill']['percentage'] * 100) + '%')
+
+    model_rotation_raw = serializer_data_copy.get('model_rotation')
+    if model_rotation_raw is None:
+        if os.path.isfile(upload_path):
+            os.remove(upload_path)
+            
+        return Response(data={'message': 'Model rotation is not set'}, status=400)
     
+    model_rotation_split = model_rotation_raw.split(',')
+    if len(model_rotation_split) != 3:
+        if os.path.isfile(upload_path):
+            os.remove(upload_path)
+            
+        return Response(data={'message': 'Rotation string split does not have 3 values'}, status=400)
+    
+    try:
+        rotation_x = ('--rotate-x', float(model_rotation_split[0]))
+        rotation_y = ('--rotate-y', float(model_rotation_split[1]))
+        rotation_z = ('--rotate', float(model_rotation_split[2]))
+
+    except ValueError:
+
+        if os.path.isfile(upload_path):
+            os.remove(upload_path)
+
+        return Response(data={'message': 'Couldnt parse rotation values to floats. Raw value = {}'.format(model_rotation_raw)}, status=400)
+
+    flag_commands = [filament_cost, 
+             filament_density, 
+             extrusion_multiplier, 
+             filament_deretract_speed, 
+             filament_max_volumetric_speed,
+             filament_retract_length,
+             filament_retract_lift,
+             fill_density,
+             rotation_x, 
+             rotation_y, 
+             rotation_z]
+
+    base_command = 'prusa-slicer --load {} --slice {}'.format(config_path, upload_path)
+    for flag_command in flag_commands:
+        if flag_command[1]:
+            base_command += " {} {}".format(flag_command[0], flag_command[1])
+
+    r = subprocess.check_output(base_command, shell=True)
+    
+    # ***************************************** #
+    # *** .gcode file estimation extraction *** #
+    # ***************************************** #
+
     gcode_paths = glob.glob("{}/{}*gcode".format(os.path.join(upload_dir), upload_filename_without_suffix))
 
     if not gcode_paths:
+        if os.path.isfile(upload_path):
+            os.remove(upload_path)
+        if os.path.isfile(gcode_path):
+            os.remove(gcode_path)
+
         return Response(data={'message': '.gcode files not found in directory'}, status=400)
     if len(gcode_paths) > 1:
+        if os.path.isfile(upload_path):
+            os.remove(upload_path)
+        if os.path.isfile(gcode_path):
+            os.remove(gcode_path)
+
         return Response(data={'message': 'Duplicated .gcode files'}, status=400)
     
     gcode_path = gcode_paths[0]
@@ -80,6 +154,10 @@ def slicer_estimation(request):
         return Response(data={'message': 'Error while parsing duration DHM format: raw value = {}'.format(estimated_duration_raw)}, status=400)
     
     estimated_price = float(estimated_price_raw)
+
+    # ************************* #
+    # *** Creating response *** #
+    # ************************* #
 
     serializer_data_copy['estimated_price'] = estimated_price
     serializer_data_copy['estimated_time'] = estimated_duration
