@@ -7,9 +7,13 @@ import subprocess
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 
+from asgiref.sync import async_to_sync
+
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+
+from channels.layers import get_channel_layer
 
 from . import serializers
 
@@ -17,6 +21,11 @@ from . import serializers
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def slicer_estimation(request):
+
+    channel_group_name = request.GET.get('channel_group_name', None)
+
+    if channel_group_name is None:
+        return Response(data={'message': 'channel group name in query params not set'},status=400)
 
     serializer = serializers.PrintOrderUnitSlicerEstimationSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
@@ -88,13 +97,24 @@ def slicer_estimation(request):
              rotation_y, 
              rotation_z]
 
-    base_command = 'prusa-slicer --load {} --slice {}'.format(config_path, upload_path)
+    slicer_command = 'prusa-slicer --load {} --slice {}'.format(config_path, upload_path)
     for flag_command in flag_commands:
         if flag_command[1]:
-            base_command += " {} {}".format(flag_command[0], flag_command[1])
+            slicer_command += " {} {}".format(flag_command[0], flag_command[1])
+
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(channel_group_name, {
+        "type": "slicer.estimation",
+        "meta": {
+            "cmd": slicer_command
+        },
+    })
+
+    return Response(status=200)
+
 
     try:
-        complete_process = subprocess.run(base_command, shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
+        complete_process = subprocess.run(slicer_command, shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
         
         if complete_process.returncode == 1:
         

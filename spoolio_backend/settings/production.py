@@ -72,3 +72,13 @@ EMAIL_USE_TLS = True
 
 # ****** Stripe ******* 
 STRIPE_API_KEY = env_config('STRIPE_SECRET_KEY_LIVE')
+
+# ****** Django Channels ****** #
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}

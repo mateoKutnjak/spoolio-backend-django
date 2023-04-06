@@ -1,4 +1,5 @@
 boto3
+channels
 Django
 django-allauth
 django-colorfield
@@ -14,6 +15,7 @@ pillow
 psycopg2-binary
 python-decouple
 stripe
+uvicorn[standard]
 
 # ! google-api-python-client is used for FIX - remove when resolved (see https://gonzafirewall.medium.com/google-oauth2-and-django-rest-auth-92b0d8f70575)
 google-api-python-client

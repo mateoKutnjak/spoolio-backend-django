@@ -65,3 +65,10 @@ else:
 
 # ****** Stripe ******* 
 STRIPE_API_KEY = env_config('STRIPE_SECRET_KEY_TEST')
+
+# ****** Django Channels ****** #
+CHANNEL_LAYERS = {
+    "default": {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
