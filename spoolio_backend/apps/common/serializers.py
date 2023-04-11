@@ -6,8 +6,6 @@ from rest_framework import serializers
 
 from . import models
 
-from .. authentication import serializers as auth_serializers
-
 
 class UserFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
     def __init__(self, **kwargs):
@@ -53,6 +51,8 @@ class CommentSerializer(serializers.ModelSerializer):
             return False
 
     def to_representation(self, instance):
+        from .. authentication import serializers as auth_serializers
+
         self.fields['user'] = auth_serializers.UserDetailsSerializer(read_only=True)
         return super(CommentSerializer, self).to_representation(instance)
 
@@ -85,6 +85,8 @@ class RatingSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def to_representation(self, instance):
+        from .. authentication import serializers as auth_serializers
+        
         self.fields['user'] = auth_serializers.UserDetailsSerializer(read_only=True)
         return super(RatingSerializer, self).to_representation(instance)
 
