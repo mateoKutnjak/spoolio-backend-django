@@ -97,7 +97,7 @@ def slicer_estimation(request):
              rotation_y, 
              rotation_z]
 
-    slicer_command = 'prusa-slicer --load {} --slice {}'.format(config_path, upload_path)
+    slicer_command = 'prusa-slicer --load {} --slice "{}"'.format(config_path, upload_path)
     for flag_command in flag_commands:
         if flag_command[1]:
             slicer_command += " {} {}".format(flag_command[0], flag_command[1])
@@ -105,9 +105,8 @@ def slicer_estimation(request):
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(channel_group_name, {
         "type": "slicer.estimation",
-        "meta": {
-            "cmd": slicer_command
-        },
+        "prusa_slicer_bash_command": slicer_command,
+        "3d_model_filepath": upload_path
     })
 
     return Response(status=200)
