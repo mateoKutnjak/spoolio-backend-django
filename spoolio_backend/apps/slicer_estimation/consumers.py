@@ -143,7 +143,7 @@ class SlicerEstimationConsumer(AsyncWebsocketConsumer):
         estimated_price = float(estimated_price_raw)
 
         await self.sendDataMessage(estimated_duration, estimated_price)
-        await self.disconnect()
+        await self.disconnect(close_code=1000)
 
     async def sendInitMessage(self, channel_group_name: str):
         await self.send(text_data=json.dumps({
