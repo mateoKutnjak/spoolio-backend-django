@@ -38,7 +38,7 @@ def slicer_estimation(request):
 
     config_dir = os.path.join(settings.BASE_DIR, 'data', 'prusa-slicer')
     config_path = os.path.join(config_dir, 'config.ini')
-    upload_dir = os.path.join('/home/mateo/Downloads/') # ! Watch out for dir owner and permissions - not working for /tmp
+    upload_dir = os.path.join('./tmp') # ! Watch out for dir owner and permissions - not working for /tmp
 
     in_memory_file_obj = request.FILES["file"]
 
