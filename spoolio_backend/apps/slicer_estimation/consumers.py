@@ -38,7 +38,7 @@ class SlicerEstimationConsumer(AsyncWebsocketConsumer):
         await self.sendInitMessage(self.channel_group_name)
 
     async def disconnect(self, close_code):
-        # await self.sendCloseMessage("Close code = {}".format(close_code))
+        self.cleanFiles()
         await self.channel_layer.group_discard(self.channel_group_name, self.channel_name)
 
     async def slicer_estimation(self, event):
