@@ -35,6 +35,7 @@ Running production has to be done on hosting service instance (for example Digit
     - `git clone` again
 - dont forget to `git checkout <branch_name>`
 - copy environment files with command `scp .env.development .env.production .env.production.db root@<DROPLET_IP>:<PATH_TO_PROJECT_ROOT>`
+- change ownership of direcories that docker uses through volume: `chown 1000:1000 tmp/ logs/ backups/`
 - build docker images using `docker-compose build`
 
 #### Start docker-compose services

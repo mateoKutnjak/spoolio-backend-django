@@ -78,7 +78,44 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [("redis", 6379)],
         },
     },
 }
+
+from datetime import datetime
+now = datetime.now()
+
+import logging.config
+logging.config.dictConfig({
+   'version': 1,
+   'disable_existing_loggers': False,
+   'formatters': {
+       'console': {
+           'format': '%(asctime)s %(levelname)s %(message)s'
+       },
+       'file': {
+           'format': '%(asctime)s %(levelname)s %(pathname)s (line %(lineno)d) %(message)s'
+       }
+   },
+   'handlers': {
+       'console': {
+           'level': 'DEBUG',
+           'class': 'logging.StreamHandler',
+           'formatter': 'console',
+       },
+       'file': {
+           'level': 'DEBUG',
+           'class': 'logging.FileHandler',
+           # TODO read user name from env file
+           'formatter': 'file',
+           'filename': str(BASE_DIR) + '/logs/' + ('DEV' if DEBUG else 'PROD') + now.strftime("-%Y-%m-%d") + '.log',
+       }
+   },
+   'loggers': {
+       '': {
+           'level': 'DEBUG',
+           'handlers': ['console', 'file']
+       }
+   }
+})
