@@ -47,6 +47,8 @@ INSTALLED_APPS = [
 
     'dbbackup',
 
+    'request',
+
     'django_filters',
 
     'corsheaders',
@@ -79,6 +81,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     'corsheaders.middleware.CorsMiddleware',
+
+    'request.middleware.RequestMiddleware',
 ]
 
 ROOT_URLCONF = 'spoolio_backend.urls'
@@ -185,4 +189,9 @@ AUTHENTICATION_BACKENDS = (
 
  # `allauth` specific authentication methods, such as login by e-mail
  "allauth.account.auth_backends.AuthenticationBackend",
+)
+
+# ****** Django-request ****** #
+REQUEST_IGNORE_PATHS = (
+    r'^admin/',
 )

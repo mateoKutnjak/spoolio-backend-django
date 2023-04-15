@@ -72,3 +72,6 @@ CHANNEL_LAYERS = {
         'BACKEND': 'channels.layers.InMemoryChannelLayer',
     },
 }
+
+# ****** Django-request ****** #
+REQUEST_BASE_URL = 'http://localhost:8000'

@@ -122,3 +122,6 @@ logging.config.dictConfig({
        'django.server': DEFAULT_LOGGING['loggers']['django.server'],
    }
 })
+
+# ****** Django-request ****** #
+REQUEST_BASE_URL = 'https://spoolio.net'
