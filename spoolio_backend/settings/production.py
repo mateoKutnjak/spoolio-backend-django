@@ -1,4 +1,7 @@
+from django.utils.log import DEFAULT_LOGGING
+
 from decouple import Config, RepositoryEnv
+import logging.config
 
 from .base import *
 
@@ -85,37 +88,37 @@ CHANNEL_LAYERS = {
 
 from datetime import datetime
 now = datetime.now()
-
-import logging.config
 logging.config.dictConfig({
    'version': 1,
    'disable_existing_loggers': False,
    'formatters': {
        'console': {
-           'format': '%(asctime)s %(levelname)s %(message)s'
+           'format': '%(levelname)s %(asctime)s %(message)s'
        },
        'file': {
-           'format': '%(asctime)s %(levelname)s %(pathname)s (line %(lineno)d) %(message)s'
-       }
+           'format': '%(levelname)s %(asctime)s %(pathname)s (line %(lineno)d) %(message)s'
+       },
+       'django.server': DEFAULT_LOGGING['formatters']['django.server'],
    },
    'handlers': {
        'console': {
-           'level': 'DEBUG',
+           'level': 'INFO',
            'class': 'logging.StreamHandler',
            'formatter': 'console',
        },
        'file': {
-           'level': 'DEBUG',
+           'level': 'INFO',
            'class': 'logging.FileHandler',
-           # TODO read user name from env file
            'formatter': 'file',
            'filename': str(BASE_DIR) + '/logs/' + ('DEV' if DEBUG else 'PROD') + now.strftime("-%Y-%m-%d") + '.log',
-       }
+       },
+       'django.server': DEFAULT_LOGGING['handlers']['django.server'],
    },
    'loggers': {
        '': {
-           'level': 'DEBUG',
+           'level': 'INFO',
            'handlers': ['console', 'file']
-       }
+       },
+       'django.server': DEFAULT_LOGGING['loggers']['django.server'],
    }
 })

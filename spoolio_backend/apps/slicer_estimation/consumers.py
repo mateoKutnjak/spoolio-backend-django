@@ -35,7 +35,7 @@ class SlicerEstimationConsumer(AsyncWebsocketConsumer):
         )
 
         await self.accept()
-        await self.sendInitMessage(self.channel_group_name)
+        await self.sendInitMessage()
 
     async def disconnect(self, close_code):
         self.cleanFiles()
@@ -145,41 +145,52 @@ class SlicerEstimationConsumer(AsyncWebsocketConsumer):
         await self.sendDataMessage(estimated_duration, estimated_price)
         await self.disconnect(close_code=1000)
 
-    async def sendInitMessage(self, channel_group_name: str):
-        await self.send(text_data=json.dumps({
+    async def sendInitMessage(self):
+        message = {
             "type": WebsocketMessageType.INIT.value,
             "data": {
-                "channel_group_name": channel_group_name, 
+                "channel_group_name": self.channel_group_name, 
             }
-        }))
+        }
+
+        logger.info('Websockets group {}'.format(self.channel_group_name))
+        if hasattr(self, 'model_filepath'): 
+            logger.info('   model file: {}'.format(self.model_filepath))
+        logger.info('   message: {}'.format(message))
+
+        await self.send(text_data=json.dumps(message))
 
     async def sendDataMessage(self, estimated_time: int, estimated_price: float):
-        await self.send(text_data=json.dumps({
+        message = {
             "type": WebsocketMessageType.DATA.value,
             "data": {
                 "estimated_time": estimated_time, 
                 "estimated_price": estimated_price,
             }
-        }))
+        }
+
+        logger.info('Websockets group {}'.format(self.channel_group_name))
+        if hasattr(self, 'model_filepath'): 
+            logger.info('   model file: {}'.format(self.model_filepath))
+        logger.info('   message: {}'.format(message))
+
+        await self.send(text_data=json.dumps(message))
 
     async def sendErrorMessage(self, error_message: str, close=False):
-        logger.error(error_message)
-
-        await self.send(text_data=json.dumps({
+        message = {
             "type": WebsocketMessageType.ERROR.value,
             "error": error_message
-        }))
+        }
+
+        logger.info('Websockets group {}'.format(self.channel_group_name))
+        if hasattr(self, 'model_filepath'): 
+            logger.info('   model file: {}'.format(self.model_filepath))
+        logger.info('   message: {}'.format(message))
+
+        await self.send(text_data=json.dumps(message))
 
         if close:
             await self.close()
-
-    async def sendCloseMessage(self, reason):
-        await self.send(text_data=json.dumps({
-            "type": WebsocketMessageType.CLOSE.value,
-            "data": {
-                "reason": reason
-            }
-        }))
 
     def cleanFiles(self):
         if hasattr(self, 'model_filepath') and  os.path.isfile(self.model_filepath):
