@@ -67,11 +67,25 @@ else:
 STRIPE_API_KEY = env_config('STRIPE_SECRET_KEY_TEST')
 
 # ****** Django Channels ****** #
-CHANNEL_LAYERS = {
-    "default": {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
-    },
-}
+# ! If USE_REDIS is enabled, run redis in docker container with command
+# ! docker run -ti -p 6379:6379 redis
+# ! and then start Django server
+
+if env_config('USE_REDIS', default=True, cast=bool):
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [("localhost", 6379)],
+            },
+        },
+    }
+else:
+    CHANNEL_LAYERS = {
+        "default": {
+            'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        },
+    }
 
 # ****** Django-request ****** #
 REQUEST_BASE_URL = 'http://localhost:8000'

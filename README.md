@@ -12,8 +12,10 @@
 `source venv/bin/activate`
 - Install dependencies
 `pip3 install -r requirements.txt`
+- If USE_REDIS is enabled in `.env.development`, start redis container in another terminal before starting Django server
+`docker run -ti -p 6379:6379 redis`
 - Run Django server
-`python3 manage.py runserver`
+`uvicorn spoolio_backend.asgi:application --reload`
 
 ### Production
 
