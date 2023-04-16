@@ -67,25 +67,31 @@ else:
 STRIPE_API_KEY = env_config('STRIPE_SECRET_KEY_TEST')
 
 # ****** Django Channels ****** #
-# ! If USE_REDIS is enabled, run redis in docker container with command
+# ! DEVELOPMENT MODE:
+# !
+# ! Don't forget to run REDIS before starting Django 
+# ! server (in separate terminal) with command
+# !
 # ! docker run -ti -p 6379:6379 redis
-# ! and then start Django server
 
-if env_config('USE_REDIS', default=True, cast=bool):
-    CHANNEL_LAYERS = {
-        "default": {
-            "BACKEND": "channels_redis.core.RedisChannelLayer",
-            "CONFIG": {
-                "hosts": [("localhost", 6379)],
-            },
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
         },
-    }
-else:
-    CHANNEL_LAYERS = {
-        "default": {
-            'BACKEND': 'channels.layers.InMemoryChannelLayer',
-        },
-    }
+    },
+}
+
+# ****** Celery[redis] ****** #
+# ! DEVELOPMENT MODE:
+# !
+# ! Don't forget to run CELERY before starting Django 
+# ! server (in separate terminal) with command
+# !
+# ! celery -A spoolio_backend worker --loglevel=info --concurrency 1 -E
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
 
 # ****** Django-request ****** #
 REQUEST_BASE_URL = 'http://localhost:8000'

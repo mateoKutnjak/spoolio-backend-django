@@ -12,8 +12,10 @@
 `source venv/bin/activate`
 - Install dependencies
 `pip3 install -r requirements.txt`
-- If USE_REDIS is enabled in `.env.development`, start redis container in another terminal before starting Django server
+- Start redis container in another terminal before starting Django server
 `docker run -ti -p 6379:6379 redis`
+- Start Django Celery in another terminal before starting Django server
+`celery -A spoolio_backend worker --loglevel=info --concurrency 1 -E`
 - Run Django server
 `uvicorn spoolio_backend.asgi:application --reload`
 
@@ -51,6 +53,10 @@ Using this [guide](https://mindsers.blog/post/https-using-nginx-certbot-docker/)
 #### Stripe
 
 Django backend uses `secret` API key from Stripe developer webpage to create payment intents.
+
+#### Prusa slicer price/duration estimation
+
+See this [flowchart](https://ibb.co/KNPJTch)
 
 ## TODOs
 
