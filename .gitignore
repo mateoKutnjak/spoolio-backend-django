@@ -119,4 +119,5 @@ ai/weights/*
 # Added by Mateo
 static/
 .env.production
+.env.production.celery
 .env.production.db
