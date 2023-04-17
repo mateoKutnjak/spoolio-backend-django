@@ -1,5 +1,5 @@
 boto3
-celery[redis]
+celery[redis]>=5.0.0,<6.0.0
 channels
 channels-redis
 Django
