@@ -61,6 +61,3 @@ RUN pip3 install --user --no-cache ${HOME_DIR}/wheels/*
 RUN chown -R ${USER_NAME}:${USER_NAME} ${HOME_DIR}
 
 WORKDIR ${HOME_DIR}/app
-
-COPY ./entrypoint.sh /
-ENTRYPOINT ["/entrypoint.sh"]

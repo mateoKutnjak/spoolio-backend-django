@@ -123,5 +123,9 @@ logging.config.dictConfig({
    }
 })
 
+# ****** Celery[redis] ****** #
+CELERY_BROKER_URL = env_config('CELERY_BROKER_URL')
+CELERY_RESULT_BACKEND = env_config('CELERY_RESULT_BACKEND')
+
 # ****** Django-request ****** #
 REQUEST_BASE_URL = 'https://spoolio.net'

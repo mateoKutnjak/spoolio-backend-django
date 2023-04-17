@@ -35,6 +35,7 @@ services:
       ofelia.job-exec.datecron.user: 'spoolio_web_user' # without it there is not access to installed user packages (Django eg)
     links:
      - redis
+    entrypoint: [ "/home/spoolio_web_user/app/entrypoint.sh" ]
 
   ofelia:
     image: mcuadros/ofelia:latest
@@ -73,6 +74,23 @@ services:
     ports:
       - 6379:6379
     restart: on-failure
+
+  celery:
+    restart: always
+    build:
+      context: .
+    command: celery -A spoolio_backend worker -l INFO
+    volumes:
+      - .:/home/spoolio_web_user/app
+    env_file:
+      - .env.production.celery
+      - .env.production
+      - .env.production.db
+    working_dir: /home/spoolio_web_user/app
+    links:
+      - db
+      - redis
+      - web
 
 volumes:
   postgres_data:
