@@ -10,98 +10,50 @@ from ...libs import views as common_views, permissions as common_permissions
 
 
 
-class ProductCategoryViewSet(viewsets.ModelViewSet):
+class ProductCategoryViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = models.ProductCategory.objects.all()
     serializer_class = serializers.ProductCategorySerializer
-    permission_classes = (common_views.ActionBasedPermission,)
     pagination_class = LimitOffsetPagination
     filter_backends = [drf_filters.SearchFilter]
     search_fields = ['name', ]
 
-    action_permissions = {
-        IsAdminUser: ['create', 'update', 'partial_update', 'destroy'],
-        common_permissions.IsAdminOrSelf: [],
-        IsAuthenticated: [],
-        AllowAny: [ 'retrieve', 'list']
-    }
 
-
-class ProductSubcategoryViewSet(viewsets.ModelViewSet):
+class ProductSubcategoryViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = models.ProductSubcategory.objects.all()
     serializer_class = serializers.ProductSubcategorySerializer
-    permission_classes = (common_views.ActionBasedPermission,)
     pagination_class = LimitOffsetPagination
     filter_backends = [drf_filters.SearchFilter]
     search_fields = ['name', ]
 
-    action_permissions = {
-        IsAdminUser: ['create', 'update', 'partial_update', 'destroy'],
-        common_permissions.IsAdminOrSelf: [],
-        IsAuthenticated: [],
-        AllowAny: [ 'retrieve', 'list']
-    }
 
-
-class ProductViewSet(viewsets.ModelViewSet):
+class ProductViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = models.Product.objects.all()
     serializer_class = serializers.ProductSerializer
-    permission_classes = (common_views.ActionBasedPermission,)
     pagination_class = LimitOffsetPagination
     filter_backends = [drf_filters.SearchFilter]
     search_fields = ['title', ]
 
-    action_permissions = {
-        IsAdminUser: ['create', 'update', 'partial_update', 'destroy'],
-        common_permissions.IsAdminOrSelf: [],
-        IsAuthenticated: [],
-        AllowAny: [ 'retrieve', 'list']
-    }
 
-
-class ProductVariationViewSet(viewsets.ModelViewSet):
+class ProductVariationViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = models.ProductVariation.objects.all()
     serializer_class = serializers.ProductVariationSerializer
-    permission_classes = (common_views.ActionBasedPermission,)
-
-    action_permissions = {
-        IsAdminUser: ['create', 'update', 'partial_update', 'destroy'],
-        common_permissions.IsAdminOrSelf: [],
-        IsAuthenticated: [],
-        AllowAny: [ 'retrieve', 'list']
-    }
 
 
-class ProductVariationOptionViewSet(viewsets.ModelViewSet):
+class ProductVariationOptionViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = models.ProductVariationOption.objects.all()
     serializer_class = serializers.ProductVariationOptionSerializer
-    permission_classes = (common_views.ActionBasedPermission,)
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['product', ]
-    
-    action_permissions = {
-        IsAdminUser: ['create', 'update', 'partial_update', 'destroy'],
-        common_permissions.IsAdminOrSelf: [],
-        IsAuthenticated: [],
-        AllowAny: [ 'retrieve', 'list']
-    }
 
 
-class ProductVariationOptionCombinationViewSet(viewsets.ModelViewSet):
+class ProductVariationOptionCombinationViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = models.ProductVariationOptionCombination.objects.all()
     serializer_class = serializers.ProductVariationOptionCombinationSerializer
-    permission_classes = (common_views.ActionBasedPermission,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = filters.ProductVariationOptionCombinationFilter
-
-    action_permissions = {
-        IsAdminUser: ['create', 'update', 'partial_update', 'destroy'],
-        common_permissions.IsAdminOrSelf: [],
-        IsAuthenticated: [],
-        AllowAny: [ 'retrieve', 'list']
-    }

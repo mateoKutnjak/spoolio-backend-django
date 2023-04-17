@@ -18,13 +18,20 @@ class Color(libs_models.SoftDeleteModel):
 class Material(libs_models.SoftDeleteModel):
     name = models.CharField(max_length=16)
     description = models.CharField(max_length=256)
-    density = models.FloatField(validators=[MinValueValidator(0.0)])
-    price = models.DecimalField(max_digits=12, decimal_places=2)
-    printing_speed = models.FloatField();
+    
+    filament_density = models.FloatField(validators=[MinValueValidator(0.0)])
+    filament_cost = models.DecimalField(max_digits=12, decimal_places=2)
+    extrusion_multiplier = models.FloatField()
+    filament_deretract_speed = models.FloatField()
+    filament_max_volumetric_speed = models.FloatField()
+    retract_length = models.FloatField()
+    retract_lift = models.FloatField()
+
+    
     available = models.BooleanField()
 
     def __str__(self) -> str:
-        return "{} [{} g/cm3] price=${} per gram, v={} mm/s".format(self.name, self.density, self.price, self.printing_speed)
+        return "{} [{} g/cm3] price=${} per gram".format(self.name, self.filament_density, self.filament_cost)
 
 
 class Infill(libs_models.SoftDeleteModel):

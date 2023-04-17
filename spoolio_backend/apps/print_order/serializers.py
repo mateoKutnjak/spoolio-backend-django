@@ -1,5 +1,3 @@
-from django.contrib.contenttypes.models import ContentType
-
 from rest_framework import serializers
 
 from . import models
@@ -59,3 +57,8 @@ class PrintOrderUnitSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.OrderUnit
         fields = '__all__'
+
+
+class PrintOrderUnitSlicerEstimationSerializer(PrintOrderUnitSerializer):
+
+    order = serializers.PrimaryKeyRelatedField(queryset=models.PrintOrder.objects.all(), required=False)

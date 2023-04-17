@@ -60,11 +60,38 @@ else:
     STATIC_URL = 'static/'
     STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
-    MEDIA_URL = 'media-public/'
-    MEDIA_ROOT  = os.path.join(BASE_DIR, 'media-public/')
-
-    MEDIA_URL_1 = 'media-private/'
-    MEDIA_ROOT_1  = os.path.join(BASE_DIR, 'media-private/')
+    MEDIA_URL = 'media/'
+    MEDIA_ROOT  = os.path.join(BASE_DIR, 'media')
 
 # ****** Stripe ******* 
 STRIPE_API_KEY = env_config('STRIPE_SECRET_KEY_TEST')
+
+# ****** Django Channels ****** #
+# ! DEVELOPMENT MODE:
+# !
+# ! Don't forget to run REDIS before starting Django 
+# ! server (in separate terminal) with command
+# !
+# ! docker run -ti -p 6379:6379 redis
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+        },
+    },
+}
+
+# ****** Celery[redis] ****** #
+# ! DEVELOPMENT MODE:
+# !
+# ! Don't forget to run CELERY before starting Django 
+# ! server (in separate terminal) with command
+# !
+# ! celery -A spoolio_backend worker --loglevel=info --concurrency 1 -E
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+
+# ****** Django-request ****** #
+REQUEST_BASE_URL = 'http://localhost:8000'

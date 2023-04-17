@@ -1,22 +1,25 @@
+from django.contrib.auth.models import AnonymousUser
+
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
-from rest_framework.response import Response
 
 from . import models, serializers
 
 from ...libs import views as common_views, permissions as common_permissions
 
 
-class UserProfileViewSet(viewsets.ModelViewSet):
+class UserProfileViewSet(viewsets.ModelViewSet, common_permissions.IsAdminOrObjectOwnerPermissionMixin):
 
     queryset = models.UserProfile.objects.all()
     serializer_class = serializers.UserProfileSerializer
-
     permission_classes = (common_views.ActionBasedPermission,)
 
     action_permissions = {
-        IsAdminUser: ['destroy'],
-        common_permissions.IsAdminOrSelf: [],
-        IsAuthenticated: ['create', 'update', 'partial_update', 'retrieve', 'list'],
+        IsAdminUser: ['retrieve', 'list', 'destroy'],
+        common_permissions.IsAdminOrSelf: ['update', 'partial_update'],
+        IsAuthenticated: ['create',],
         AllowAny: []
     }
+
+    def get_object_owner(self, obj):
+        return obj.user or AnonymousUser

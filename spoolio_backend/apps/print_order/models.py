@@ -14,13 +14,19 @@ class PrintOrder(libs_models.SoftDeleteModel):
 
     # ! IMPORTANT ! For every change in server side (django choices) adjust frontend enums (constants.vue)
 
+    STATUS_AWAITING_PAYMENT = 'awaiting_payment'
+    STATUS_REJECTED = 'rejected'
+    STATUS_IN_PROGRESS = 'in_progress'
+    STATUS_SHIPPED = 'shipped'
+    STATUS_DELIVERED = 'delivered'
+
     ORDER_STATUS_CHOICES = (
-        ('awaiting_payment', 'Awaiting Payment'),
-        ('rejected', 'Rejected'),
-        ('in_progress', 'In progress'),
-        ('shipped', 'Shipped'),
-        ('delivered', 'Delivered'),
-     )
+        (STATUS_AWAITING_PAYMENT, STATUS_AWAITING_PAYMENT.replace('_', ' ').capitalize()),
+        (STATUS_REJECTED, STATUS_REJECTED.replace('_', ' ').capitalize()),
+        (STATUS_IN_PROGRESS, STATUS_IN_PROGRESS.replace('_', ' ').capitalize()),
+        (STATUS_SHIPPED, STATUS_SHIPPED.replace('_', ' ').capitalize()),
+        (STATUS_DELIVERED, STATUS_DELIVERED.replace('_', ' ').capitalize()),
+    )
 
     user_profile = models.ForeignKey(user_profile_models.UserProfile, null=True, on_delete=models.SET_NULL)
 
@@ -71,8 +77,15 @@ class OrderUnit(libs_models.SoftDeleteModel):
     estimated_price = models.DecimalField(max_digits=12, decimal_places=2)
     estimated_time = models.PositiveIntegerField()
 
-    model_volume = models.FloatField()
-    model_dimensions = models.CharField(max_length=64)
+    model_volume = models.FloatField(help_text='Volume with length_unit unit. Format: "x,y,z"')
+    model_dimensions = models.CharField(max_length=128, help_text='Dimensions with length_unit unit.')
+
+    model_rotation = models.CharField(max_length=128, help_text='Rotation chosen by user on frontend. Format: "x,y,z"')
+    optimal_rotation = models.CharField(max_length=128, help_text='Rotation determined by Threejs on frontend to be optimal. Format: "x,y,z"')
+    use_optimal_rotation = models.BooleanField(help_text='If true then optimal_rotation should bu used, else use model_rotation')
+
+    length_unit = models.CharField(max_length=8, help_text='mms or inches')
+    rotation_unit = models.CharField(max_length=12, help_text="degrees or radians")
 
     def __str__(self):
         return "{}: [{}] {} ATTRIBUTES={},{}".format(self.pk, self.created_at, self.file, self.spool, self.length_unit)

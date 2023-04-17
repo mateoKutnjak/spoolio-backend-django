@@ -22,12 +22,18 @@ RUN pip3 wheel --no-cache-dir --no-deps --wheel-dir /wheels -r requirements.txt
 
 FROM python:3
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && \
+    apt-get install -y \
     binutils \
+    bzip2 \
+    libgl1 \
+    libgtk-3-0 \
+    libglu1 \
     libproj-dev \
     gdal-bin \
     ncat \
-    postgresql-client
+    postgresql-client \
+    wget
 
 ENV USER_NAME "spoolio_web_user"
 ENV HOME_DIR "/home/${USER_NAME}"
@@ -39,7 +45,15 @@ RUN mkdir -p ${HOME_DIR}/app
 
 RUN pip3 install --upgrade pip
 
-ENV PATH="${HOME_DIR}/.local/bin:${PATH}"
+# prusa-slicer
+#  - download, extract, rename extracted dir and remove .tar
+RUN cd ${HOME_DIR} && \
+    wget -O PrusaSlicer.tar https://github.com/prusa3d/PrusaSlicer/releases/download/version_2.5.2/PrusaSlicer-2.5.2+linux-x64-GTK3-202303231201.tar.bz2 && \
+    tar xvjf PrusaSlicer.tar && \
+    mv PrusaSlicer-2.5.2+linux-x64-GTK3-202303231201 PrusaSlicer && \
+    rm -r PrusaSlicer.tar
+
+ENV PATH="${HOME_DIR}/.local/bin:${HOME_DIR}/PrusaSlicer:${PATH}"
 
 COPY --from=builder --chown=${USER_NAME}:${USER_NAME} /wheels ${HOME_DIR}/wheels
 RUN pip3 install --user --no-cache ${HOME_DIR}/wheels/*

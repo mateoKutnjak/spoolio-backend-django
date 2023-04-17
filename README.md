@@ -12,8 +12,12 @@
 `source venv/bin/activate`
 - Install dependencies
 `pip3 install -r requirements.txt`
+- Start redis container in another terminal before starting Django server
+`docker run -ti -p 6379:6379 redis`
+- Start Django Celery in another terminal before starting Django server
+`celery -A spoolio_backend worker --loglevel=info --concurrency 1 -E`
 - Run Django server
-`python3 manage.py runserver`
+`uvicorn spoolio_backend.asgi:application --reload`
 
 ### Production
 
@@ -35,6 +39,7 @@ Running production has to be done on hosting service instance (for example Digit
     - `git clone` again
 - dont forget to `git checkout <branch_name>`
 - copy environment files with command `scp .env.development .env.production .env.production.db root@<DROPLET_IP>:<PATH_TO_PROJECT_ROOT>`
+- change ownership of direcories that docker uses through volume: `chown 1000:1000 tmp/ logs/ backups/`
 - build docker images using `docker-compose build`
 
 #### Start docker-compose services
@@ -48,6 +53,10 @@ Using this [guide](https://mindsers.blog/post/https-using-nginx-certbot-docker/)
 #### Stripe
 
 Django backend uses `secret` API key from Stripe developer webpage to create payment intents.
+
+#### Prusa slicer price/duration estimation
+
+See this [flowchart](https://ibb.co/KNPJTch)
 
 ## TODOs
 

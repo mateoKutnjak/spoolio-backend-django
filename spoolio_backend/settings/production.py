@@ -1,4 +1,7 @@
+from django.utils.log import DEFAULT_LOGGING
+
 from decouple import Config, RepositoryEnv
+import logging.config
 
 from .base import *
 
@@ -72,3 +75,53 @@ EMAIL_USE_TLS = True
 
 # ****** Stripe ******* 
 STRIPE_API_KEY = env_config('STRIPE_SECRET_KEY_LIVE')
+
+# ****** Django Channels ****** #
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("redis", 6379)],
+        },
+    },
+}
+
+from datetime import datetime
+now = datetime.now()
+logging.config.dictConfig({
+   'version': 1,
+   'disable_existing_loggers': False,
+   'formatters': {
+       'console': {
+           'format': '%(levelname)s %(asctime)s %(message)s'
+       },
+       'file': {
+           'format': '%(levelname)s %(asctime)s %(pathname)s (line %(lineno)d) %(message)s'
+       },
+       'django.server': DEFAULT_LOGGING['formatters']['django.server'],
+   },
+   'handlers': {
+       'console': {
+           'level': 'INFO',
+           'class': 'logging.StreamHandler',
+           'formatter': 'console',
+       },
+       'file': {
+           'level': 'INFO',
+           'class': 'logging.FileHandler',
+           'formatter': 'file',
+           'filename': str(BASE_DIR) + '/logs/' + ('DEV' if DEBUG else 'PROD') + now.strftime("-%Y-%m-%d") + '.log',
+       },
+       'django.server': DEFAULT_LOGGING['handlers']['django.server'],
+   },
+   'loggers': {
+       '': {
+           'level': 'INFO',
+           'handlers': ['console', 'file']
+       },
+       'django.server': DEFAULT_LOGGING['loggers']['django.server'],
+   }
+})
+
+# ****** Django-request ****** #
+REQUEST_BASE_URL = 'https://spoolio.net'

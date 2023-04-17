@@ -27,10 +27,12 @@ urlpatterns = [
     path('api/', include('spoolio_backend.apps.modeling_order.urls')),
     path('api/', include('spoolio_backend.apps.payments.urls')),
     path('api/', include('spoolio_backend.apps.print_order.urls')),
+    path('api/', include('spoolio_backend.apps.slicer_estimation.urls')),
     path('api/', include('spoolio_backend.apps.store.urls')),
     path('api/', include('spoolio_backend.apps.store_order.urls')),
     path('api/', include('spoolio_backend.apps.user_profile.urls')),
 ]
 
 if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
