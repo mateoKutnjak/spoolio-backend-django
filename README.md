@@ -50,6 +50,10 @@ Running production has to be done on hosting service instance (for example Digit
 
 Using this [guide](https://mindsers.blog/post/https-using-nginx-certbot-docker/) certbot was set up. It also has part for renewing through `docker-compose` service. It needs to be renewed every 90 days.
 
+#### Redis
+
+To protect remote access to redis instance through add firewall to Digital Ocean droplet. See this [screenshot](https://www.dropbox.com/s/v3qbmwkqb0ztchn/Screenshot%20from%202023-04-18%2012-48-01.png?dl=0)
+
 #### Stripe
 
 Django backend uses `secret` API key from Stripe developer webpage to create payment intents.
