@@ -87,6 +87,8 @@ class OrderUnit(libs_models.SoftDeleteModel):
     length_unit = models.CharField(max_length=8, help_text='mms or inches')
     rotation_unit = models.CharField(max_length=12, help_text="degrees or radians")
 
+    screenshot = models.ImageField(storage=storage_backends.PrivateMediaStorage(), upload_to='print_unit_screenshots/', null=True, blank=True)
+
     def __str__(self):
         return "{}: [{}] {} ATTRIBUTES={},{}".format(self.pk, self.created_at, self.file, self.spool, self.length_unit)
 
