@@ -60,3 +60,12 @@ class SoftDeleteModel(models.Model):
 
     def __str__(self):
         return "{}{}: ".format("DELETED" if self.is_deleted else "", self.pk)
+    
+
+class BaseTimestampModel(models.Model):
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True

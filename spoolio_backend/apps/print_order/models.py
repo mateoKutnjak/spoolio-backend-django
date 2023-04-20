@@ -1,16 +1,25 @@
+from datetime import datetime, timedelta
+
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import signals
+from django.dispatch import receiver
+import logging
 
 from ..common import models as common_models
 from ..filament import models as filament_models
+from ..print_job import models as print_job_models
+from ..printer import models as printer_models
 from ..user_profile import models as user_profile_models
 
 from ...libs import models as libs_models, signals as libs_signals, storage_backends
 
 
-class PrintOrder(libs_models.SoftDeleteModel):
+logger = logging.getLogger(__name__)
+
+
+class PrintOrder(libs_models.BaseTimestampModel):
 
     # ! IMPORTANT ! For every change in server side (django choices) adjust frontend enums (constants.vue)
 
@@ -51,7 +60,7 @@ class PrintOrder(libs_models.SoftDeleteModel):
         return "{}: [{}] BY={} CONTACT_EMAIL={} STATUS={}".format(self.pk, self.created_at, self.user_profile.user.email if self.user_profile is not None and self.user_profile.user is not None else 'guest', self.contact_email, self.status )
 
 
-class OrderUnit(libs_models.SoftDeleteModel):
+class OrderUnit(libs_models.BaseTimestampModel):
 
     LENGTH_UNIT_CHOICES = {
         'inches': 'inches',
@@ -93,4 +102,145 @@ class OrderUnit(libs_models.SoftDeleteModel):
         return "{}: [{}] {} ATTRIBUTES={},{}".format(self.pk, self.created_at, self.file, self.spool, self.length_unit)
 
 
+# * Every time 'status' field of PrintOrder changes, send email to 'contact_email' field
 signals.pre_save.connect(receiver=libs_signals.send_email_on_order_status_change, sender=PrintOrder)
+
+# * Every time new OrderUnit is added, create PrintingJob (app print_job)
+@receiver(signals.post_save, sender=OrderUnit, weak=False)
+def create_printing_job_for_print_order_unit(sender, instance, created, **kwargs):
+
+    if created:
+
+        START_WORKING_TIME_HOURS = 7
+        START_WORKING_TIME_MINUTES = 0
+        END_WORKING_TIME_HOURS = 15
+        END_WORKING_TIME_MINUTES = 0
+
+        BUFFER_AFTER_HOURS = 1
+        BUFFER_AFTER_MINUTES = 0
+
+        BUFFER_AFTER = timedelta(hours=BUFFER_AFTER_HOURS, minutes=BUFFER_AFTER_MINUTES)
+
+        last_printer_jobs = []
+        printers = printer_models.Printer.objects.filter(available=True, type__supported_materials__in=[instance.spool.material])
+        
+        for printer in printers:
+
+            # * Fetch newest printing job on priter with status 'in_queue' or 'in_progress'
+            # *
+            # * filter leaves only printing orders with 'in_queue' and 'in_progress' status
+            # * order_by('end_at') orders printing jobs from oldest to newest
+            # * last() fetches newest printing job or None if list is empty
+            last_printer_job = print_job_models.PrintingJob.objects.filter(status__in=[print_job_models.PrintingJob.STATUS_IN_QUEUE, print_job_models.PrintingJob.STATUS_IN_PROGRESS]).order_by('end_at').last()
+            
+            # ! Notice: last_printer_job can be None if printer does not have any printing jobs
+            last_printer_jobs.append((last_printer_job, printer))
+
+        # * Sort last job of every printer based on time it ends. Put empty printers with 
+        # * last job == None at the beginning of the sorted list to be fetched first
+        last_printer_jobs_sorted = sorted(last_printer_jobs, key=lambda item: (item is not None, item.end_at))
+
+        # * Fetch printer job that ends first
+        job_previous = last_printer_jobs_sorted[0] if len(last_printer_jobs_sorted) > 0 else None
+
+        # * Determine end time of previous job to which new jobe will be appended
+        if job_previous is None:
+            # * Printer does not have any 'in_queue' or 'in_progress' jobs so current time
+            # * is used as a 'dummy' printing job end time to indicate that printer has
+            # * just finished his last job and can be used immediately (with taking weekends 
+            # * into consideration)
+
+            if end_at_previous.isoweekday() in [1,2,3,4,5]:
+                # ? Mon, Tue, Wed, Thu, Sun - add one day
+                days_to_add = 0
+            elif end_at_previous.isoweekday() == 6:
+                # ? Fri - add three days
+                days_to_add = 2
+            elif end_at_previous.isoweekday() == 7:
+                # ? Sat - add two days
+                days_to_add = 1
+
+            end_at_previous = datetime.now() + timedelta(days=days_to_add)
+        else:
+            # * Printer has jobs in his job queue so last job ending time is used
+
+            # ! This should not be on weekends or holiday 
+            # ! and algorith below forbids that situation
+            end_at_previous = job_previous.end_time
+
+        # * Determine if job ends after working time
+        working_day_start = end_at_previous.replace(hour=START_WORKING_TIME_HOURS, minute=START_WORKING_TIME_MINUTES, second=0)
+        working_time_end = end_at_previous.replace(hour=END_WORKING_TIME_HOURS, minute=END_WORKING_TIME_MINUTES, second=0)
+
+        if end_at_previous > working_day_start and end_at_previous < working_time_end:
+            # * Job is done in middle of the working day. 
+
+            # todo what if job is added on non working day
+
+            if end_at_previous + BUFFER_AFTER < working_time_end:
+                # * Job is done before end of the work day with BUFFER_AFTER taken into consideration.
+                # * Add new job after this one in the same day
+
+                start_at = end_at_previous + BUFFER_AFTER
+                end_at = start_at + timedelta(seconds=instance.estimated_time)
+
+            else:
+                # * When taking BUFFER_AFTER into consideration, job ends after working hours, so
+                # * it is shifted for next working day
+
+                # * Determine how much days to add for every possible weekday when job ends
+                if end_at_previous.isoweekday() in [1,2,3,4,7]:
+                    # ? Mon, Tue, Wed, Thu, Sun - add one day
+                    days_to_add = 1
+                elif end_at_previous.isoweekday() == 5:
+                    # ? Fri - add three days
+                    days_to_add = 3
+                elif end_at_previous.isoweekday() == 6:
+                    # ? Sat - add two days
+                    days_to_add = 2
+
+                start_at = end_at_previous + timedelta(days=days_to_add)
+                start_at = start_at.replace(hour=START_WORKING_TIME_HOURS, minute=START_WORKING_TIME_MINUTES)
+
+        elif end_at_previous < working_day_start:
+
+            # * Job is done before working day starts so it is placed in the same day
+            # * right when working hours start
+
+            start_at = end_at_previous.replace(hour=START_WORKING_TIME_HOURS, minute=START_WORKING_TIME_MINUTES)
+
+        elif end_at_previous > working_time_end:
+
+            # * Job is done after working day ends so it is placed in the next working day
+            # * right when working hours start
+
+            if end_at_previous.isoweekday() in [1,2,3,4,7]:
+                # ? Mon, Tue, Wed, Thu, Sun - add one day
+                days_to_add = 1
+            elif end_at_previous.isoweekday() == 5:
+                # ? Fri - add three days
+                days_to_add = 3
+            elif end_at_previous.isoweekday() == 6:
+                # ? Sat - add two days
+                days_to_add = 2
+
+            start_at = end_at_previous + timedelta(days=days_to_add)
+            start_at = start_at.replace(hour=START_WORKING_TIME_HOURS, minute=START_WORKING_TIME_MINUTES)
+
+        else:
+            logger.error('Cannot create printing job for OrderUnit #{}. Cannot determine previous job ending time placement in working day'.format(instance.id))
+            return
+
+        end_at = start_at + timedelta(seconds=instance.estimated_time)
+
+        # * Default status is 'in_queue'.
+        print_job_models.PrintingJob.objects.create(
+            print_order=instance, 
+            printer=job_previous.printer,
+            duration=instance.estimated_time,
+            start_at=start_at,
+            end_at=end_at)
+
+        logger.info('Printing job created for print order unit #{}'.format(instance.id))
+        logger.info('   Printing starts at: {}'.format(start_at))
+        logger.info('   Printing starts at: {}'.format(end_at))
