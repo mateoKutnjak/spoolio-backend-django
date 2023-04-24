@@ -17,8 +17,6 @@ logger = logging.getLogger(__name__)
 @shared_task()
 def task_execute(job_params):
 
-    print(job_params)
-
     def cleanFiles():
         try:
             if os.path.isfile(model_filepath):
