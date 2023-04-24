@@ -18,6 +18,8 @@
 `celery -A spoolio_backend worker --loglevel=info --concurrency 1 -E`
 - Run Django server
 `uvicorn spoolio_backend.asgi:application --reload`
+- Start listening to Stripe webhooks with command
+`stripe listen --forward-to localhost:8000/api/stripe-webhooks/`
 
 ### Production
 

@@ -113,7 +113,7 @@ def create_printing_job_for_print_order_unit(sender, instance, created, **kwargs
     # ! This can cause problems in future. 
 
     if instance.status != PrintOrder.STATUS_IN_PROGRESS:
-        pass
+        return
 
     START_WORKING_TIME_HOURS = 7
     START_WORKING_TIME_MINUTES = 0
@@ -153,16 +153,18 @@ def create_printing_job_for_print_order_unit(sender, instance, created, **kwargs
             # * filter leaves only printing orders with 'in_queue' and 'in_progress' status
             # * order_by('end_at') orders printing jobs from oldest to newest
             # * last() fetches newest printing job or None if list is empty
-            last_printer_job = print_job_models.PrintingJob.objects.filter(status__in=[print_job_models.PrintingJob.STATUS_IN_QUEUE, print_job_models.PrintingJob.STATUS_IN_PROGRESS]).order_by('end_at').last()
+            last_printer_job = print_job_models.PrintingJob.objects.filter(printer=printer, status__in=[print_job_models.PrintingJob.STATUS_IN_QUEUE, print_job_models.PrintingJob.STATUS_IN_PROGRESS]).order_by('end_at').last()
             
-            # ! Notice: last_printer_job can be None if printer does not have any printing jobs
-            last_printer_jobs.append((last_printer_job, printer))
+            if last_printer_job:
+                logger.info('   Printer {} has last job #{} which ends at {}'.format(printer.name, last_printer_job.pk, last_printer_job.end_at))
+            else:
+                logger.info('   Printer {} has no "in_queue" or "in_progress" jobs'.format(printer.name))
 
-            logger.info('   Printer {} has last job #{} which ends at {}'.format(printer.name, last_printer_job.pk, last_printer_job.end_at))
+            last_printer_jobs.append((last_printer_job, printer))
 
         # * Sort last job of every printer based on time it ends. Put empty printers with 
         # * last job == None at the beginning of the sorted list to be fetched first
-        last_printer_jobs_sorted = sorted(last_printer_jobs, key=lambda item: (item[0] is not None, item[0].end_at))
+        last_printer_jobs_sorted = sorted(last_printer_jobs, key=lambda item: (item[0] is not None and item[0].end_at is not None, item[0].end_at))
 
         # * Fetch printer job that ends first
         job_previous = last_printer_jobs_sorted[0][0] if len(last_printer_jobs_sorted) > 0 else None
@@ -195,11 +197,19 @@ def create_printing_job_for_print_order_unit(sender, instance, created, **kwargs
             logger.info('   Because today weekday number is {}, we will add {} days.\n'.format(end_at_previous.isoweekday(), days_to_add))
 
         else:
-            # * Printer has jobs in his job queue so last job ending time is used
+            # * Printer has jobs in his job queue so last job ending time is used (if it
+            # * in future). If last printing job ending is not in the future, use current
+            # * time as last job ending time.
+
+            now = datetime.now()
+
+            if job_previous.end_at.timestamp() < now.timestamp():
+                end_at_previous = now
+            else:                
+                end_at_previous = datetime.fromtimestamp(job_previous.end_at.timestamp())
 
             # ! This should not be on weekends or holiday 
             # ! and algorith below forbids that situation
-            end_at_previous = job_previous.end_at
 
             logger.info('   Printer {} will be available first at {} when job #{} ends'.format(printer.name, last_printer_job.end_at, last_printer_job.pk))
 
@@ -289,4 +299,8 @@ def create_printing_job_for_print_order_unit(sender, instance, created, **kwargs
         logger.info('   Printing starts at: {}'.format(job.end_at))
 
 # * Every time new OrderUnit is added, create PrintingJob (app print_job)
+# ! Signal will not be called with .update() method on queryset.
+# ! It will be called with .save() method on model object
+# !
+# ! See how status gets updated in 'payment/views.py'
 signals.post_save.connect(receiver=create_printing_job_for_print_order_unit, sender=PrintOrder)
