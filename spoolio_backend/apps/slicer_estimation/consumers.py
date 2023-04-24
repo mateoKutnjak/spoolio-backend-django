@@ -41,10 +41,13 @@ class SlicerEstimationConsumer(AsyncWebsocketConsumer):
             await self.sendDataMessage(estimated_time, estimated_price)
         else:
             await self.sendErrorMessage('Not all data is present (estimated_time={}, estimated_price={})'.format(estimated_time, estimated_price))
+        
+        await self.channel_layer.group_discard(self.channel_group_name, self.channel_name)
 
     async def slicer_estimation_error(self, event):
         error_message = event.get('payload', {}).get('message')
         await self.sendErrorMessage(error_message, close=True)
+        await self.channel_layer.group_discard(self.channel_group_name, self.channel_name)
 
     async def sendInitMessage(self):
         message = {
