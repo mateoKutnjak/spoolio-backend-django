@@ -9,7 +9,7 @@ from . import models, serializers
 from ...libs import views as common_views
 
 
-class PrintingJobViewSet(viewsets.ReadOnlyModelViewSet):
+class PrintingJobViewSet(viewsets.ReadOnlyModelViewSet, viewsets.mixins.UpdateModelMixin):
 
     queryset = models.PrintingJob.objects.all()
     serializer_class = serializers.PrintingJobSerializer
