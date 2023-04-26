@@ -6,6 +6,9 @@ from .base import *
 env_file = os.path.join(BASE_DIR, '.env.development')
 env_config = Config(RepositoryEnv(env_file))
 
+env_file_db = os.path.join(BASE_DIR, '.env.development.db')
+env_config_db = Config(RepositoryEnv(env_file_db))
+
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
@@ -18,8 +21,12 @@ ALLOWED_HOSTS = []
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME':env_config_db('POSTGRES_NAME'),
+        'USER': env_config_db('POSTGRES_USER'),
+        'PASSWORD': env_config_db('POSTGRES_PASSWORD'),
+        'HOST': env_config_db('POSTGRES_HOST'),
+        'PORT': env_config_db('POSTGRES_PORT', cast=int)
     }
 }
 

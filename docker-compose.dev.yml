@@ -1,0 +1,67 @@
+version: '3.7'
+
+services:
+
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+      - ./data/postgres/database_scripts/001_create_database.sql:/docker-entrypoint-initdb.d/001_create_database.sql
+    env_file:
+      - .env.development.db
+
+  web:
+    build: .
+    working_dir: /home/spoolio_web_user/app
+
+    command: bash -c "uvicorn spoolio_backend.asgi:application --host 0.0.0.0 --port 8000 --reload --log-level debug"
+    volumes:
+      - .:/home/spoolio_web_user/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    env_file: .env.development
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-exec.datecron.schedule: "@every 2h"
+      ofelia.job-exec.datecron.command: "python3 manage.py dbbackup"
+      ofelia.job-exec.datecron.container: 'web'
+      ofelia.job-exec.datecron.user: 'spoolio_web_user' # without it there is not access to installed user packages (Django eg)
+    links:
+      - redis
+    entrypoint: [ "/home/spoolio_web_user/app/entrypoint.sh" ]
+
+  ofelia:
+    image: mcuadros/ofelia:latest
+    depends_on:
+      - web
+    command: daemon --docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  redis:
+    image: redis:alpine
+    ports:
+      - 6379:6379
+    restart: on-failure
+
+  celery:
+    restart: always
+    build:
+      context: .
+    command: celery -A spoolio_backend worker -l INFO
+    volumes:
+      - .:/home/spoolio_web_user/app
+    env_file:
+      - .env.development.celery
+      - .env.development
+      - .env.development.db
+    working_dir: /home/spoolio_web_user/app
+    links:
+      - db
+      - redis
+      - web
+
+volumes:
+  postgres_data:
