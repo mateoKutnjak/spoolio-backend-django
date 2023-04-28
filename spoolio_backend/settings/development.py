@@ -17,7 +17,7 @@ SECRET_KEY = env_config('SECRET_KEY')
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', 'web']
 
 DATABASES = {
     'default': {
@@ -85,7 +85,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("localhost", 6379)],
+            "hosts": [("redis", 6379)],
         },
     },
 }
@@ -97,8 +97,8 @@ CHANNEL_LAYERS = {
 # ! server (in separate terminal) with command
 # !
 # ! celery -A spoolio_backend worker --loglevel=info --concurrency 1 -E
-CELERY_BROKER_URL = "redis://localhost:6379/0"
-CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+CELERY_BROKER_URL = "redis://redis:6379/0"
+CELERY_RESULT_BACKEND = "redis://redis:6379/0"
 
 # ****** Django-request ****** #
 REQUEST_BASE_URL = 'http://localhost:8000'

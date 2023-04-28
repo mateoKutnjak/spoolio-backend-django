@@ -33,6 +33,9 @@ class UserProfile(libs_models.SoftDeleteModel):
 
 
 @receiver(post_save, sender=get_user_model(), weak=False)
-def create_user_profile(sender, instance, created, **kwargs):
+def create_user_profile(sender, instance, created, raw, **kwargs):
+    if raw:
+        return
+    
     if created:
         UserProfile.objects.create(user=instance)

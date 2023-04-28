@@ -101,7 +101,10 @@ class OrderUnit(libs_models.BaseTimestampModel):
 # * Every time 'status' field of PrintOrder changes, send email to 'contact_email' field
 signals.pre_save.connect(receiver=libs_signals.send_email_on_order_status_change, sender=PrintOrder)
 
-def create_printing_job_for_print_order_unit(sender, instance, created, **kwargs):
+def create_printing_job_for_print_order_unit(sender, instance, created, raw, **kwargs):
+
+    if raw:
+        return
 
     # ! STATUS_IN_PROGRESS means that printing order has been 
     # ! paid and has to be printed and sent to customer

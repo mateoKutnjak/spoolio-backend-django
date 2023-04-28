@@ -21,6 +21,7 @@ services:
       - "8000:8000"
     depends_on:
       - db
+      - redis
     env_file: .env.development
     labels:
       ofelia.enabled: "true"
@@ -31,6 +32,13 @@ services:
     links:
       - redis
     entrypoint: [ "/home/spoolio_web_user/app/entrypoint.sh" ]
+
+  stripe-cli:
+    image: stripe/stripe-cli
+    container_name: stripe-cli
+    command: "listen --forward-to web:8000/api/stripe-webhooks/"
+    env_file:
+      - .env.development.stripe
 
   ofelia:
     image: mcuadros/ofelia:latest

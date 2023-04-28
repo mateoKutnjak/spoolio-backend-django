@@ -6,7 +6,10 @@ import logging.config
 logger = logging.getLogger(__name__)
 
 
-def send_email_on_order_status_change(sender, instance, using, **kwargs):
+def send_email_on_order_status_change(sender, instance, raw, using, **kwargs):
+
+    if raw:
+        return
 
     try:
         obj = sender.objects.get(pk=instance.pk)

@@ -6,20 +6,10 @@
 
 - Checkout to branch [TODO]
 `git checkout [TODO]`
-- In root directory of project setup a python virtual environment
-`python3 -m venv venv`
-- Activate virual environment
-`source venv/bin/activate`
-- Install dependencies
-`pip3 install -r requirements.txt`
-- Start redis container in another terminal before starting Django server
-`docker run -ti -p 6379:6379 redis`
-- Start Django Celery in another terminal before starting Django server
-`celery -A spoolio_backend worker --loglevel=info --concurrency 1 -E`
-- Run Django server
-`uvicorn spoolio_backend.asgi:application --reload`
-- Start listening to Stripe webhooks with command
-`stripe listen --forward-to localhost:8000/api/stripe-webhooks/`
+- Build docker images
+`docker-compose -f docker-compose.dev.yml build`
+- Run docker compose for development
+`docker-compose -f docker-compose.dev.yml up`
 
 ### Production
 
