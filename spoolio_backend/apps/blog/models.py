@@ -7,13 +7,32 @@ from ..common import models as common_models
 from ...libs import models as libs_models, storage_backends
 
 
-class Blog(libs_models.SoftDeleteModel):
+class Category(models.Model):
 
-    BLOG_CATEGORY_CHOICES = (
-        ('3d-printing', '3D Printing'),
-        ('electronics', 'Electronics'),
-        ('design', 'Design'),
-    )
+    name = models.CharField(max_length=128)
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class Subcategory(models.Model):
+
+    name = models.CharField(max_length=128)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return "{} [category={}]".format(self.name, self.category)
+
+
+class Tag(models.Model):
+
+    name = models.CharField(max_length=128)
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class Blog(libs_models.SoftDeleteModel):
 
     author = author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
 
@@ -24,7 +43,9 @@ class Blog(libs_models.SoftDeleteModel):
 
     picture = models.ImageField(storage=storage_backends.PublicMediaStorage(), upload_to='blog_images/', null=True, blank=True)
     
-    type = models.CharField(max_length=16, choices=BLOG_CATEGORY_CHOICES)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    subcategory = models.ForeignKey(Subcategory, on_delete=models.CASCADE)
+    tags = models.ManyToManyField(Tag)
 
     comments = GenericRelation(common_models.Comment)
     likes = GenericRelation(common_models.Like)

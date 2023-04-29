@@ -9,11 +9,40 @@ from .. authentication import serializers as auth_serializers
 from .. common import models as common_models
 
 
+class CategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Category
+        fields = '__all__'
+
+
+class SubcategorySerializer(serializers.ModelSerializer):
+
+    category = CategorySerializer()
+
+    class Meta:
+        model = models.Subcategory
+        fields = '__all__'
+
+
+class TagSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Tag
+        fields = '__all__'
+
+
 class BlogSerializer(serializers.ModelSerializer):
 
     author = auth_serializers.UserDetailsSerializer()
+    
+    category = CategorySerializer()
+    subcategory = SubcategorySerializer()
+    tags = TagSerializer(many=True)
+
     comment_count = serializers.SerializerMethodField()
     like_count = serializers.SerializerMethodField()
+    
     liked_by_me = serializers.SerializerMethodField()
 
     class Meta:
