@@ -46,9 +46,10 @@ class Blog(libs_models.SoftDeleteModel):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     subcategory = models.ForeignKey(Subcategory, on_delete=models.CASCADE)
     tags = models.ManyToManyField(Tag)
+    is_featured = models.BooleanField(default=False)
 
     comments = GenericRelation(common_models.Comment)
     likes = GenericRelation(common_models.Like)
 
     def __str__(self):
-        return "{}: [{}] AUTHOR={}: {}".format(self.pk, self.created_at, self.author.username, self.title)
+        return "{}: {} AUTHOR={}: {}".format(self.pk, '[FEATURED]' if self.is_featured else '', self.author.username, self.title)
