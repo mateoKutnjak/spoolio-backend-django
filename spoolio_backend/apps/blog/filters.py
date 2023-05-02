@@ -5,14 +5,18 @@ import django_filters
 from . import models
 
 
-# * This FilterSet class is created only to replace query
-# * parameter 'category__pk' in url with 'category'
-class BlogCategoryFilter(django_filters.FilterSet):
+class BlogFilter(django_filters.FilterSet):
+
+    class Meta:
+        model = models.Blog
+        fields = ("category", "tags", )
+
+    tags = django_filters.ModelMultipleChoiceFilter(
+        field_name="tags",
+        queryset=models.Tag.objects.all(),
+        conjoined=True  # Explanation:  https://github.com/carltongibson/django-filter/issues/595#issuecomment-270566521
+    )
 
     category = django_filters.ModelChoiceFilter(
         field_name="category",
         queryset=models.Category.objects.all())
-
-    class Meta:
-        model = models.Category
-        fields = ('category',)

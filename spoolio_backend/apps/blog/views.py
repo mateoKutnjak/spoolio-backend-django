@@ -61,9 +61,9 @@ class BlogViewSet(viewsets.ModelViewSet, common_permissions.IsAdminOrObjectOwner
     pagination_class = LimitOffsetPagination
 
     filter_backends = [drf_filters.SearchFilter, DjangoFilterBackend]
-    filter_class = filters.BlogCategoryFilter
+    filter_class = filters.BlogFilter
     search_fields = ('title', 'subtitle', 'author__email')
-    filterset_fields = ('category', 'is_featured')
+    filterset_fields = ('category', 'is_featured', 'tags')
 
     action_permissions = {
         IsAdminUser: ['create'],

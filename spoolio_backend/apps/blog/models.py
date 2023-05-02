@@ -52,4 +52,4 @@ class Blog(libs_models.SoftDeleteModel):
     likes = GenericRelation(common_models.Like)
 
     def __str__(self):
-        return "{}: {} AUTHOR={}: {}".format(self.pk, '[FEATURED]' if self.is_featured else '', self.author.username, self.title)
+        return "{}: {} [{}] AUTHOR={}: {}".format(self.pk, '[FEATURED]' if self.is_featured else '', self.category.id, self.author.username, self.title)
