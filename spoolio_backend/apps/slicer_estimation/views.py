@@ -1,3 +1,4 @@
+import json
 import os
 
 from django.conf import settings
@@ -8,6 +9,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from . import serializers, tasks
+
+from .. print_order import serializers as print_order_serializers
 
 
 @api_view(['POST'])
@@ -21,6 +24,9 @@ def slicer_estimation(request):
 
     serializer = serializers.PrintOrderUnitSlicerEstimationSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
+
+    serializer_other_units = print_order_serializers.PrintOrderUnitPlaceholderSerializer(data=json.loads(request.data.get('other_units', '[]')), many=True)
+    serializer_other_units.is_valid(raise_exception=False)
 
     # ************************************ #
     # *** STL and config.ini filepaths *** #
@@ -48,6 +54,7 @@ def slicer_estimation(request):
         'task': {
             'data': {
                 'print_order_unit': serializer.data,
+                'other_units': json.loads(request.data.get('other_units', '[]'))
             },
             'meta': {
                 "model_filepath": upload_path,

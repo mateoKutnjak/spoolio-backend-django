@@ -59,6 +59,8 @@ class PrintOrderUnitSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class PrintOrderUnitSlicerEstimationSerializer(PrintOrderUnitSerializer):
+class PrintOrderUnitPlaceholderSerializer(serializers.Serializer):
 
-    order = serializers.PrimaryKeyRelatedField(queryset=models.PrintOrder.objects.all(), required=False)
+    quantity = serializers.IntegerField(min_value=1)
+    material = filament_serializers.MaterialSerializer()
+    estimated_time = serializers.IntegerField(min_value=1)

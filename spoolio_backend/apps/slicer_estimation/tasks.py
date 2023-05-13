@@ -10,6 +10,8 @@ from asgiref.sync import async_to_sync
 from celery import shared_task
 from channels.layers import get_channel_layer
 
+from ..print_job import utils as print_job_utils
+
 
 logger = logging.getLogger(__name__)
 
@@ -63,16 +65,28 @@ def task_execute(job_params):
 
     print_order_unit = job_params.get('task', {}).get('data', {}).get('print_order_unit', {})
 
-    filament_cost = print_order_unit.get('spool', {}).get('material', {}).get('filament_cost')
-    filament_density = print_order_unit.get('spool', {}).get('material', {}).get('filament_density')
-    extrusion_multiplier = print_order_unit.get('spool', {}).get('material', {}).get('extrusion_multiplier')
-    filament_deretract_speed = print_order_unit.get('spool', {}).get('material', {}).get('filament_deretract_speed')
-    filament_max_volumetric_speed = print_order_unit.get('spool', {}).get('material', {}).get('filament_max_volumetric_speed')
-    filament_retract_length = print_order_unit.get('spool', {}).get('material', {}).get('filament_retract_length')
-    filament_retract_lift = print_order_unit.get('spool', {}).get('material', {}).get('filament_retract_lift')
-    fill_density = print_order_unit.get('infill', {}).get('percentage')
+    other_units = job_params.get('task', {}).get('data', {}).get('other_units', [])
 
+    quantity = print_order_unit.get('quantity')
+    material = print_order_unit.get('spool', {}).get('material', {})
+    fill_density = print_order_unit.get('infill', {}).get('percentage')
     model_rotation_raw = print_order_unit.get('model_rotation')
+
+    filament_cost = material.get('filament_cost')
+    filament_density = material.get('filament_density')
+    extrusion_multiplier = material.get('extrusion_multiplier')
+    filament_deretract_speed = material.get('filament_deretract_speed')
+    filament_max_volumetric_speed = material.get('filament_max_volumetric_speed')
+    filament_retract_length = material.get('filament_retract_length')
+    filament_retract_lift = material.get('filament_retract_lift')
+
+
+    quantity = print_order_unit.get('quantity')
+    material = print_order_unit.get('spool', {}).get('material')
+    
+    if quantity is None or not material:
+        onError('Quantity (={}) or material (={}) is not set'.format(quantity, material), channel_group_name=channel_group_name)
+        return
 
     # * Parsing model rotation
 
@@ -189,7 +203,15 @@ def task_execute(job_params):
 
     estimated_price = float(estimated_price_raw)
 
-    onSuccess(estimated_price, estimated_duration, channel_group_name=channel_group_name)
+    units = [print_job_utils.PrintOrderUnitPlaceholder(
+        quantity=u['quantity'], 
+        material_id=u['material']['id'], 
+        estimated_time=u['estimated_time']) for u in other_units]
+    units.append(print_job_utils.PrintOrderUnitPlaceholder(quantity=quantity, estimated_time=estimated_duration, material_id=material['id']))
+
+    estimated_ending_time = print_job_utils.generate_print_jobs(units, fake=True)
+
+    onSuccess(estimated_price, estimated_duration, estimated_ending_time, channel_group_name=channel_group_name)
 
 def parse_model_rotation(model_rotation_raw: str):
     if model_rotation_raw is None:
@@ -223,7 +245,7 @@ def onError(error_message, channel_group_name):
             }
         })
 
-def onSuccess(estimated_price, estimated_time, channel_group_name):
+def onSuccess(estimated_price, estimated_time, estimated_ending_time, channel_group_name):
     channel_layer = get_channel_layer()
 
     async_to_sync(channel_layer.group_send)(channel_group_name, {
@@ -233,6 +255,7 @@ def onSuccess(estimated_price, estimated_time, channel_group_name):
             "data": {
                 "estimated_time": estimated_time, 
                 "estimated_price": estimated_price,
+                "estimated_ending_time": estimated_ending_time.isoformat(),
             }
         }
     })

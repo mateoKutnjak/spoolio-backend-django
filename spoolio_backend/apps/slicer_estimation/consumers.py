@@ -36,11 +36,12 @@ class SlicerEstimationConsumer(AsyncWebsocketConsumer):
     async def slicer_estimation_success(self, event):
         estimated_price = event.get('payload', {}).get('data', {}).get('estimated_price')
         estimated_time = event.get('payload', {}).get('data', {}).get('estimated_time')
+        estimated_ending_time = event.get('payload', {}).get('data', {}).get('estimated_ending_time')
 
-        if estimated_time and estimated_price:
-            await self.sendDataMessage(estimated_time, estimated_price)
+        if estimated_time and estimated_price and estimated_ending_time:
+            await self.sendDataMessage(estimated_time, estimated_price, estimated_ending_time)
         else:
-            await self.sendErrorMessage('Not all data is present (estimated_time={}, estimated_price={})'.format(estimated_time, estimated_price))
+            await self.sendErrorMessage('Not all data is present (estimated_time={}, estimated_price={}, estimated_ending_time={})'.format(estimated_time, estimated_price, estimated_ending_time))
         
         await self.channel_layer.group_discard(self.channel_group_name, self.channel_name)
 
@@ -64,12 +65,13 @@ class SlicerEstimationConsumer(AsyncWebsocketConsumer):
 
         await self.send(text_data=json.dumps(message))
 
-    async def sendDataMessage(self, estimated_time: int, estimated_price: float):
+    async def sendDataMessage(self, estimated_time: int, estimated_price: float, estimated_ending_time: str):
         message = {
             "type": WebsocketMessageType.DATA.value,
             "data": {
                 "estimated_time": estimated_time, 
                 "estimated_price": estimated_price,
+                "estimated_ending_time": estimated_ending_time,
             }
         }
 
