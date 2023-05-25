@@ -5,6 +5,10 @@ import uuid
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 
+from .. print_job import tasks as print_job_tasks
+
+from ... libs import channels
+
 
 logger = logging.getLogger(__name__)
 
@@ -14,6 +18,59 @@ class WebsocketMessageType(Enum):
     DATA = 'data'
     ERROR = 'error'
     CLOSE = 'close'
+
+
+class PrintJobEndingTimeEstimationConsumer(AsyncWebsocketConsumer):
+
+    async def connect(self):
+
+        self.channel_group_name = str(uuid.uuid4())
+
+        await self.channel_layer.group_add(
+            self.channel_group_name,
+            self.channel_name
+        )
+
+        await self.accept()
+
+    async def receive(self, text_data=None, bytes_data=None):
+
+        # TODO generate_celery_delay_request function
+
+        print_job_tasks.print_job_ending_time_estimation.delay({
+            'meta': {
+                'django_channels': {
+                    'channel_group_name': self.channel_group_name
+                }
+            },
+            'data': {
+                'units': json.loads(text_data)
+            }
+        })
+
+    async def on_success(self, event):
+        estimated_ending_time = event.get('payload', {}).get('data', {}).get('estimated_ending_time')
+        
+        if estimated_ending_time:
+            data = {
+                "estimated_ending_time": estimated_ending_time,
+            }
+
+            await self.send(text_data=channels.generate_data_response(data))
+        else:
+            error_message = 'Not all data is present (estimated_ending_time={})'.format(estimated_ending_time)
+            await self.send(text_data=channels.generate_error_response(error_message))
+        
+        await self.channel_layer.group_discard(self.channel_group_name, self.channel_name)
+
+    async def on_error(self, event):
+
+        error_message = event.get('payload', {}).get('message')
+
+        await self.send(text_data=channels.generate_error_response(error_message))
+        await self.close()
+
+        await self.channel_layer.group_discard(self.channel_group_name, self.channel_name)
 
 
 class SlicerEstimationConsumer(AsyncWebsocketConsumer):
@@ -28,72 +85,32 @@ class SlicerEstimationConsumer(AsyncWebsocketConsumer):
         )
 
         await self.accept()
-        await self.sendInitMessage()
+        await self.send(text_data=channels.generate_init_response(self.channel_group_name))
 
-    async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(self.channel_group_name, self.channel_name)
-
-    async def slicer_estimation_success(self, event):
+    async def on_success(self, event):
         estimated_price = event.get('payload', {}).get('data', {}).get('estimated_price')
         estimated_time = event.get('payload', {}).get('data', {}).get('estimated_time')
         estimated_ending_time = event.get('payload', {}).get('data', {}).get('estimated_ending_time')
 
         if estimated_time and estimated_price and estimated_ending_time:
-            await self.sendDataMessage(estimated_time, estimated_price, estimated_ending_time)
-        else:
-            await self.sendErrorMessage('Not all data is present (estimated_time={}, estimated_price={}, estimated_ending_time={})'.format(estimated_time, estimated_price, estimated_ending_time))
-        
-        await self.channel_layer.group_discard(self.channel_group_name, self.channel_name)
 
-    async def slicer_estimation_error(self, event):
-        error_message = event.get('payload', {}).get('message')
-        await self.sendErrorMessage(error_message, close=True)
-        await self.channel_layer.group_discard(self.channel_group_name, self.channel_name)
-
-    async def sendInitMessage(self):
-        message = {
-            "type": WebsocketMessageType.INIT.value,
-            "data": {
-                "channel_group_name": self.channel_group_name, 
-            }
-        }
-
-        logger.info('Websockets group {}'.format(self.channel_group_name))
-        if hasattr(self, 'model_filepath'): 
-            logger.info('   model file: {}'.format(self.model_filepath))
-        logger.info('   message: {}'.format(message))
-
-        await self.send(text_data=json.dumps(message))
-
-    async def sendDataMessage(self, estimated_time: int, estimated_price: float, estimated_ending_time: str):
-        message = {
-            "type": WebsocketMessageType.DATA.value,
-            "data": {
+            data = {
                 "estimated_time": estimated_time, 
                 "estimated_price": estimated_price,
                 "estimated_ending_time": estimated_ending_time,
             }
-        }
 
-        logger.info('Websockets group {}'.format(self.channel_group_name))
-        if hasattr(self, 'model_filepath'): 
-            logger.info('   model file: {}'.format(self.model_filepath))
-        logger.info('   message: {}'.format(message))
+            await self.send(text_data=channels.generate_data_response(data))
+        else:
+            error_message = 'Not all data is present (estimated_time={}, estimated_price={}, estimated_ending_time={})'.format(estimated_time, estimated_price, estimated_ending_time)
+            await self.send(text_data=channels.generate_error_response(error_message))
+        
+        await self.channel_layer.group_discard(self.channel_group_name, self.channel_name)
 
-        await self.send(text_data=json.dumps(message))
+    async def on_error(self, event):
+        error_message = event.get('payload', {}).get('message')
 
-    async def sendErrorMessage(self, error_message: str, close=False):
-        message = {
-            "type": WebsocketMessageType.ERROR.value,
-            "error": error_message
-        }
+        await self.send(text_data=channels.generate_error_response(error_message))
+        await self.close()
 
-        logger.info('Websockets group {}'.format(self.channel_group_name))
-        if hasattr(self, 'model_filepath'): 
-            logger.info('   model file: {}'.format(self.model_filepath))
-        logger.info('   message: {}'.format(message))
-
-        await self.send(text_data=json.dumps(message))
-
-        if close:
-            await self.close()
+        await self.channel_layer.group_discard(self.channel_group_name, self.channel_name)

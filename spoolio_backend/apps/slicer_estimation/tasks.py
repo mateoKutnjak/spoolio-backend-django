@@ -5,12 +5,11 @@ import os
 import re
 import subprocess
 
-from asgiref.sync import async_to_sync
-
 from celery import shared_task
-from channels.layers import get_channel_layer
 
 from ..print_job import utils as print_job_utils
+
+from ... libs import channels as channels_utils
 
 
 logger = logging.getLogger(__name__)
@@ -18,6 +17,39 @@ logger = logging.getLogger(__name__)
 
 @shared_task()
 def task_execute(job_params):
+
+    # ************************************************ #
+    # *** Check websocket communication parameters *** #
+    # ************************************************ #
+
+    channel_group_name = job_params.get('meta', {}).get('django_channels', {}).get('channel_group_name', None)
+
+    if not channel_group_name:
+        logger.error('Celery task stopped. Parameter "channel_group_name" missing')
+        return
+
+    # ************************ #
+    # *** Check parameters *** #
+    # ************************ #
+
+    model_filepath = job_params.get('task', {}).get('meta', {}).get('model_filepath')
+    config_filepath = job_params.get('task', {}).get('meta', {}).get('config_filepath')
+
+    required_parameters = {
+        '--slice': model_filepath,
+        '--config': config_filepath
+    }
+
+    for required_parameter in required_parameters:
+        if not required_parameter:
+            error_message = 'Celery task stopped. Parameter {} missing'.format(required_parameter)
+            channels_utils.channels_group_send_error(error_message, channel_group_name=channel_group_name)
+            cleanFiles()
+            return
+    
+    # **************************** #
+    # *** Clean files function *** #
+    # **************************** #
 
     def cleanFiles():
         try:
@@ -31,33 +63,6 @@ def task_execute(job_params):
                 os.remove(gcode_path)
         except NameError:
             pass # * Variable is not defined
-
-    # ************************************************ #
-    # *** Check websocket communication parameters *** #
-    # ************************************************ #
-
-    channel_group_name = job_params.get('meta', {}).get('django_channels', {}).get('channel_group_name', None)
-
-    if not channel_group_name:
-        logger.error('Celery task stopped. Parameter "channel_group_name" missing')
-        return
-
-    # ********************************* #
-    # *** Check required parameters *** #
-    # ********************************* #
-
-    model_filepath = job_params.get('task', {}).get('meta', {}).get('model_filepath')
-    config_filepath = job_params.get('task', {}).get('meta', {}).get('config_filepath')
-
-    required_parameters = {
-        '--slice': model_filepath,
-        '--config': config_filepath
-    }
-
-    for required_parameter in required_parameters:
-        if not required_parameter:
-            onError('Celery task stopped. Parameter {} missing', channel_group_name=channel_group_name)
-            return
 
     # ****************************** #
     # *** Check other parameters *** #
@@ -85,7 +90,8 @@ def task_execute(job_params):
     material = print_order_unit.get('spool', {}).get('material')
     
     if quantity is None or not material:
-        onError('Quantity (={}) or material (={}) is not set'.format(quantity, material), channel_group_name=channel_group_name)
+        error_message = 'Quantity (={}) or material (={}) is not set'.format(quantity, material)
+        channels_utils.channels_group_send_error(error_message, channel_group_name=channel_group_name)
         return
 
     # * Parsing model rotation
@@ -93,7 +99,7 @@ def task_execute(job_params):
     rotation_x, rotation_y, rotation_z, error_message = parse_model_rotation(model_rotation_raw)
 
     if error_message:
-        onError(error_message, channel_group_name=channel_group_name)
+        channels_utils.channels_group_send_error(error_message, channel_group_name=channel_group_name)
         return
     
     # * Checking existance of prusa-slicer command flags
@@ -142,12 +148,12 @@ def task_execute(job_params):
                     if len(output_line) > 1:
                         error_message = output_line_split[1]
             
-            onError(error_message, channel_group_name=channel_group_name)
+            channels_utils.channels_group_send_error(error_message, channel_group_name=channel_group_name)
             cleanFiles()
             return
         
     except subprocess.CalledProcessError as e:
-        onError(str(e), channel_group_name=channel_group_name)
+        channels_utils.channels_group_send_error(str(e), channel_group_name=channel_group_name)
         cleanFiles()
         return
     
@@ -159,12 +165,14 @@ def task_execute(job_params):
     gcode_paths = glob.glob("{}*gcode".format(model_filepath_without_suffix))
 
     if not gcode_paths:
-        onError('.gcode files not found in directory', channel_group_name=channel_group_name)
+        error_message = '.gcode files not found in directory'
+        channels_utils.channels_group_send_error(error_message, channel_group_name=channel_group_name)
         cleanFiles()
         return
 
     if len(gcode_paths) > 1:
-        onError('Duplicated .gcode files', channel_group_name=channel_group_name)
+        error_message = 'Duplicated .gcode files'
+        channels_utils.channels_group_send_error(error_message, channel_group_name=channel_group_name)
         cleanFiles()
         return
 
@@ -180,8 +188,9 @@ def task_execute(job_params):
     pattern = re.compile(r"(\d+d)?(\d+h)?(\d+m)?")
     estimated_duration_split = pattern.search(estimated_duration_raw).groups()
     if len(estimated_duration_split) != 3:
+        error_message = 'Split DHM format invalid length. Expected 3, got {}'.format(len(estimated_duration_split))
+        channels_utils.channels_group_send_error(error_message, channel_group_name=channel_group_name)
 
-        onError('Split DHM format invalid length. Expected 3, got {}'.format(len(estimated_duration_split)), channel_group_name=channel_group_name)
         cleanFiles()
         return
 
@@ -196,8 +205,8 @@ def task_execute(job_params):
             minutes=int(estimated_duration_minutes_raw),
         ).seconds
     except ValueError:
-
-        onError('Error while parsing duration DHM format: raw value = {}'.format(estimated_duration_raw), channel_group_name=channel_group_name)
+        error_message = 'Error while parsing duration DHM format: raw value = {}'.format(estimated_duration_raw)
+        channels_utils.channels_group_send_error(error_message, channel_group_name=channel_group_name)
         cleanFiles()
         return
 
@@ -211,7 +220,16 @@ def task_execute(job_params):
 
     estimated_ending_time = print_job_utils.generate_print_jobs(units, fake=True)
 
-    onSuccess(estimated_price, estimated_duration, estimated_ending_time, channel_group_name=channel_group_name)
+    data = {
+        "estimated_time": estimated_duration, 
+        "estimated_price": estimated_price,
+        "estimated_ending_time": estimated_ending_time.isoformat(),
+    }
+
+    channels_utils.channels_group_send_data(
+        data=data,
+        channel_group_name=channel_group_name
+    )
 
 def parse_model_rotation(model_rotation_raw: str):
     if model_rotation_raw is None:
@@ -230,32 +248,3 @@ def parse_model_rotation(model_rotation_raw: str):
         return None, None, None, "Some of the values in model rotation cannot be parsed as float"
     
     return rotation_x, rotation_y, rotation_z, None
-
-def onError(error_message, channel_group_name):
-    logger.error(error_message)
-    
-    if channel_group_name:
-        channel_layer = get_channel_layer()
-
-        async_to_sync(channel_layer.group_send)(channel_group_name, {
-            "type": "slicer.estimation.error",
-            "payload": {
-                "type": 'error',
-                "message": error_message
-            }
-        })
-
-def onSuccess(estimated_price, estimated_time, estimated_ending_time, channel_group_name):
-    channel_layer = get_channel_layer()
-
-    async_to_sync(channel_layer.group_send)(channel_group_name, {
-        "type": "slicer.estimation.success",
-        "payload": {
-            "type": 'success',
-            "data": {
-                "estimated_time": estimated_time, 
-                "estimated_price": estimated_price,
-                "estimated_ending_time": estimated_ending_time.isoformat(),
-            }
-        }
-    })

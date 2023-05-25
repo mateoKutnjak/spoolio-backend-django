@@ -3,7 +3,8 @@ import logging
 from ..print_job import utils as print_job_utils
 from ..print_order import models as print_order_models
 
-from ...celery import app
+from ... celery import app
+from ... libs import channels as channels_utils
 
 
 logger = logging.getLogger(__name__)
@@ -37,3 +38,49 @@ def create_printing_jobs_for_print_order(job_params):
     units = [print_job_utils.PrintOrderUnitPlaceholder.fromEntity(print_order_unit) for print_order_unit in print_order_units]
 
     end_at = print_job_utils.generate_print_jobs(units, fake=False)
+
+
+@app.task
+def print_job_ending_time_estimation(job_params):
+
+    # ************************************************ #
+    # *** Check websocket communication parameters *** #
+    # ************************************************ #
+
+    channel_group_name = job_params.get('meta', {}).get('django_channels', {}).get('channel_group_name', None)
+
+    if not channel_group_name:
+        channels_utils.channels_group_send_error('Celery task stopped. Parameter "channel_group_name" missing')
+        return
+
+    # ********************************* #
+    # *** Check required parameters *** #
+    # ********************************* #
+
+    raw_units = job_params.get('data', {}).get('units')
+
+    if raw_units is None:
+        channels_utils.channels_group_send_error('Celery task stopped. Parameter units is missing', channel_group_name)
+        return
+    
+    units = [print_job_utils.PrintOrderUnitPlaceholder(
+        quantity=u['quantity'], 
+        material_id=u['material']['id'], 
+        estimated_time=u['estimated_time']) for u in raw_units]
+
+    # ************************************** #
+    # *** Estimate print job ending time *** #
+    # ************************************** #
+
+    estimated_ending_time = print_job_utils.generate_print_jobs(units, fake=True)
+
+    # ************************************* #
+    # *** Send result to channels layer *** #
+    # ************************************* #
+
+    channels_utils.channels_group_send_data(
+        data={
+            "estimated_ending_time": estimated_ending_time.isoformat(),
+        }, 
+        channel_group_name=channel_group_name
+    )
