@@ -33,3 +33,16 @@ class PrinterViewSet(viewsets.ReadOnlyModelViewSet):
         IsAuthenticated: [],
         AllowAny: []
     }
+
+
+class PrintingMethodViewSet(viewsets.ReadOnlyModelViewSet):
+
+    queryset = models.PrintingMethod.objects.all()
+    serializer_class = serializers.PrintingMethodSerializer
+    permission_classes = (common_views.ActionBasedPermission,)
+
+    action_permissions = {
+        IsAdminUser: ['create', 'update', 'partial_update', 'destroy'],
+        IsAuthenticated: [],
+        AllowAny: ['retrieve', 'list']
+    }
