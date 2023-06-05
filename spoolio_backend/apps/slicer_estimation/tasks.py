@@ -75,6 +75,7 @@ def task_execute(job_params):
     quantity = print_order_unit.get('quantity')
     material = print_order_unit.get('spool', {}).get('material', {})
     fill_density = print_order_unit.get('infill', {}).get('percentage')
+    walls_count = print_order_unit.get('wall', {}).get('amount')
     model_rotation_raw = print_order_unit.get('model_rotation')
 
     filament_cost = material.get('filament_cost')
@@ -113,6 +114,7 @@ def task_execute(job_params):
         '--filament-retract-length': filament_retract_length,
         '--filament-retract-lift': filament_retract_lift,
         '--fill-density': str(int(fill_density * 100)) + "%" if fill_density else None,
+        '--perimeters': walls_count,
         '--rotate-x': rotation_x,
         '--rotate-y': rotation_y,
         '--rotate': rotation_z,

@@ -8,6 +8,16 @@ from .. user_profile import models as user_profile_models
 from ... libs import models as libs_models, signals as libs_signals
 
 
+class ItemType(models.Model):
+
+    name = models.CharField(max_length=128)
+
+
+class ItemAttribute(models.Model):
+
+    name = models.CharField(max_length=128)
+
+
 class ModelingOrder(libs_models.SoftDeleteModel):
 
     STATUS_REVIEWING = 'reviewing'
@@ -36,6 +46,9 @@ class ModelingOrder(libs_models.SoftDeleteModel):
     # Images and PDFs
     attachment_files = GenericRelation(common_models.AttachmentFile)
     attachment_images = GenericRelation(common_models.AttachmentImage)
+
+    item_type = models.ForeignKey(ItemType, on_delete=models.SET_NULL, null=True)
+    item_attributes = models.ManyToManyField(ItemAttribute)
 
     estimated_price = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
 

@@ -20,3 +20,7 @@ class OrderAdmin(admin.ModelAdmin):
 
 admin.site.register(models.OrderUnit, OrderUnitAdmin)
 admin.site.register(models.PrintOrder, OrderAdmin)
+
+admin.site.register(models.PrintUnitInfill)
+admin.site.register(models.PrintUnitWall)
+admin.site.register(models.PrintUnitInfillWallCombination)

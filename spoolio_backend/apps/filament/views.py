@@ -27,15 +27,6 @@ class MaterialViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_fields = ['available', ]
 
 
-class InfillViewSet(viewsets.ReadOnlyModelViewSet):
-
-    queryset = models.Infill.objects.all()
-    serializer_class = serializers.InfillSerializer
-    pagination_class = LimitOffsetPagination
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['available', ]
-
-
 class SpoolViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = models.Spool.objects.all()

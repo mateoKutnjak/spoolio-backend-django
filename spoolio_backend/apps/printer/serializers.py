@@ -5,8 +5,18 @@ from . import models
 from ..filament import serializers as filament_serializers
 
 
+class PrintingMethodSerializer(serializers.ModelSerializer):
+
+    supported_materials = filament_serializers.MaterialSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = models.PrintingMethod
+        fields = '__all__'
+
+
 class PrinterTypeSerializer(serializers.ModelSerializer):
 
+    printer_method = PrintingMethodSerializer(read_only=True)
     supported_materials = filament_serializers.MaterialSerializer(read_only=True, many=True)
 
     class Meta:

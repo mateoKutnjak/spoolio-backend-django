@@ -40,8 +40,8 @@ def findFirstAvailablePrinterForMaterial(material_id: filament_models.Material, 
     logger.debug('material_id={}'.format(material_id))
 
     for printer, ending_time in last_job_ending_time_dict.items():
-        logger.debug(printer.type.supported_materials.all())
-        if printer.type.supported_materials.filter(pk=material_id):
+        logger.debug(printer.type.printing_method.supported_materials.all())
+        if printer.type.printing_method.supported_materials.filter(pk=material_id):
             supported_pairs.append((printer, ending_time,))
 
     logger.debug('supported_pairs = {}'.format(supported_pairs))

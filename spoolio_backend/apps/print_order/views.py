@@ -65,3 +65,20 @@ class PrintOrderUnitViewSet(viewsets.ModelViewSet, common_permissions.IsAdminOrO
             return obj.user_profile.user or AnonymousUser
         return AnonymousUser
     
+
+class PrintUnitInfillViewSet(viewsets.ReadOnlyModelViewSet):
+
+    queryset = models.PrintUnitInfill.objects.all()
+    serializer_class = serializers.PrintUnitInfillSerializer
+
+
+class PrintUnitWallViewSet(viewsets.ReadOnlyModelViewSet):
+
+    queryset = models.PrintUnitWall.objects.all()
+    serializer_class = serializers.PrintUnitWallSerializer
+
+
+class PrintUnitInfillWallCombinationViewSet(viewsets.ReadOnlyModelViewSet):
+
+    queryset = models.PrintUnitInfillWallCombination.objects.all()
+    serializer_class = serializers.PrintUnitInfillWallCombinationSerializer

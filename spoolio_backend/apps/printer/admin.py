@@ -14,3 +14,4 @@ class PrinterTypeAdmin(admin.ModelAdmin):
 
 admin.site.register(models.PrinterType, PrinterTypeAdmin)
 admin.site.register(models.Printer)
+admin.site.register(models.PrintingMethod)

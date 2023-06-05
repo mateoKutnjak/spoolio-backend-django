@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from . import models
+from . import models, serializers as print_order_serializers
 
 
 from .. common import models as common_models, serializers as common_serializers
@@ -46,11 +46,14 @@ class PrintOrderSerializer(serializers.ModelSerializer):
 class PrintOrderUnitSerializer(serializers.ModelSerializer):
 
     spool = serializers.PrimaryKeyRelatedField(queryset=filament_models.Spool.objects.all(), required=False)
-    infill = serializers.PrimaryKeyRelatedField(queryset=filament_models.Infill.objects.all())
+    infill = serializers.PrimaryKeyRelatedField(queryset=models.PrintUnitInfill.objects.all())
+    wall = serializers.PrimaryKeyRelatedField(queryset=models.PrintUnitWall.objects.all())
+    infill_wall_combination = serializers.PrimaryKeyRelatedField(queryset=models.PrintUnitInfillWallCombination.objects.all(), required=False)
 
     def to_representation(self, instance):
         self.fields['spool'] = filament_serializers.SpoolSerializer(read_only=True)
-        self.fields['infill'] = filament_serializers.InfillSerializer(read_only=True)
+        self.fields['infill'] = print_order_serializers.PrintUnitInfillSerializer(read_only=True)
+        self.fields['wall'] = print_order_serializers.PrintUnitWallSerializer(read_only=True)
 
         return super(PrintOrderUnitSerializer, self).to_representation(instance)
 
@@ -64,3 +67,33 @@ class PrintOrderUnitPlaceholderSerializer(serializers.Serializer):
     quantity = serializers.IntegerField(min_value=1)
     material = filament_serializers.MaterialSerializer()
     estimated_time = serializers.IntegerField(min_value=1)
+
+
+class PrintUnitInfillSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.PrintUnitInfill
+        fields = '__all__'
+
+
+class PrintUnitWallSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.PrintUnitWall
+        fields = '__all__'
+
+
+class PrintUnitInfillWallCombinationSerializer(serializers.ModelSerializer):
+
+    infill = serializers.PrimaryKeyRelatedField(queryset=models.PrintUnitInfill.objects.all())
+    wall = serializers.PrimaryKeyRelatedField(queryset=models.PrintUnitWall.objects.all())
+
+    class Meta:
+        model = models.PrintUnitInfillWallCombination
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        self.fields['infill'] = print_order_serializers.PrintUnitInfillSerializer(read_only=True)
+        self.fields['wall'] = print_order_serializers.PrintUnitWallSerializer(read_only=True)
+
+        return super(PrintUnitInfillWallCombinationSerializer, self).to_representation(instance)

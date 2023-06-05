@@ -1,7 +1,9 @@
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models import signals
+
 import logging
 
 from ..common import models as common_models
@@ -13,6 +15,32 @@ from ...libs import models as libs_models, signals as libs_signals, storage_back
 
 
 logger = logging.getLogger(__name__)
+
+
+class PrintUnitInfill(models.Model):
+    name = models.CharField(max_length=16)
+    percentage = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(1.0)])
+    available = models.BooleanField()
+
+    def __str__(self) -> str:
+        return "{} - {}%".format(self.name, self.percentage * 100)
+    
+
+class PrintUnitWall(models.Model):
+    amount = models.PositiveSmallIntegerField()
+
+    def __str__(self) -> str:
+        return "{}".format(self.amount)
+    
+
+class PrintUnitInfillWallCombination(models.Model):
+
+    name = models.CharField(max_length=128)
+    infill = models.ForeignKey(PrintUnitInfill, on_delete=models.CASCADE)
+    wall = models.ForeignKey(PrintUnitWall, on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return "infill={}% [{}], walls={}".format(self.infill.percentage * 100, self.infill.name, self.wall.amount)
 
 
 class PrintOrder(libs_models.BaseTimestampModel):
@@ -66,7 +94,8 @@ class OrderUnit(libs_models.BaseTimestampModel):
     comment = models.TextField(blank=True, null=True)
 
     spool = models.ForeignKey(filament_models.Spool, on_delete=models.CASCADE)
-    infill = models.ForeignKey(filament_models.Infill, on_delete=models.CASCADE)
+    infill = models.ForeignKey(PrintUnitInfill, on_delete=models.CASCADE)
+    wall = models.ForeignKey(PrintUnitWall, on_delete=models.CASCADE)
 
     quantity = models.PositiveIntegerField()
 

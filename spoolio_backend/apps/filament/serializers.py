@@ -17,13 +17,6 @@ class MaterialSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class InfillSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = models.Infill
-        fields = '__all__'
-
-
 class SpoolSerializer(serializers.ModelSerializer):
 
     material = MaterialSerializer()
