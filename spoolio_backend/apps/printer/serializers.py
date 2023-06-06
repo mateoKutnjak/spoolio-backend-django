@@ -18,10 +18,14 @@ class PrinterTypeSerializer(serializers.ModelSerializer):
 
     printer_method = PrintingMethodSerializer(read_only=True)
     supported_materials = filament_serializers.MaterialSerializer(read_only=True, many=True)
+    printer_count = serializers.SerializerMethodField()
 
     class Meta:
         model = models.PrinterType
         fields = '__all__'
+
+    def get_printer_count(self, instance):
+        return models.Printer.objects.filter(type=instance).count()
 
 
 class PrinterSerializer(serializers.ModelSerializer):

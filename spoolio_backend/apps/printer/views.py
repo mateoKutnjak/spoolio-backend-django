@@ -15,9 +15,9 @@ class PrinterTypeViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = LimitOffsetPagination
 
     action_permissions = {
-        IsAdminUser: ['create', 'update', 'partial_update', 'retrieve', 'list', 'destroy'],
+        IsAdminUser: ['create', 'update', 'partial_update', 'retrieve', 'destroy'],
         IsAuthenticated: [],
-        AllowAny: []
+        AllowAny: ['list']
     }
 
 

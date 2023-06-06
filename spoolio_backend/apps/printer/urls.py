@@ -7,6 +7,7 @@ from . import views
 
 router = routers.DefaultRouter()
 router.register('printers', views.PrinterViewSet)
+router.register('printer-types', views.PrinterTypeViewSet)
 router.register('printing-methods', views.PrintingMethodViewSet)
 
 urlpatterns = [
