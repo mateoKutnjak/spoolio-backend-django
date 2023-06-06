@@ -37,7 +37,10 @@ def create_printing_jobs_for_print_order(job_params):
     print_order_units = print_order_models.OrderUnit.objects.filter(order=print_order_id)
     units = [print_job_utils.PrintOrderUnitPlaceholder.fromEntity(print_order_unit) for print_order_unit in print_order_units]
 
-    end_at = print_job_utils.generate_print_jobs(units, fake=False)
+    end_at, error_message = print_job_utils.generate_print_jobs(units, fake=False)
+
+    if error_message:
+        logger.error(error_message)
 
 
 @app.task
@@ -72,7 +75,11 @@ def print_job_ending_time_estimation(job_params):
     # *** Estimate print job ending time *** #
     # ************************************** #
 
-    estimated_ending_time = print_job_utils.generate_print_jobs(units, fake=True)
+    estimated_ending_time, error_message = print_job_utils.generate_print_jobs(units, fake=True)
+
+    if error_message:
+        channels_utils.channels_group_send_error(error_message, channel_group_name)
+        return
 
     # ************************************* #
     # *** Send result to channels layer *** #

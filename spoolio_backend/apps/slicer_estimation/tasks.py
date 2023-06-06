@@ -220,7 +220,12 @@ def task_execute(job_params):
         estimated_time=u['estimated_time']) for u in other_units]
     units.append(print_job_utils.PrintOrderUnitPlaceholder(quantity=quantity, estimated_time=estimated_duration, material_id=material['id']))
 
-    estimated_ending_time = print_job_utils.generate_print_jobs(units, fake=True)
+    estimated_ending_time, error_message = print_job_utils.generate_print_jobs(units, fake=True)
+
+    if error_message:
+        channels_utils.channels_group_send_error(error_message, channel_group_name=channel_group_name)
+        cleanFiles()
+        return
 
     data = {
         "estimated_time": estimated_duration, 

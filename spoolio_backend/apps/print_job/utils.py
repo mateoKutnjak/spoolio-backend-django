@@ -44,6 +44,9 @@ def findFirstAvailablePrinterForMaterial(material_id: filament_models.Material, 
         if printer.type.printing_method.supported_materials.filter(pk=material_id):
             supported_pairs.append((printer, ending_time,))
 
+    if not supported_pairs:
+        return None, None, 'There is not a printer that supports material with id = {}'.format(material_id)
+
     logger.debug('supported_pairs = {}'.format(supported_pairs))
 
     sorted_supported_pairs = sorted(supported_pairs, key=lambda x: x[1])
@@ -52,7 +55,7 @@ def findFirstAvailablePrinterForMaterial(material_id: filament_models.Material, 
     first_available_printer = sorted_supported_pairs[0][0]
     first_available_ending_time = sorted_supported_pairs[0][1]
     
-    return first_available_printer, first_available_ending_time
+    return first_available_printer, first_available_ending_time, None
 
 def generate_print_jobs(units: List[PrintOrderUnitPlaceholder], fake=True) -> datetime:
     
@@ -71,7 +74,7 @@ def generate_print_jobs(units: List[PrintOrderUnitPlaceholder], fake=True) -> da
 
     if not available_printers:
         logger.warn('No available printers')
-        return
+        return None, 'No printers available'
     
     # * Saves pairs (printer, datetime_when_available)
     printer_last_jobs_ending_time = {}
@@ -107,7 +110,10 @@ def generate_print_jobs(units: List[PrintOrderUnitPlaceholder], fake=True) -> da
 
             logger.info('Quantity = {}/{}'.format(_+1, unit.quantity))
 
-            printer, last_job_end_at = findFirstAvailablePrinterForMaterial(unit.material_id, printer_last_jobs_ending_time)
+            printer, last_job_end_at, error_message = findFirstAvailablePrinterForMaterial(unit.material_id, printer_last_jobs_ending_time)
+
+            if error_message:
+                return None, error_message
 
             logger.info('First available printer for material {} is {} which is available {}'.format(unit.material_id, printer, last_job_end_at))
 
@@ -135,7 +141,7 @@ def generate_print_jobs(units: List[PrintOrderUnitPlaceholder], fake=True) -> da
                 last_end_at = end_at
 
     # * Returning most recent ending time of a print job
-    return last_end_at
+    return last_end_at, None
 
 
 def firstTimeAvailableFrom(time: datetime, daytimeBoundStart: time, daytimeBoundEnd: time, buffer: timedelta):
