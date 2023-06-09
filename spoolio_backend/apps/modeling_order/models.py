@@ -12,10 +12,15 @@ class ItemType(models.Model):
 
     name = models.CharField(max_length=128)
 
+    def __str__(self) -> str:
+        return self.name
 
 class ItemAttribute(models.Model):
 
     name = models.CharField(max_length=128)
+
+    def __str__(self) -> str:
+        return self.name
 
 
 class ModelingOrder(libs_models.SoftDeleteModel):

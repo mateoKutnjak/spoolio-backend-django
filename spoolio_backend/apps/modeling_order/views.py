@@ -35,3 +35,16 @@ class ModelingOrderViewSet(viewsets.ModelViewSet, common_permissions.IsAdminOrOb
         if obj.user_profile:
             return obj.user_profile.user or AnonymousUser
         return AnonymousUser
+    
+
+class ItemTypeViewSet(viewsets.ReadOnlyModelViewSet):
+
+    queryset = models.ItemType.objects.all()
+    serializer_class = serializers.ItemTypeSerializer
+
+
+class ItemAttributeViewSet(viewsets.ReadOnlyModelViewSet):
+
+    queryset = models.ItemAttribute.objects.all()
+    serializer_class = serializers.ItemAttributeSerializer
+    
