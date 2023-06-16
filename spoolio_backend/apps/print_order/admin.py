@@ -23,4 +23,5 @@ admin.site.register(models.PrintOrder, OrderAdmin)
 
 admin.site.register(models.PrintUnitInfill)
 admin.site.register(models.PrintUnitWall)
+admin.site.register(models.PrintUnitWallThickness)
 admin.site.register(models.PrintUnitInfillWallCombination)

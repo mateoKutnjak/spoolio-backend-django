@@ -8,15 +8,21 @@ from ..filament import serializers as filament_serializers
 class PrintingMethodSerializer(serializers.ModelSerializer):
 
     supported_materials = filament_serializers.MaterialSerializer(read_only=True, many=True)
+    printer_type_picture = serializers.SerializerMethodField()
 
     class Meta:
         model = models.PrintingMethod
         fields = '__all__'
 
+    def get_printer_type_picture(self, instance):
+        # * Fetch picture URL of PrinterType of PrinterMethod
+        request = self.context.get('request')
+        first_printer_type = models.PrinterType.objects.filter(printing_method=instance).first()
+        return request.build_absolute_uri(first_printer_type.picture.url) if first_printer_type is not None else None
 
 class PrinterTypeSerializer(serializers.ModelSerializer):
 
-    printer_method = PrintingMethodSerializer(read_only=True)
+    printing_method = PrintingMethodSerializer(read_only=True)
     supported_materials = filament_serializers.MaterialSerializer(read_only=True, many=True)
     printer_count = serializers.SerializerMethodField()
 

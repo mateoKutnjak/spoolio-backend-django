@@ -78,6 +78,12 @@ class PrintUnitWallViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.PrintUnitWallSerializer
 
 
+class PrintUnitWallThicknessViewSet(viewsets.ReadOnlyModelViewSet):
+
+    queryset = models.PrintUnitWallThickness.objects.all()
+    serializer_class = serializers.PrintUnitWallThicknessSerializer
+
+
 class PrintUnitInfillWallCombinationViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = models.PrintUnitInfillWallCombination.objects.all()

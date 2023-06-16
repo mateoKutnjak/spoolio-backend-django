@@ -27,10 +27,17 @@ class PrintUnitInfill(models.Model):
     
 
 class PrintUnitWall(models.Model):
-    amount = models.PositiveSmallIntegerField()
+    amount = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)])
 
     def __str__(self) -> str:
         return "{}".format(self.amount)
+    
+
+class PrintUnitWallThickness(models.Model):
+    thickness = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(0.3)], help_text='In millimeters')
+
+    def __str__(self) -> str:
+        return "{}".format(self.thickness)
     
 
 class PrintUnitInfillWallCombination(models.Model):
@@ -96,6 +103,11 @@ class OrderUnit(libs_models.BaseTimestampModel):
     spool = models.ForeignKey(filament_models.Spool, on_delete=models.CASCADE)
     infill = models.ForeignKey(PrintUnitInfill, on_delete=models.CASCADE)
     wall = models.ForeignKey(PrintUnitWall, on_delete=models.CASCADE)
+    wall_thickness = models.ForeignKey(PrintUnitWallThickness, on_delete=models.CASCADE)
+
+    scale = models.FloatField(validators=[
+                MinValueValidator(0.001),
+            ], default=1.0)
 
     quantity = models.PositiveIntegerField()
 

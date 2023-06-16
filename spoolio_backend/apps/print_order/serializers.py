@@ -48,12 +48,14 @@ class PrintOrderUnitSerializer(serializers.ModelSerializer):
     spool = serializers.PrimaryKeyRelatedField(queryset=filament_models.Spool.objects.all(), required=False)
     infill = serializers.PrimaryKeyRelatedField(queryset=models.PrintUnitInfill.objects.all())
     wall = serializers.PrimaryKeyRelatedField(queryset=models.PrintUnitWall.objects.all())
+    wall_thickness = serializers.PrimaryKeyRelatedField(queryset=models.PrintUnitWallThickness.objects.all())
     infill_wall_combination = serializers.PrimaryKeyRelatedField(queryset=models.PrintUnitInfillWallCombination.objects.all(), required=False)
 
     def to_representation(self, instance):
         self.fields['spool'] = filament_serializers.SpoolSerializer(read_only=True)
         self.fields['infill'] = print_order_serializers.PrintUnitInfillSerializer(read_only=True)
         self.fields['wall'] = print_order_serializers.PrintUnitWallSerializer(read_only=True)
+        self.fields['wall_thickness'] = print_order_serializers.PrintUnitWallThicknessSerializer(read_only=True)
 
         return super(PrintOrderUnitSerializer, self).to_representation(instance)
 
@@ -80,6 +82,13 @@ class PrintUnitWallSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.PrintUnitWall
+        fields = '__all__'
+
+
+class PrintUnitWallThicknessSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.PrintUnitWallThickness
         fields = '__all__'
 
 
