@@ -76,7 +76,9 @@ def task_execute(job_params):
     material = print_order_unit.get('spool', {}).get('material', {})
     fill_density = print_order_unit.get('infill', {}).get('percentage')
     walls_count = print_order_unit.get('wall', {}).get('amount')
+    wall_thickness = print_order_unit.get('wall_thickness', {}).get('thickness')
     model_rotation_raw = print_order_unit.get('model_rotation')
+    scale = print_order_unit.get('scale')
 
     filament_cost = material.get('filament_cost')
     filament_density = material.get('filament_density')
@@ -90,8 +92,8 @@ def task_execute(job_params):
     quantity = print_order_unit.get('quantity')
     material = print_order_unit.get('spool', {}).get('material')
     
-    if quantity is None or not material:
-        error_message = 'Quantity (={}) or material (={}) is not set'.format(quantity, material)
+    if quantity is None or not material or scale is None:
+        error_message = 'Quantity (={}) or material (={}) or scale (={}) is not set'.format(quantity, material, scale)
         channels_utils.channels_group_send_error(error_message, channel_group_name=channel_group_name)
         return
 
@@ -115,9 +117,11 @@ def task_execute(job_params):
         '--filament-retract-lift': filament_retract_lift,
         '--fill-density': str(int(fill_density * 100)) + "%" if fill_density else None,
         '--perimeters': walls_count,
+        '--layer-height': wall_thickness,
         '--rotate-x': rotation_x,
         '--rotate-y': rotation_y,
         '--rotate': rotation_z,
+        '--scale': scale,
     }
 
     # ********************************** #
@@ -138,17 +142,23 @@ def task_execute(job_params):
     try:
         complete_process = subprocess.run(slicer_command, shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
 
-        if complete_process.returncode == 1:
-        
+        if complete_process.returncode > 0:
+
+            logger.error('Slicer error. Return code: {}'.format(complete_process.returncode))
+            logger.error('Slicer error. output lines: {}'.format(complete_process.stdout))
+
             error_message = 'Error occurred in subprocess command'
 
-            output_lines = str(complete_process.stdout).split('\\n')
-            for output_line in output_lines:
-                if output_line.startswith('error'):
-                    output_line_split = output_line.split(': ', 1)
+            if 'Objects could not fit on the bed' in str(complete_process.stdout):
+                error_message = 'Objects could not fit on the bed'
+            else:
+                output_lines = str(complete_process.stdout).split('\\n')
+                for output_line in output_lines:
+                    if output_line.startswith('error'):
+                        output_line_split = output_line.split(': ', 1)
 
-                    if len(output_line) > 1:
-                        error_message = output_line_split[1]
+                        if len(output_line) > 1:
+                            error_message = output_line_split[1]
             
             channels_utils.channels_group_send_error(error_message, channel_group_name=channel_group_name)
             cleanFiles()

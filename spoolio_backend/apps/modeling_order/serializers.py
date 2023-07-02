@@ -19,6 +19,13 @@ class ItemTypeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class OrderTypeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.OrderType
+        fields = '__all__'
+
+
 class ModelingOrderSerializer(serializers.ModelSerializer):
 
     user_profile = serializers.PrimaryKeyRelatedField(queryset=user_profile_models.UserProfile.objects.all(), required=False)

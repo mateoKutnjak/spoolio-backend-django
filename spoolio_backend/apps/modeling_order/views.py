@@ -48,3 +48,8 @@ class ItemAttributeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.ItemAttribute.objects.all()
     serializer_class = serializers.ItemAttributeSerializer
     
+
+class OrderTypeViewSet(viewsets.ReadOnlyModelViewSet):
+
+    queryset = models.OrderType.objects.all()
+    serializer_class = serializers.OrderTypeSerializer

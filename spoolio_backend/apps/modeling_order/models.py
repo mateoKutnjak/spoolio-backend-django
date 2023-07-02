@@ -11,13 +11,25 @@ from ... libs import models as libs_models, signals as libs_signals
 class ItemType(models.Model):
 
     name = models.CharField(max_length=128)
+    icon_name = models.CharField(max_length=64)
 
     def __str__(self) -> str:
         return self.name
 
+
 class ItemAttribute(models.Model):
 
     name = models.CharField(max_length=128)
+    description = models.CharField(max_length=128, blank=True)
+
+    def __str__(self) -> str:
+        return self.name
+    
+
+class OrderType(models.Model):
+
+    name = models.CharField(max_length=128)
+    icon_name = models.CharField(max_length=64)
 
     def __str__(self) -> str:
         return self.name
@@ -55,7 +67,7 @@ class ModelingOrder(libs_models.SoftDeleteModel):
     item_type = models.ForeignKey(ItemType, on_delete=models.SET_NULL, null=True)
     item_attributes = models.ManyToManyField(ItemAttribute)
 
-    estimated_price = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
+    estimated_price = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True, help_text="VAT will be added on this price")
 
     status = models.CharField(max_length=16, choices=ORDER_STATUS_CHOICES, default='reviewing')
 

@@ -12,3 +12,4 @@ class ModelingOrderAdmin(admin.ModelAdmin):
 admin.site.register(models.ModelingOrder, ModelingOrderAdmin)
 admin.site.register(models.ItemAttribute)
 admin.site.register(models.ItemType)
+admin.site.register(models.OrderType)

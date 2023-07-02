@@ -9,6 +9,7 @@ import logging
 from ..common import models as common_models
 from ..filament import models as filament_models
 from ..print_job import tasks as print_job_tasks
+from ..printer import models as printer_models
 from ..user_profile import models as user_profile_models
 
 from ...libs import models as libs_models, signals as libs_signals, storage_backends
@@ -104,6 +105,7 @@ class OrderUnit(libs_models.BaseTimestampModel):
     infill = models.ForeignKey(PrintUnitInfill, on_delete=models.CASCADE)
     wall = models.ForeignKey(PrintUnitWall, on_delete=models.CASCADE)
     wall_thickness = models.ForeignKey(PrintUnitWallThickness, on_delete=models.CASCADE)
+    printing_method = models.ForeignKey(printer_models.PrintingMethod, on_delete=models.SET_NULL, null=True)
 
     scale = models.FloatField(validators=[
                 MinValueValidator(0.001),
@@ -122,6 +124,7 @@ class OrderUnit(libs_models.BaseTimestampModel):
 
     estimated_price = models.DecimalField(max_digits=12, decimal_places=2)
     estimated_time = models.PositiveIntegerField()
+    eta = models.DateTimeField(null=True)
 
     model_volume = models.FloatField(help_text='Volume with length_unit unit. Format: "x,y,z"')
     model_dimensions = models.CharField(max_length=128, help_text='Dimensions with length_unit unit.')
