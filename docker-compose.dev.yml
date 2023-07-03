@@ -3,7 +3,7 @@ version: '3.7'
 services:
 
   db:
-    image: postgres:13
+    image: postgres:15.3
     volumes:
       - postgres_data:/var/lib/postgresql/data/
       - ./data/postgres/database_scripts/001_create_database.sql:/docker-entrypoint-initdb.d/001_create_database.sql

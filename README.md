@@ -10,6 +10,9 @@
 `docker-compose -f docker-compose.dev.yml build`
 - Run docker compose for development
 `docker-compose -f docker-compose.dev.yml up`
+- Fixtures load/dump (commands inside `web` docker service container)
+`python3 manage.py dumpdata --indent 4 --natural-foreign --natural-primary -e contenttypes -e auth.Permission -e sessions.session -e request.request > fixtures/backup.json`
+`python3 manage.py loaddata fixtures/backup.json`
 
 ### Production
 

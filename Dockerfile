@@ -35,6 +35,13 @@ RUN apt-get update && \
     postgresql-client \
     wget
 
+# * Explicit postgresql 15 version install
+# ! Must be compatible with docker-compose.yml/docker-compose.dev.yml postgres image version
+RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list' && \
+    wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
+    apt-get update --allow-releaseinfo-change && \
+    apt-get -y install postgresql-client-15
+
 ENV USER_NAME "spoolio_web_user"
 ENV HOME_DIR "/home/${USER_NAME}"
 
