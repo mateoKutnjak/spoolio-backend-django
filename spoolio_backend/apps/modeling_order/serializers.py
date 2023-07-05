@@ -32,6 +32,7 @@ class ModelingOrderSerializer(serializers.ModelSerializer):
     
     item_attributes = serializers.PrimaryKeyRelatedField(queryset=models.ItemAttribute.objects.all(), many=True)
     item_type = serializers.PrimaryKeyRelatedField(queryset=models.ItemType.objects.all())
+    order_type = serializers.PrimaryKeyRelatedField(queryset=models.OrderType.objects.all())
 
     class Meta:
         model = models.ModelingOrder
@@ -41,5 +42,6 @@ class ModelingOrderSerializer(serializers.ModelSerializer):
         self.fields['user_profile'] = user_profile_serializers.UserProfileSerializer(read_only=True)
         self.fields['item_attributes'] = ItemAttributeSerializer(read_only=True, many=True)
         self.fields['item_type'] = ItemTypeSerializer(read_only=True)
+        self.fields['order_type'] = OrderTypeSerializer(read_only=True)
 
         return super(ModelingOrderSerializer, self).to_representation(instance)

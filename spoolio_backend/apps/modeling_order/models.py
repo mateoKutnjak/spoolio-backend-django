@@ -66,6 +66,7 @@ class ModelingOrder(libs_models.SoftDeleteModel):
 
     item_type = models.ForeignKey(ItemType, on_delete=models.SET_NULL, null=True)
     item_attributes = models.ManyToManyField(ItemAttribute)
+    order_type = models.ForeignKey(OrderType, on_delete=models.SET_NULL, null=True)
 
     estimated_price = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True, help_text="VAT will be added on this price")
 
