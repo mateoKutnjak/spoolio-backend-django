@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'spoolio_backend.apps.authentication',
     'spoolio_backend.apps.blog',
     'spoolio_backend.apps.common',
+    'spoolio_backend.apps.faq',
     'spoolio_backend.apps.filament',
     'spoolio_backend.apps.invitation_token',
     'spoolio_backend.apps.modeling_order',

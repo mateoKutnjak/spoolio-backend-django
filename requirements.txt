@@ -1,24 +1,24 @@
-boto3
+boto3==1.26.85
 celery[redis]>=5.0.0,<6.0.0
-channels
-channels-redis
-Django
-django-allauth
-django-colorfield
-django-cors-headers
-django-dbbackup
-django-filter
-django-request
-django-storages
-djangorestframework
-djangorestframework-simplejwt
-dj-rest-auth[with_social]
-gunicorn
-pillow
-psycopg2-binary
-python-decouple
-stripe
-uvicorn[standard]
+channels==4.0.0
+channels-redis==4.1.0
+Django==4.1.3
+django-allauth==0.50.0
+django-colorfield==0.8.0
+django-cors-headers==3.13.0
+django-dbbackup==4.0.2
+django-filter==22.1
+django-request==1.6.2
+django-storages==1.13.2
+djangorestframework==3.14.0
+djangorestframework-simplejwt==5.2.2
+dj-rest-auth[with_social]==3.0.0
+gunicorn==20.1.0
+pillow==9.3.0
+psycopg2-binary==2.9.5
+python-decouple==3.8
+stripe==5.2.0
+uvicorn[standard]==0.21.1
 
 # * Without this package websockets cannot be used in production
 # *
@@ -30,7 +30,7 @@ uvicorn[standard]
 # *
 # * If similar error occurs, try adding dependency 'uvloop'
 # * For some reason uvicorn[standard] is not installed, but only uvicorn, so we add this package
-websockets
+websockets==11.0.1
 
 # ! google-api-python-client is used for FIX - remove when resolved (see https://gonzafirewall.medium.com/google-oauth2-and-django-rest-auth-92b0d8f70575)
-google-api-python-client
+google-api-python-client==2.77.0
