@@ -11,7 +11,9 @@
 - Run docker compose for development
 `docker-compose -f docker-compose.dev.yml up`
 - Fixtures load/dump (commands inside `web` docker service container)
+
 `python3 manage.py dumpdata --indent 4 --natural-foreign --natural-primary -e contenttypes -e auth.Permission -e sessions.session -e request.request > fixtures/backup.json`
+
 `python3 manage.py loaddata fixtures/backup.json`
 
 ### Production
@@ -44,6 +46,8 @@ Running production has to be done on hosting service instance (for example Digit
 #### Certbot
 
 Using this [guide](https://mindsers.blog/post/https-using-nginx-certbot-docker/) certbot was set up. It also has part for renewing through `docker-compose` service. It needs to be renewed every 90 days.
+
+Renew certificate by starting `docker-compose` services with `docker compose -f docker-compose.yml up` and in different terminal call `docker compose run --rm certbot renew`. Make sure that firewall does not block ports 80 and 443.
 
 #### Redis
 
