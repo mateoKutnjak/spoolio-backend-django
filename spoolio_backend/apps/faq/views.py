@@ -33,7 +33,7 @@ class BlogViewSet(viewsets.ModelViewSet, common_permissions.IsAdminOrObjectOwner
     filter_backends = [drf_filters.SearchFilter, DjangoFilterBackend]
     filter_class = filters.BlogFilter
     search_fields = ('title', 'subtitle')
-    filterset_fields = ('category')
+    filterset_fields = ('category', )
 
     action_permissions = {
         IsAdminUser: ['create', 'update', 'partial_update', 'destroy'],

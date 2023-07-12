@@ -3,7 +3,7 @@
     "model": "auth.user",
     "fields": {
         "password": "pbkdf2_sha256$600000$OyaDgfwhv3K9IcCkBkGCTM$mLOjj8k0iYTtRX8JvupoyYBblAYRDQBfCnTCyAxqJcs=",
-        "last_login": "2023-07-03T09:06:46.683Z",
+        "last_login": "2023-07-06T12:48:48.529Z",
         "is_superuser": true,
         "username": "admin",
         "first_name": "",
@@ -20,7 +20,7 @@
     "model": "auth.user",
     "fields": {
         "password": "pbkdf2_sha256$600000$9eJURfI7BS1jEUAEzWHXdI$HmKNLKgwFrWuLm8i1bMLcu94+/gggPuH0sFKLadzFrk=",
-        "last_login": "2023-06-26T14:21:01.702Z",
+        "last_login": "2023-07-08T12:26:57.872Z",
         "is_superuser": false,
         "username": "proba",
         "first_name": "",
@@ -70,8 +70,8 @@
 {
     "model": "auth.user",
     "fields": {
-        "password": "pbkdf2_sha256$600000$O0zwsSsIZiFojJXIGTlCZm$/NWha7DymzeEZWPLLTLSf3jZ06Ac9gTNhLdTULe+SNQ=",
-        "last_login": "2023-06-26T15:30:59.886Z",
+        "password": "pbkdf2_sha256$600000$9ujfOg0zppTHF5m7Q7uH1W$n/M5Aly6dsVpfm3J0l0Oq0rQ327crVPTPAwzksQ9Btc=",
+        "last_login": "2023-07-12T18:30:53.438Z",
         "is_superuser": false,
         "username": "mateo.kutnjak7",
         "first_name": "",
@@ -391,6 +391,23 @@
     }
 },
 {
+    "model": "auth.user",
+    "fields": {
+        "password": "pbkdf2_sha256$600000$BbBT7x3RYzkD1Y3xnwBDmT$abN6GEwt/fjNv7v4c0vkCVkMmtkMpr808Uawi8tjO7E=",
+        "last_login": "2023-07-10T13:24:17.540Z",
+        "is_superuser": false,
+        "username": "mateo.kutnjak77777777",
+        "first_name": "",
+        "last_name": "",
+        "email": "mateo.kutnjak77777777@gmail.com",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2023-07-10T13:24:17.339Z",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
     "model": "sites.site",
     "fields": {
         "domain": "example.com",
@@ -686,6 +703,18 @@
             "mateo.kutnjak71"
         ],
         "email": "mateo.kutnjak71@gmail.com",
+        "verified": false,
+        "primary": true
+    }
+},
+{
+    "model": "account.emailaddress",
+    "pk": 26,
+    "fields": {
+        "user": [
+            "mateo.kutnjak77777777"
+        ],
+        "email": "mateo.kutnjak77777777@gmail.com",
         "verified": false,
         "primary": true
     }
@@ -1570,13 +1599,13 @@
     "pk": 1,
     "fields": {
         "created_at": "2022-12-30T22:57:38.515Z",
-        "updated_at": "2023-03-25T19:00:18.169Z",
+        "updated_at": "2023-07-03T14:28:39.206Z",
         "is_deleted": false,
         "first_name": "a",
         "last_name": "a",
         "address": "a",
         "state": "a",
-        "country": "Austria",
+        "country": "Albania",
         "locality": "a",
         "postal_code": 123,
         "phone_number": ""
@@ -7108,13 +7137,47 @@
     }
 },
 {
+    "model": "common.shippingaddress",
+    "pk": 327,
+    "fields": {
+        "created_at": "2023-07-04T17:50:37.199Z",
+        "updated_at": "2023-07-04T17:50:37.199Z",
+        "is_deleted": false,
+        "first_name": "a",
+        "last_name": "a",
+        "address": "a",
+        "state": "a",
+        "country": "Albania",
+        "locality": "a",
+        "postal_code": 123,
+        "phone_number": ""
+    }
+},
+{
+    "model": "common.shippingaddress",
+    "pk": 328,
+    "fields": {
+        "created_at": "2023-07-08T11:32:48.506Z",
+        "updated_at": "2023-07-08T11:32:48.506Z",
+        "is_deleted": false,
+        "first_name": "a",
+        "last_name": "a",
+        "address": "a",
+        "state": "a",
+        "country": "Albania",
+        "locality": "a",
+        "postal_code": 123,
+        "phone_number": ""
+    }
+},
+{
     "model": "common.billingaddress",
     "pk": 1,
     "fields": {
         "created_at": "2022-12-30T22:57:38.468Z",
-        "updated_at": "2023-03-25T19:00:25.465Z",
+        "updated_at": "2023-07-03T14:29:10.781Z",
         "is_deleted": false,
-        "type": "individual",
+        "type": "company",
         "first_name": "b",
         "last_name": "b",
         "address": "b",
@@ -7123,10 +7186,10 @@
         "locality": "b",
         "postal_code": 123,
         "phone_number": "",
-        "contact_first_name": "",
-        "contact_last_name": "",
-        "company_name": "",
-        "vat_id": ""
+        "contact_first_name": "Mateo",
+        "contact_last_name": "Kutnjak",
+        "company_name": "Ocean Reverie j.d.o.o.",
+        "vat_id": "012345678901"
     }
 },
 {
@@ -14456,6 +14519,50 @@
     }
 },
 {
+    "model": "common.billingaddress",
+    "pk": 335,
+    "fields": {
+        "created_at": "2023-07-04T17:50:37.202Z",
+        "updated_at": "2023-07-04T17:50:37.202Z",
+        "is_deleted": false,
+        "type": "company",
+        "first_name": "b",
+        "last_name": "b",
+        "address": "b",
+        "state": "b",
+        "country": "Canada",
+        "locality": "b",
+        "postal_code": 123,
+        "phone_number": "",
+        "contact_first_name": "Mateo",
+        "contact_last_name": "Kutnjak",
+        "company_name": "Ocean Reverie j.d.o.o.",
+        "vat_id": "012345678901"
+    }
+},
+{
+    "model": "common.billingaddress",
+    "pk": 336,
+    "fields": {
+        "created_at": "2023-07-08T11:32:48.508Z",
+        "updated_at": "2023-07-08T11:32:48.508Z",
+        "is_deleted": false,
+        "type": "company",
+        "first_name": "b",
+        "last_name": "b",
+        "address": "b",
+        "state": "b",
+        "country": "Canada",
+        "locality": "b",
+        "postal_code": 123,
+        "phone_number": "",
+        "contact_first_name": "Mateo",
+        "contact_last_name": "Kutnjak",
+        "company_name": "Ocean Reverie j.d.o.o.",
+        "vat_id": "012345678901"
+    }
+},
+{
     "model": "common.attachmentfile",
     "pk": 2,
     "fields": {
@@ -14616,6 +14723,70 @@
     }
 },
 {
+    "model": "common.attachmentfile",
+    "pk": 12,
+    "fields": {
+        "created_at": "2023-07-04T00:09:50.062Z",
+        "updated_at": "2023-07-04T00:09:50.062Z",
+        "is_deleted": false,
+        "file": "attachment-files/account.export.details.name_KqrIezV.pdf",
+        "comment": null,
+        "content_type": [
+            "modeling_order",
+            "modelingorder"
+        ],
+        "object_id": 117
+    }
+},
+{
+    "model": "common.attachmentfile",
+    "pk": 13,
+    "fields": {
+        "created_at": "2023-07-04T00:22:07.850Z",
+        "updated_at": "2023-07-04T00:22:07.850Z",
+        "is_deleted": false,
+        "file": "attachment-files/account.export.details.name_1_8zf26wp.pdf",
+        "comment": null,
+        "content_type": [
+            "modeling_order",
+            "modelingorder"
+        ],
+        "object_id": 118
+    }
+},
+{
+    "model": "common.attachmentfile",
+    "pk": 14,
+    "fields": {
+        "created_at": "2023-07-08T11:52:25.741Z",
+        "updated_at": "2023-07-08T11:52:25.741Z",
+        "is_deleted": false,
+        "file": "attachment-files/account.export.details.name_1_Zw4UP9q.pdf",
+        "comment": null,
+        "content_type": [
+            "modeling_order",
+            "modelingorder"
+        ],
+        "object_id": 119
+    }
+},
+{
+    "model": "common.attachmentfile",
+    "pk": 15,
+    "fields": {
+        "created_at": "2023-07-12T22:44:54.946Z",
+        "updated_at": "2023-07-12T22:44:54.946Z",
+        "is_deleted": false,
+        "file": "attachment-files/account.export.details.name_ZBalr2p.pdf",
+        "comment": null,
+        "content_type": [
+            "modeling_order",
+            "modelingorder"
+        ],
+        "object_id": 120
+    }
+},
+{
     "model": "common.attachmentimage",
     "pk": 2,
     "fields": {
@@ -14648,6 +14819,22 @@
     }
 },
 {
+    "model": "common.attachmentimage",
+    "pk": 4,
+    "fields": {
+        "created_at": "2023-07-12T22:44:55.026Z",
+        "updated_at": "2023-07-12T22:44:55.026Z",
+        "is_deleted": false,
+        "image": "attachment-images/original-prusa-sl1s_4a8KQz9.png",
+        "comment": null,
+        "content_type": [
+            "modeling_order",
+            "modelingorder"
+        ],
+        "object_id": 120
+    }
+},
+{
     "model": "common.shippingmethod",
     "pk": 1,
     "fields": {
@@ -14671,6 +14858,72 @@
         "description": "Your order will be lost",
         "price": "33.00",
         "available": true
+    }
+},
+{
+    "model": "faq.category",
+    "pk": 1,
+    "fields": {
+        "name": "_3d_printing",
+        "description": "todo",
+        "picture": "faq_blog_images/http-channels-celery-flowchart.drawio.png"
+    }
+},
+{
+    "model": "faq.category",
+    "pk": 2,
+    "fields": {
+        "name": "materials",
+        "description": "todo",
+        "picture": "faq_blog_images/298711580_488003949994028_8324153697868383929_n.jpg"
+    }
+},
+{
+    "model": "faq.category",
+    "pk": 3,
+    "fields": {
+        "name": "design_guidelines",
+        "description": "todo",
+        "picture": "faq_blog_images/domagoj-9iLi9zWXgEQ-unsplash.jpg"
+    }
+},
+{
+    "model": "faq.blog",
+    "pk": 1,
+    "fields": {
+        "created_at": "2023-07-10T10:24:45.635Z",
+        "updated_at": "2023-07-10T10:24:45.635Z",
+        "title": "sla_technology",
+        "subtitle": "blabla",
+        "content": "blabla",
+        "picture": "faq_blog_images/test.jpg",
+        "category": 1
+    }
+},
+{
+    "model": "faq.blog",
+    "pk": 2,
+    "fields": {
+        "created_at": "2023-07-10T10:25:11.968Z",
+        "updated_at": "2023-07-10T10:25:11.968Z",
+        "title": "fdm_technology",
+        "subtitle": "b",
+        "content": "b",
+        "picture": "faq_blog_images/test_1.jpg",
+        "category": 1
+    }
+},
+{
+    "model": "faq.blog",
+    "pk": 3,
+    "fields": {
+        "created_at": "2023-07-10T10:27:24.593Z",
+        "updated_at": "2023-07-10T10:27:24.593Z",
+        "title": "petg",
+        "subtitle": "asf",
+        "content": "asf",
+        "picture": "faq_blog_images/original-prusa-sl1s.png",
+        "category": 2
     }
 },
 {
@@ -14890,6 +15143,30 @@
     }
 },
 {
+    "model": "invitation_token.invitationtoken",
+    "pk": 4,
+    "fields": {
+        "created_at": "2023-07-10T13:24:12.534Z",
+        "updated_at": "2023-07-10T13:24:17.535Z",
+        "is_deleted": false,
+        "value": "12341234",
+        "user": [
+            "mateo.kutnjak77777777"
+        ]
+    }
+},
+{
+    "model": "invitation_token.invitationtoken",
+    "pk": 5,
+    "fields": {
+        "created_at": "2023-07-12T10:09:19.961Z",
+        "updated_at": "2023-07-12T10:09:19.961Z",
+        "is_deleted": false,
+        "value": "69420",
+        "user": null
+    }
+},
+{
     "model": "modeling_order.itemtype",
     "pk": 1,
     "fields": {
@@ -14972,6 +15249,7 @@
         "contact_email": "nekidrugi@gmail.com",
         "comment": "daffd",
         "item_type": null,
+        "order_type": null,
         "estimated_price": null,
         "status": "reviewing",
         "item_attributes": []
@@ -14988,6 +15266,7 @@
         "contact_email": "adsf@adfs.asdf",
         "comment": "sdfsdf",
         "item_type": null,
+        "order_type": null,
         "estimated_price": null,
         "status": "reviewing",
         "item_attributes": []
@@ -15004,6 +15283,7 @@
         "contact_email": "nekidrugi@gmail.com",
         "comment": "sd",
         "item_type": null,
+        "order_type": null,
         "estimated_price": null,
         "status": "reviewing",
         "item_attributes": []
@@ -15020,6 +15300,7 @@
         "contact_email": "nekidrugi@gmail.com",
         "comment": "gjkj",
         "item_type": 2,
+        "order_type": null,
         "estimated_price": null,
         "status": "reviewing",
         "item_attributes": [
@@ -15040,6 +15321,7 @@
         "contact_email": "nekidrugi@gmail.com",
         "comment": "bcgfhdfgh",
         "item_type": 2,
+        "order_type": null,
         "estimated_price": null,
         "status": "reviewing",
         "item_attributes": [
@@ -15059,6 +15341,7 @@
         "contact_email": "nekidrugi@gmail.com",
         "comment": "sdfggf",
         "item_type": 2,
+        "order_type": null,
         "estimated_price": null,
         "status": "reviewing",
         "item_attributes": [
@@ -15078,6 +15361,7 @@
         "contact_email": "nekidrugi@gmail.com",
         "comment": "dsf",
         "item_type": 1,
+        "order_type": null,
         "estimated_price": null,
         "status": "reviewing",
         "item_attributes": []
@@ -15094,11 +15378,95 @@
         "contact_email": "nekidrugi@gmail.com",
         "comment": "asdfasdf",
         "item_type": 2,
+        "order_type": null,
         "estimated_price": "34.00",
         "status": "in_progress",
         "item_attributes": [
             1,
             3,
+            4
+        ]
+    }
+},
+{
+    "model": "modeling_order.modelingorder",
+    "pk": 117,
+    "fields": {
+        "created_at": "2023-07-04T00:09:49.942Z",
+        "updated_at": "2023-07-04T00:09:49.942Z",
+        "is_deleted": false,
+        "user_profile": 7,
+        "contact_email": "nekidrugi@gmail.23333112",
+        "comment": "asfasf",
+        "item_type": 1,
+        "order_type": null,
+        "estimated_price": null,
+        "status": "reviewing",
+        "item_attributes": [
+            1,
+            2,
+            4
+        ]
+    }
+},
+{
+    "model": "modeling_order.modelingorder",
+    "pk": 118,
+    "fields": {
+        "created_at": "2023-07-04T00:22:07.724Z",
+        "updated_at": "2023-07-04T15:17:53.723Z",
+        "is_deleted": false,
+        "user_profile": 7,
+        "contact_email": "nekidrugi@gmail.23333112",
+        "comment": "sfa",
+        "item_type": 1,
+        "order_type": 3,
+        "estimated_price": "33.00",
+        "status": "awaiting_payment",
+        "item_attributes": [
+            1,
+            2,
+            4
+        ]
+    }
+},
+{
+    "model": "modeling_order.modelingorder",
+    "pk": 119,
+    "fields": {
+        "created_at": "2023-07-08T11:52:25.607Z",
+        "updated_at": "2023-07-08T11:52:25.607Z",
+        "is_deleted": false,
+        "user_profile": 7,
+        "contact_email": "nekidrugi@gmail.23333112",
+        "comment": "asffasf",
+        "item_type": 1,
+        "order_type": 3,
+        "estimated_price": null,
+        "status": "reviewing",
+        "item_attributes": [
+            2,
+            3
+        ]
+    }
+},
+{
+    "model": "modeling_order.modelingorder",
+    "pk": 120,
+    "fields": {
+        "created_at": "2023-07-12T22:44:54.897Z",
+        "updated_at": "2023-07-12T22:44:54.897Z",
+        "is_deleted": false,
+        "user_profile": null,
+        "contact_email": "mateo.kutnjak7@gmail.com",
+        "comment": "probni za gueswta",
+        "item_type": 1,
+        "order_type": 3,
+        "estimated_price": null,
+        "status": "reviewing",
+        "item_attributes": [
+            1,
+            2,
             4
         ]
     }
@@ -15212,6 +15580,20 @@
         "duration": 68160,
         "start_at": "2023-06-28T07:00:00.918Z",
         "end_at": "2023-06-29T01:56:00.918Z",
+        "status": "in_queue"
+    }
+},
+{
+    "model": "print_job.printingjob",
+    "pk": 136,
+    "fields": {
+        "created_at": "2023-07-08T11:48:21.580Z",
+        "updated_at": "2023-07-08T11:48:21.580Z",
+        "print_order_unit": 242,
+        "printer": 3,
+        "duration": 68160,
+        "start_at": "2023-07-10T07:00:00.560Z",
+        "end_at": "2023-07-11T01:56:00.560Z",
         "status": "in_queue"
     }
 },
@@ -15477,6 +15859,40 @@
         "estimated_price": "10.00",
         "estimated_time": 6120,
         "status": "awaiting_payment"
+    }
+},
+{
+    "model": "print_order.printorder",
+    "pk": 293,
+    "fields": {
+        "created_at": "2023-07-04T17:50:37.206Z",
+        "updated_at": "2023-07-04T17:50:37.206Z",
+        "user_profile": 7,
+        "contact_email": "nekidrugi@gmail.23333112",
+        "shipping_address": 327,
+        "billing_address": 335,
+        "shipping_method": 2,
+        "comment": null,
+        "estimated_price": "10.00",
+        "estimated_time": 8160,
+        "status": "awaiting_payment"
+    }
+},
+{
+    "model": "print_order.printorder",
+    "pk": 294,
+    "fields": {
+        "created_at": "2023-07-08T11:32:48.514Z",
+        "updated_at": "2023-07-08T11:48:21.507Z",
+        "user_profile": 7,
+        "contact_email": "nekidrugi@gmail.23333112",
+        "shipping_address": 328,
+        "billing_address": 336,
+        "shipping_method": 2,
+        "comment": null,
+        "estimated_price": "27.26",
+        "estimated_time": 68160,
+        "status": "in_progress"
     }
 },
 {
@@ -15796,6 +16212,64 @@
         "length_unit": "mms",
         "rotation_unit": "degrees",
         "screenshot": "print_unit_screenshots/screenshot_TMGY5ts.jpg"
+    }
+},
+{
+    "model": "print_order.orderunit",
+    "pk": 241,
+    "fields": {
+        "created_at": "2023-07-04T17:50:37.872Z",
+        "updated_at": "2023-07-04T17:50:37.872Z",
+        "comment": "TODO",
+        "spool": 2,
+        "infill": 1,
+        "wall": 5,
+        "wall_thickness": 1,
+        "printing_method": 2,
+        "scale": 1.0,
+        "quantity": 4,
+        "file": "print_order_files/awm_trigger_PC1gYHA_sQ9nI7Z.stl",
+        "order": 293,
+        "estimated_price": "0.08",
+        "estimated_time": 2040,
+        "eta": null,
+        "model_volume": 3643.344666064102,
+        "model_dimensions": "48.45189666748047,38.506004333496094,9",
+        "model_rotation": "0,0,0",
+        "optimal_rotation": "0,0,0",
+        "use_optimal_rotation": true,
+        "length_unit": "mms",
+        "rotation_unit": "degrees",
+        "screenshot": "print_unit_screenshots/screenshot_s1I6NfV.jpg"
+    }
+},
+{
+    "model": "print_order.orderunit",
+    "pk": 242,
+    "fields": {
+        "created_at": "2023-07-08T11:32:49.188Z",
+        "updated_at": "2023-07-08T11:32:49.188Z",
+        "comment": "TODO",
+        "spool": 1,
+        "infill": 1,
+        "wall": 5,
+        "wall_thickness": 1,
+        "printing_method": 1,
+        "scale": 1.0,
+        "quantity": 1,
+        "file": "print_order_files/awm_receiver_UhC4o1E_Che2mgy.stl",
+        "order": 294,
+        "estimated_price": "3.41",
+        "estimated_time": 68160,
+        "eta": null,
+        "model_volume": 170399.4635447574,
+        "model_dimensions": "30,198,102",
+        "model_rotation": "0,0,0",
+        "optimal_rotation": "0,0,0",
+        "use_optimal_rotation": true,
+        "length_unit": "mms",
+        "rotation_unit": "degrees",
+        "screenshot": "print_unit_screenshots/screenshot_2jg0c9D.jpg"
     }
 },
 {
@@ -20271,12 +20745,12 @@
     "pk": 7,
     "fields": {
         "created_at": "2022-12-30T22:57:38.934Z",
-        "updated_at": "2023-03-25T19:00:25.535Z",
+        "updated_at": "2023-07-12T17:44:54.009Z",
         "is_deleted": false,
         "user": [
             "mateo.kutnjak7"
         ],
-        "email": "nekidrugi@gmail.com",
+        "email": "",
         "first_name": "Mateo2",
         "last_name": "Kutnjak",
         "shipping_address": 1,
@@ -20681,6 +21155,24 @@
     }
 },
 {
+    "model": "user_profile.userprofile",
+    "pk": 32,
+    "fields": {
+        "created_at": "2023-07-10T13:24:17.528Z",
+        "updated_at": "2023-07-10T13:25:17.373Z",
+        "is_deleted": false,
+        "user": [
+            "mateo.kutnjak77777777"
+        ],
+        "email": "mateo.kutnjak7777@gmail.com",
+        "first_name": null,
+        "last_name": null,
+        "shipping_address": null,
+        "billing_address": null,
+        "phone_number": ""
+    }
+},
+{
     "model": "admin.logentry",
     "pk": 1,
     "fields": {
@@ -20894,6 +21386,240 @@
         "object_repr": "designing_new_model",
         "action_flag": 2,
         "change_message": "[{\"changed\": {\"fields\": [\"Icon name\"]}}]"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 13,
+    "fields": {
+        "action_time": "2023-07-04T15:17:53.728Z",
+        "user": [
+            "admin"
+        ],
+        "content_type": [
+            "modeling_order",
+            "modelingorder"
+        ],
+        "object_id": "118",
+        "object_repr": "118: [2023-07-04 00:22:07.724053+00:00] BY=mateo.kutnjak7@gmail.com CONTACT_EMAIL=nekidrugi@gmail.23333112",
+        "action_flag": 2,
+        "change_message": "[{\"changed\": {\"fields\": [\"Estimated price\", \"Status\"]}}]"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 14,
+    "fields": {
+        "action_time": "2023-07-10T10:03:51.946Z",
+        "user": [
+            "admin"
+        ],
+        "content_type": [
+            "faq",
+            "category"
+        ],
+        "object_id": "1",
+        "object_repr": "3d_printing",
+        "action_flag": 1,
+        "change_message": "[{\"added\": {}}]"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 15,
+    "fields": {
+        "action_time": "2023-07-10T10:03:58.884Z",
+        "user": [
+            "admin"
+        ],
+        "content_type": [
+            "faq",
+            "category"
+        ],
+        "object_id": "2",
+        "object_repr": "materials",
+        "action_flag": 1,
+        "change_message": "[{\"added\": {}}]"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 16,
+    "fields": {
+        "action_time": "2023-07-10T10:23:58.957Z",
+        "user": [
+            "admin"
+        ],
+        "content_type": [
+            "faq",
+            "category"
+        ],
+        "object_id": "3",
+        "object_repr": "design_guidelines",
+        "action_flag": 1,
+        "change_message": "[{\"added\": {}}]"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 17,
+    "fields": {
+        "action_time": "2023-07-10T10:24:45.636Z",
+        "user": [
+            "admin"
+        ],
+        "content_type": [
+            "faq",
+            "blog"
+        ],
+        "object_id": "1",
+        "object_repr": "1: [1]: sla_technology",
+        "action_flag": 1,
+        "change_message": "[{\"added\": {}}]"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 18,
+    "fields": {
+        "action_time": "2023-07-10T10:25:11.970Z",
+        "user": [
+            "admin"
+        ],
+        "content_type": [
+            "faq",
+            "blog"
+        ],
+        "object_id": "2",
+        "object_repr": "2: [3d_printing]: fdm_technology",
+        "action_flag": 1,
+        "change_message": "[{\"added\": {}}]"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 19,
+    "fields": {
+        "action_time": "2023-07-10T10:27:24.595Z",
+        "user": [
+            "admin"
+        ],
+        "content_type": [
+            "faq",
+            "blog"
+        ],
+        "object_id": "3",
+        "object_repr": "3: [materials]: petg",
+        "action_flag": 1,
+        "change_message": "[{\"added\": {}}]"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 20,
+    "fields": {
+        "action_time": "2023-07-10T10:54:13.754Z",
+        "user": [
+            "admin"
+        ],
+        "content_type": [
+            "faq",
+            "category"
+        ],
+        "object_id": "1",
+        "object_repr": "3d_printing",
+        "action_flag": 2,
+        "change_message": "[{\"changed\": {\"fields\": [\"Picture\"]}}]"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 21,
+    "fields": {
+        "action_time": "2023-07-10T10:54:19.687Z",
+        "user": [
+            "admin"
+        ],
+        "content_type": [
+            "faq",
+            "category"
+        ],
+        "object_id": "2",
+        "object_repr": "materials",
+        "action_flag": 2,
+        "change_message": "[{\"changed\": {\"fields\": [\"Picture\"]}}]"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 22,
+    "fields": {
+        "action_time": "2023-07-10T10:54:32.605Z",
+        "user": [
+            "admin"
+        ],
+        "content_type": [
+            "faq",
+            "category"
+        ],
+        "object_id": "3",
+        "object_repr": "design_guidelines",
+        "action_flag": 2,
+        "change_message": "[{\"changed\": {\"fields\": [\"Picture\"]}}]"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 23,
+    "fields": {
+        "action_time": "2023-07-10T11:03:46.869Z",
+        "user": [
+            "admin"
+        ],
+        "content_type": [
+            "faq",
+            "category"
+        ],
+        "object_id": "1",
+        "object_repr": "_3d_printing",
+        "action_flag": 2,
+        "change_message": "[{\"changed\": {\"fields\": [\"Name\"]}}]"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 24,
+    "fields": {
+        "action_time": "2023-07-10T13:24:12.535Z",
+        "user": [
+            "admin"
+        ],
+        "content_type": [
+            "invitation_token",
+            "invitationtoken"
+        ],
+        "object_id": "4",
+        "object_repr": "12341234: USER=null",
+        "action_flag": 1,
+        "change_message": "[{\"added\": {}}]"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 25,
+    "fields": {
+        "action_time": "2023-07-12T10:09:19.970Z",
+        "user": [
+            "admin"
+        ],
+        "content_type": [
+            "invitation_token",
+            "invitationtoken"
+        ],
+        "object_id": "5",
+        "object_repr": "69420: USER=null",
+        "action_flag": 1,
+        "change_message": "[{\"added\": {}}]"
     }
 }
 ]
