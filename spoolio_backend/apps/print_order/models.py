@@ -124,7 +124,7 @@ class OrderUnit(libs_models.BaseTimestampModel):
 
     estimated_price = models.DecimalField(max_digits=12, decimal_places=2)
     estimated_time = models.PositiveIntegerField()
-    eta = models.DateTimeField(null=True)
+    eta = models.DateTimeField(null=True, blank=True)
 
     model_volume = models.FloatField(help_text='Volume with length_unit unit. Format: "x,y,z"')
     model_dimensions = models.CharField(max_length=128, help_text='Dimensions with length_unit unit.')
@@ -143,7 +143,8 @@ class OrderUnit(libs_models.BaseTimestampModel):
 
 
 # * Every time 'status' field of PrintOrder changes, send email to 'contact_email' field
-signals.pre_save.connect(receiver=libs_signals.send_email_on_order_status_change, sender=PrintOrder)
+signals.pre_save.connect(receiver=libs_signals.print_order_pre_save_signal, sender=PrintOrder)
+signals.post_save.connect(receiver=libs_signals.print_order_post_save_signal, sender=PrintOrder)
 
 def create_printing_job_for_print_order_unit(sender, instance, created, raw, **kwargs):
 

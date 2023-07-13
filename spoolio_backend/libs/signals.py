@@ -6,7 +6,7 @@ import logging.config
 logger = logging.getLogger(__name__)
 
 
-def send_email_on_order_status_change(sender, instance, raw, using, **kwargs):
+def print_order_pre_save_signal(sender, instance, raw, using, **kwargs):
 
     if raw:
         return
@@ -33,3 +33,18 @@ def send_email_on_order_status_change(sender, instance, raw, using, **kwargs):
                 )
         except Exception as e:
             logger.critical("Exception occurred while trying to send order status change email: {}".format(e))
+
+
+def print_order_post_save_signal(sender, instance, created, raw, using, update_fields, **kwargs):
+
+    if raw:
+        return
+    
+    if created:
+        send_mail(
+            'Order has been created',
+            '{} no {} has been created. STATUS={}'.format(sender.__name__, instance.id, instance.status),
+            'bot@spoolio.net',
+            ['info.ur3d@gmail.com'],
+            fail_silently=False,
+        )

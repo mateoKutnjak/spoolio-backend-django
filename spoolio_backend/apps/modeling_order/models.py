@@ -76,4 +76,5 @@ class ModelingOrder(libs_models.SoftDeleteModel):
         return "{}: [{}] BY={} CONTACT_EMAIL={}".format(self.pk, self.created_at, self.user_profile.user.email if self.user_profile is not None and self.user_profile.user is not None else 'guest', self.contact_email )
 
 
-signals.pre_save.connect(receiver=libs_signals.send_email_on_order_status_change, sender=ModelingOrder)
+signals.pre_save.connect(receiver=libs_signals.print_order_pre_save_signal, sender=ModelingOrder)
+signals.post_save.connect(receiver=libs_signals.print_order_post_save_signal, sender=ModelingOrder)

@@ -48,4 +48,5 @@ class StoreOrderUnit(libs_models.SoftDeleteModel):
     quantity = models.PositiveIntegerField()
 
 
-signals.pre_save.connect(receiver=libs_signals.send_email_on_order_status_change, sender=StoreOrder)
+signals.pre_save.connect(receiver=libs_signals.print_order_pre_save_signal, sender=StoreOrder)
+signals.post_save.connect(receiver=libs_signals.print_order_post_save_signal, sender=StoreOrder)
