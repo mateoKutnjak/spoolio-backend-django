@@ -30,10 +30,13 @@ RUN apt-get update && \
     libgtk-3-0 \
     libglu1 \
     libproj-dev \
+    lsb-release \
     gdal-bin \
     ncat \
     postgresql-client \
     wget
+
+RUN lsb_release -cs
 
 # * Explicit postgresql 15 version install
 # ! Must be compatible with docker-compose.yml/docker-compose.dev.yml postgres image version
