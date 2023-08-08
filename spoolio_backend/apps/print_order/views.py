@@ -3,6 +3,7 @@ from django.contrib.auth.models import AnonymousUser
 from rest_framework import filters, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
+from rest_framework.response import Response
 
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -27,6 +28,17 @@ class PrintOrderViewSet(viewsets.ModelViewSet, common_permissions.IsAdminOrObjec
         IsAuthenticated: [],
         AllowAny: ['create',]
     }
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset()).exclude(status__in=[models.PrintOrder.STATUS_AWAITING_PAYMENT])
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     def get_queryset(self):
         # * As this method filters only order which belong to request.user,

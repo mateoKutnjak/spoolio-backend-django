@@ -29,6 +29,7 @@ class ItemAttribute(models.Model):
 class OrderType(models.Model):
 
     name = models.CharField(max_length=128)
+    description = models.CharField(max_length=512)
     icon_name = models.CharField(max_length=64)
 
     def __str__(self) -> str:
