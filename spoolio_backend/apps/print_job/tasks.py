@@ -61,15 +61,18 @@ def print_job_ending_time_estimation(job_params):
     # ********************************* #
 
     raw_units = job_params.get('data', {}).get('units')
+    logger.info('RAW UNITS: {}'.format(raw_units))
 
     if raw_units is None:
         channels_utils.channels_group_send_error('Celery task stopped. Parameter units is missing', channel_group_name)
         return
-    
+
     units = [print_job_utils.PrintOrderUnitPlaceholder(
         quantity=u['quantity'], 
-        material_id=u['material']['id'], 
-        estimated_time=u['estimated_time']) for u in raw_units]
+        material_id=u['material_id'], 
+        estimated_time=u['estimated_time'],
+        model_dimensions=u['model_dimensions'],
+        length_unit=u['length_unit']) for u in raw_units]
 
     # ************************************** #
     # *** Estimate print job ending time *** #

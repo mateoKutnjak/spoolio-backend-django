@@ -25,3 +25,6 @@ admin.site.register(models.PrintUnitInfill)
 admin.site.register(models.PrintUnitWall)
 admin.site.register(models.PrintUnitWallThickness)
 admin.site.register(models.PrintUnitInfillWallCombination)
+
+admin.site.register(models.CostVariables)
+admin.site.register(models.QuantityMultiplier)

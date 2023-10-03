@@ -15,10 +15,12 @@ logger = logging.getLogger(__name__)
 
 class PrintOrderUnitPlaceholder:
 
-    def __init__(self, quantity, estimated_time, material_id, id=None) -> None:
+    def __init__(self, quantity, estimated_time, material_id, model_dimensions, length_unit, id=None) -> None:
         self.quantity = quantity
         self.estimated_time = estimated_time
         self.material_id = material_id
+        self.model_dimensions = model_dimensions
+        self.length_unit = length_unit
         self.id = id
 
     def hasId(self) -> bool:
@@ -30,14 +32,16 @@ class PrintOrderUnitPlaceholder:
             quantity=entity.quantity, 
             estimated_time=entity.estimated_time, 
             material_id=entity.spool.material.id, 
+            model_dimensions=entity.model_dimensions,
+            length_unit=entity.length_unit,
             id=entity.id)
 
 
-def findFirstAvailablePrinterForMaterial(material_id: filament_models.Material, last_job_ending_time_dict: Dict[printer_models.Printer, datetime]) -> printer_models.Printer:
+def findFirstAvailablePrinterForMaterial(material_id: int, last_job_ending_time_dict: Dict[printer_models.Printer, datetime]) -> printer_models.Printer:
 
     supported_pairs = []
 
-    logger.debug('material_id={}'.format(material_id))
+    logger.info('material_id={}'.format(material_id))
 
     for printer, ending_time in last_job_ending_time_dict.items():
         logger.debug(printer.type.printing_method.supported_materials.all())
@@ -57,18 +61,12 @@ def findFirstAvailablePrinterForMaterial(material_id: filament_models.Material, 
     
     return first_available_printer, first_available_ending_time, None
 
-def generate_print_jobs(units: List[PrintOrderUnitPlaceholder], fake=True) -> datetime:
+
+def generate_print_jobs(units: List[PrintOrderUnitPlaceholder], fake: bool) -> datetime:
     
     working_hours_start = time(settings.WORKING_HOURS_START_HOUR, settings.WORKING_HOURS_START_MINUTE)
     working_hours_end = time(settings.WORKING_HOURS_END_HOUR, settings.WORKING_HOURS_END_MINUTE)
     buffer_after_job = timedelta(hours=settings.BUFFER_AFTER_PRINT_JOB_DONE_HOUR, minutes=settings.BUFFER_AFTER_PRINT_JOB_DONE_MINUTE)
-
-    logger.debug('SETTINGS: Working hours: {} - {}'.format(working_hours_start, working_hours_end))
-    logger.debug('SETTINGS: Buffer after job: {}'.format(buffer_after_job))
-
-    logger.debug('   Working day (UTC time): {} - {}'.format(working_hours_start, working_hours_end))
-    logger.debug('   Time buffer after previous job is finished: {}'.format(buffer_after_job))
-
 
     available_printers = printer_models.Printer.objects.filter(available=True)
 
@@ -105,28 +103,40 @@ def generate_print_jobs(units: List[PrintOrderUnitPlaceholder], fake=True) -> da
 
         logger.info('')
         logger.info('Unit: {}'.format(unit))
+        logger.info('Material ID: {}'.format(unit.material_id))
+        quantity = unit.quantity
 
-        for _ in range(unit.quantity):
+        while quantity > 0:
 
-            logger.info('Quantity = {}/{}'.format(_+1, unit.quantity))
-
+            # Get first available printer and ending time
             printer, last_job_end_at, error_message = findFirstAvailablePrinterForMaterial(unit.material_id, printer_last_jobs_ending_time)
 
             if error_message:
                 return None, error_message
+            
+            # Get unit quantity for the printer
+            job_quantity = fillPrinterSurface(unit, printer, quantity)
+            quantity -= job_quantity
+
+            job_duration = job_quantity*unit.estimated_time
+
+            logger.info('Job Quantity = {}/{}'.format(job_quantity, unit.quantity))
 
             logger.info('First available printer for material {} is {} which is available {}'.format(unit.material_id, printer, last_job_end_at))
 
             start_at = firstTimeAvailableFrom(last_job_end_at, working_hours_start, working_hours_end, buffer_after_job)
-            end_at = start_at + timedelta(seconds=unit.estimated_time)
+            if start_at.date() == now.date() and now.hour > 12:
+                start_at = (start_at + timedelta(days=1)).replace(hour=working_hours_start.hour, minute=working_hours_start.minute, second=0)
+            
+            end_at = start_at + timedelta(seconds=job_duration)
 
-            logger.info('New job can start at {} and will end at {} -- duration = {}'.format(start_at, end_at, unit.estimated_time))
-
+            logger.info('New job can start at {} and will end at {} -- duration = {}'.format(start_at, end_at, job_duration))
+            
             if not fake:
                 job = print_job_models.PrintingJob.objects.create(
                     print_order_unit_id=unit.id, 
                     printer=printer,
-                    duration=unit.estimated_time,
+                    duration=job_duration,
                     start_at=start_at,
                     end_at=end_at)
                 
@@ -143,6 +153,30 @@ def generate_print_jobs(units: List[PrintOrderUnitPlaceholder], fake=True) -> da
     # * Returning most recent ending time of a print job
     return last_end_at, None
 
+def fillPrinterSurface(unit: PrintOrderUnitPlaceholder, printer: printer_models.Printer, quantity: int):
+
+    job_quantity = 0
+    len_multiplier = 1
+    len_unit = unit.length_unit
+    surface_size = parse_vector(printer.type.max_print_size)
+
+    unit_size = parse_vector(unit.model_dimensions)
+    if len_unit == 'inches':
+        len_multiplier = 25.4
+
+    unit_size['x'] = unit_size['x']*len_multiplier + 20  # 10mms on each side 
+    unit_size['y'] = unit_size['y']*len_multiplier + 20
+
+    axis_orders =[['x', 'y'], ['y','x']]
+
+    for axis_order in axis_orders:
+        job_q = (surface_size['x']//unit_size[axis_order[0]])*(surface_size['y']//unit_size[axis_order[1]])
+        if job_q > job_quantity:
+            job_quantity = job_q
+
+    # Return number of objects that fit on printer
+    return min(job_quantity, quantity)
+
 
 def firstTimeAvailableFrom(time: datetime, daytimeBoundStart: time, daytimeBoundEnd: time, buffer: timedelta):
 
@@ -155,10 +189,10 @@ def firstTimeAvailableFrom(time: datetime, daytimeBoundStart: time, daytimeBound
             return time + buffer
         elif time.isoweekday() in [6]:
             # * For saturday return monday with daytimeBoundStart
-            return (time + timedelta(days=2)).replace(hour=daytimeBoundStart.hour, minute=daytimeBoundStart.minute, second=0)
+            return (time + timedelta(days=2)).replace(hour=daytimeBoundStart.hour, minute=daytimeBoundStart.minute, second=0) + buffer
         elif time.isoweekday() in [7]:
             # * For sunday return monday with daytimeBoundStart
-            return (time + timedelta(days=1)).replace(hour=daytimeBoundStart.hour, minute=daytimeBoundStart.minute, second=0)
+            return (time + timedelta(days=1)).replace(hour=daytimeBoundStart.hour, minute=daytimeBoundStart.minute, second=0) + buffer
         else:
             raise Exception('datetime.isoweekday() value of {} not handled'.format(time.isoweekday()))
         
@@ -166,13 +200,13 @@ def firstTimeAvailableFrom(time: datetime, daytimeBoundStart: time, daytimeBound
 
         if time.isoweekday() in [1,2,3,4,5]:
             # * Ending before day starts. Put as first thing in the day
-            return time.replace(hour=daytimeBoundStart.hour, minute=daytimeBoundStart.minute, second=0)
+            return time.replace(hour=daytimeBoundStart.hour, minute=daytimeBoundStart.minute, second=0) + buffer
         elif time.isoweekday() in [6]:
             # * Ending in saturday. Add two days
-            return (time + timedelta(days=2)).replace(hour=daytimeBoundStart.hour, minute=daytimeBoundStart.minute, second=0)
+            return (time + timedelta(days=2)).replace(hour=daytimeBoundStart.hour, minute=daytimeBoundStart.minute, second=0) + buffer
         elif time.isoweekday() in [7]:
             # * Ending in sunday. Add one day
-            return (time + timedelta(days=1)).replace(hour=daytimeBoundStart.hour, minute=daytimeBoundStart.minute, second=0)
+            return (time + timedelta(days=1)).replace(hour=daytimeBoundStart.hour, minute=daytimeBoundStart.minute, second=0) + buffer
         else:
             raise Exception('datetime.isoweekday() value of {} not handled'.format(time.isoweekday()))
         
@@ -181,13 +215,13 @@ def firstTimeAvailableFrom(time: datetime, daytimeBoundStart: time, daytimeBound
         if time.isoweekday() in [1,2,3,4,7]:
             # ! Mon, Tue, Wen, Thu, Sun
             # * Ending after day ends. Add as first thing tomorrow
-            return (time + timedelta(days=1)).replace(hour=daytimeBoundStart.hour, minute=daytimeBoundStart.minute, second=0)
+            return (time + timedelta(days=1)).replace(hour=daytimeBoundStart.hour, minute=daytimeBoundStart.minute, second=0) + buffer
         elif time.isoweekday() in [5]:
             # * Ending after friday ends. Add as first thing in monday (add 3 days, reset to working hours start)
-            return (time + timedelta(days=3)).replace(hour=daytimeBoundStart.hour, minute=daytimeBoundStart.minute, second=0)
+            return (time + timedelta(days=3)).replace(hour=daytimeBoundStart.hour, minute=daytimeBoundStart.minute, second=0) + buffer
         elif time.isoweekday() in [6]:
             # * Ending after saturday ends. Add as first thing in monday (add 2 days, reset to working hours start)
-            return (time + timedelta(days=2)).replace(hour=daytimeBoundStart.hour, minute=daytimeBoundStart.minute, second=0)
+            return (time + timedelta(days=2)).replace(hour=daytimeBoundStart.hour, minute=daytimeBoundStart.minute, second=0) + buffer
         else:
             raise Exception('datetime.isoweekday() value of {} not handled'.format(time.isoweekday()))
         
@@ -201,3 +235,27 @@ def compareToDaytimeBounds(value: time, boundLower: time, boundUpper: time):
     if value > boundUpper:
         return 'after'
     return 'inside'
+
+
+def parse_vector(vec_raw: str):
+    vec = {
+        'x': None,
+        'y': None,
+        'z': None
+    }
+    if vec_raw is None:
+        return None
+    
+    vec_split = vec_raw.split(',')
+    if len(vec_split) != 3:
+        return None
+    
+    try:
+        vec['x'] = float(vec_split[0])
+        vec['y'] = float(vec_split[1])
+        vec['z'] = float(vec_split[2])
+                      
+    except ValueError:
+        return None
+    
+    return vec

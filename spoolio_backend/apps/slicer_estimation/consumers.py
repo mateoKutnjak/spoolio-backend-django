@@ -90,14 +90,14 @@ class SlicerEstimationConsumer(AsyncWebsocketConsumer):
     async def on_success(self, event):
         estimated_price = event.get('payload', {}).get('data', {}).get('estimated_price')
         estimated_time = event.get('payload', {}).get('data', {}).get('estimated_time')
-        estimated_ending_time = event.get('payload', {}).get('data', {}).get('estimated_ending_time')
+        pricing_list = event.get('payload', {}).get('data', {}).get('pricing_list')
 
-        if estimated_time and estimated_price and estimated_ending_time:
+        if estimated_time and estimated_price and pricing_list:
 
             data = {
                 "estimated_time": estimated_time, 
                 "estimated_price": estimated_price,
-                "estimated_ending_time": estimated_ending_time,
+                "pricing_list": pricing_list
             }
 
             await self.send(text_data=channels.generate_data_response(data))

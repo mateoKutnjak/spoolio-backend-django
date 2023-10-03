@@ -50,6 +50,25 @@ class PrintUnitInfillWallCombination(models.Model):
     def __str__(self) -> str:
         return "infill={}% [{}], walls={}".format(self.infill.percentage * 100, self.infill.name, self.wall.amount)
 
+class CostVariables(models.Model):
+
+    material_markup = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(10.0)], default=1.2, help_text='Cp (hint: 20% markup = 1.2)')
+    print_hour_cost = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(10.0)], default=0.25, help_text='Ct (euros per hour)')
+    post_process_cost = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(100.0)], default=2.0, help_text='Cpost (post processing cost per part)')
+    price_margin = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(10.0)], default=3.0, help_text='Cm')
+    prep_cost = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(100.0)], default=3.0, help_text='Cprep (total preperation cost)')
+
+    def __str__(self) -> str:
+        return "price = quantity x [quantity_multiplier x [{} x ({} x material + {} x time) + {}]] + {}".format(self.price_margin, self.material_markup, self.print_hour_cost, self.post_process_cost, self.prep_cost)
+
+class QuantityMultiplier(models.Model):
+
+    quantity_min = models.PositiveIntegerField(default=0)
+    quantity_max = models.PositiveIntegerField(default=0)
+    add_percentage = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(100.0)], default=1.2, help_text='Cq (hint: 20% markup = 1.2)')
+
+    def __str__(self) -> str:
+        return "From {} to {} pcs, {}%".format(self.quantity_min, self.quantity_max, round(100*self.add_percentage - 100, 2))
 
 class PrintOrder(libs_models.BaseTimestampModel):
 

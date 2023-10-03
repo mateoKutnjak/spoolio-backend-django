@@ -31,7 +31,7 @@ class Material(libs_models.SoftDeleteModel):
     available = models.BooleanField()
 
     def __str__(self) -> str:
-        return "{} [{} g/cm3] price=${} per gram".format(self.name, self.filament_density, self.filament_cost)
+        return "{} [{} g/cm3] price=${} per kg".format(self.name, self.filament_density, self.filament_cost)
 
 
 class Spool(libs_models.SoftDeleteModel):

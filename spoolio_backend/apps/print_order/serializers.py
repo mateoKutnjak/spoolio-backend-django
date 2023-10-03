@@ -77,6 +77,18 @@ class PrintUnitInfillSerializer(serializers.ModelSerializer):
         model = models.PrintUnitInfill
         fields = '__all__'
 
+class QuantityMultiplierSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.QuantityMultiplier
+        fields = '__all__'
+
+class CostVariablesSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.CostVariables
+        fields = '__all__'
+
 
 class PrintUnitWallSerializer(serializers.ModelSerializer):
 

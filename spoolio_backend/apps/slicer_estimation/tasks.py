@@ -4,10 +4,14 @@ import logging
 import os
 import re
 import subprocess
+import shutil
+import json
 
 from celery import shared_task
 
 from ..print_job import utils as print_job_utils
+
+from ..print_order import utils as order_utils
 
 from ... libs import channels as channels_utils
 
@@ -224,23 +228,18 @@ def task_execute(job_params):
 
     estimated_price = float(estimated_price_raw)
 
-    units = [print_job_utils.PrintOrderUnitPlaceholder(
-        quantity=u['quantity'], 
-        material_id=u['material']['id'], 
-        estimated_time=u['estimated_time']) for u in other_units]
-    units.append(print_job_utils.PrintOrderUnitPlaceholder(quantity=quantity, estimated_time=estimated_duration, material_id=material['id']))
-
-    estimated_ending_time, error_message = print_job_utils.generate_print_jobs(units, fake=True)
-
     if error_message:
         channels_utils.channels_group_send_error(error_message, channel_group_name=channel_group_name)
         cleanFiles()
         return
 
+    price_list = order_utils.calculatePrice(estimated_price, estimated_duration)
+
+
     data = {
         "estimated_time": estimated_duration, 
         "estimated_price": estimated_price,
-        "estimated_ending_time": estimated_ending_time.isoformat(),
+        "pricing_list": price_list
     }
 
     channels_utils.channels_group_send_data(
