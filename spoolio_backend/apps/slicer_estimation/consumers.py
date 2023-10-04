@@ -49,8 +49,9 @@ class PrintJobEndingTimeEstimationConsumer(AsyncWebsocketConsumer):
         })
 
     async def on_success(self, event):
-        estimated_ending_time = event.get('payload', {}).get('data', {}).get('estimated_ending_time')
-        
+        estimated_ending_time = event.get('payload', {}).get(
+            'data', {}).get('estimated_ending_time')
+
         if estimated_ending_time:
             data = {
                 "estimated_ending_time": estimated_ending_time,
@@ -58,9 +59,10 @@ class PrintJobEndingTimeEstimationConsumer(AsyncWebsocketConsumer):
 
             await self.send(text_data=channels.generate_data_response(data))
         else:
-            error_message = 'Not all data is present (estimated_ending_time={})'.format(estimated_ending_time)
+            error_message = 'Not all data is present (estimated_ending_time={})'.format(
+                estimated_ending_time)
             await self.send(text_data=channels.generate_error_response(error_message))
-        
+
         await self.channel_layer.group_discard(self.channel_group_name, self.channel_name)
 
     async def on_error(self, event):
@@ -88,23 +90,27 @@ class SlicerEstimationConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=channels.generate_init_response(self.channel_group_name))
 
     async def on_success(self, event):
-        estimated_price = event.get('payload', {}).get('data', {}).get('estimated_price')
-        estimated_time = event.get('payload', {}).get('data', {}).get('estimated_time')
-        pricing_list = event.get('payload', {}).get('data', {}).get('pricing_list')
+        estimated_price = event.get('payload', {}).get(
+            'data', {}).get('estimated_price')
+        estimated_time = event.get('payload', {}).get(
+            'data', {}).get('estimated_time')
+        pricing_list = event.get('payload', {}).get(
+            'data', {}).get('pricing_list')
 
         if estimated_time and estimated_price and pricing_list:
 
             data = {
-                "estimated_time": estimated_time, 
+                "estimated_time": estimated_time,
                 "estimated_price": estimated_price,
                 "pricing_list": pricing_list
             }
 
             await self.send(text_data=channels.generate_data_response(data))
         else:
-            error_message = 'Not all data is present (estimated_time={}, estimated_price={}, estimated_ending_time={})'.format(estimated_time, estimated_price, estimated_ending_time)
+            error_message = 'Not all data is present (estimated_time={}, estimated_price={}, pricing_list={})'.format(
+                estimated_time, estimated_price, pricing_list)
             await self.send(text_data=channels.generate_error_response(error_message))
-        
+
         await self.channel_layer.group_discard(self.channel_group_name, self.channel_name)
 
     async def on_error(self, event):

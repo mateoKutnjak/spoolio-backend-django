@@ -20,26 +20,29 @@ logger = logging.getLogger(__name__)
 
 class PrintUnitInfill(models.Model):
     name = models.CharField(max_length=16)
-    percentage = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(1.0)])
+    percentage = models.FloatField(
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)])
     available = models.BooleanField()
 
     def __str__(self) -> str:
         return "{} - {}%".format(self.name, self.percentage * 100)
-    
+
 
 class PrintUnitWall(models.Model):
-    amount = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)])
+    amount = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(4)])
 
     def __str__(self) -> str:
         return "{}".format(self.amount)
-    
+
 
 class PrintUnitWallThickness(models.Model):
-    thickness = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(0.3)], help_text='In millimeters')
+    thickness = models.FloatField(validators=[MinValueValidator(
+        0.0), MaxValueValidator(0.3)], help_text='In millimeters')
 
     def __str__(self) -> str:
         return "{}".format(self.thickness)
-    
+
 
 class PrintUnitInfillWallCombination(models.Model):
 
@@ -50,25 +53,34 @@ class PrintUnitInfillWallCombination(models.Model):
     def __str__(self) -> str:
         return "infill={}% [{}], walls={}".format(self.infill.percentage * 100, self.infill.name, self.wall.amount)
 
+
 class CostVariables(models.Model):
 
-    material_markup = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(10.0)], default=1.2, help_text='Cp (hint: 20% markup = 1.2)')
-    print_hour_cost = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(10.0)], default=0.25, help_text='Ct (euros per hour)')
-    post_process_cost = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(100.0)], default=2.0, help_text='Cpost (post processing cost per part)')
-    price_margin = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(10.0)], default=3.0, help_text='Cm')
-    prep_cost = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(100.0)], default=3.0, help_text='Cprep (total preperation cost)')
+    material_markup = models.FloatField(validators=[MinValueValidator(
+        0.0), MaxValueValidator(10.0)], default=1.2, help_text='Cp (hint: 20% markup = 1.2)')
+    print_hour_cost = models.FloatField(validators=[MinValueValidator(
+        0.0), MaxValueValidator(10.0)], default=0.25, help_text='Ct (euros per hour)')
+    post_process_cost = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(
+        100.0)], default=2.0, help_text='Cpost (post processing cost per part)')
+    price_margin = models.FloatField(validators=[MinValueValidator(
+        0.0), MaxValueValidator(10.0)], default=3.0, help_text='Cm')
+    prep_cost = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(
+        100.0)], default=3.0, help_text='Cprep (total preperation cost)')
 
     def __str__(self) -> str:
         return "price = quantity x [quantity_multiplier x [{} x ({} x material + {} x time) + {}]] + {}".format(self.price_margin, self.material_markup, self.print_hour_cost, self.post_process_cost, self.prep_cost)
+
 
 class QuantityMultiplier(models.Model):
 
     quantity_min = models.PositiveIntegerField(default=0)
     quantity_max = models.PositiveIntegerField(default=0)
-    add_percentage = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(100.0)], default=1.2, help_text='Cq (hint: 20% markup = 1.2)')
+    add_percentage = models.FloatField(validators=[MinValueValidator(
+        0.0), MaxValueValidator(100.0)], default=1.2, help_text='Cq (hint: 20% markup = 1.2)')
 
     def __str__(self) -> str:
         return "From {} to {} pcs, {}%".format(self.quantity_min, self.quantity_max, round(100*self.add_percentage - 100, 2))
+
 
 class PrintOrder(libs_models.BaseTimestampModel):
 
@@ -88,12 +100,16 @@ class PrintOrder(libs_models.BaseTimestampModel):
         (STATUS_DELIVERED, STATUS_DELIVERED.replace('_', ' ').capitalize()),
     )
 
-    user_profile = models.ForeignKey(user_profile_models.UserProfile, null=True, on_delete=models.SET_NULL)
+    user_profile = models.ForeignKey(
+        user_profile_models.UserProfile, null=True, on_delete=models.SET_NULL)
 
     contact_email = models.EmailField()
-    shipping_address = models.ForeignKey(common_models.ShippingAddress, on_delete=models.RESTRICT)
-    billing_address = models.ForeignKey(common_models.BillingAddress, on_delete=models.RESTRICT)
-    shipping_method = models.ForeignKey(common_models.ShippingMethod, null=True, on_delete=models.SET_NULL)
+    shipping_address = models.ForeignKey(
+        common_models.ShippingAddress, on_delete=models.RESTRICT)
+    billing_address = models.ForeignKey(
+        common_models.BillingAddress, on_delete=models.RESTRICT)
+    shipping_method = models.ForeignKey(
+        common_models.ShippingMethod, null=True, on_delete=models.SET_NULL)
     # TODO add payment method
 
     comment = models.TextField(blank=True, null=True)
@@ -105,10 +121,11 @@ class PrintOrder(libs_models.BaseTimestampModel):
     estimated_price = models.DecimalField(max_digits=12, decimal_places=2)
     estimated_time = models.PositiveIntegerField()
 
-    status = models.CharField(max_length=16, choices=ORDER_STATUS_CHOICES, default='awaiting_payment')
-    
+    status = models.CharField(
+        max_length=16, choices=ORDER_STATUS_CHOICES, default='awaiting_payment')
+
     def __str__(self):
-        return "{}: [{}] BY={} CONTACT_EMAIL={} STATUS={}".format(self.pk, self.created_at, self.user_profile.user.email if self.user_profile is not None and self.user_profile.user is not None else 'guest', self.contact_email, self.status )
+        return "{}: [{}] BY={} CONTACT_EMAIL={} STATUS={}".format(self.pk, self.created_at, self.user_profile.user.email if self.user_profile is not None and self.user_profile.user is not None else 'guest', self.contact_email, self.status)
 
 
 class OrderUnit(libs_models.BaseTimestampModel):
@@ -123,16 +140,19 @@ class OrderUnit(libs_models.BaseTimestampModel):
     spool = models.ForeignKey(filament_models.Spool, on_delete=models.CASCADE)
     infill = models.ForeignKey(PrintUnitInfill, on_delete=models.CASCADE)
     wall = models.ForeignKey(PrintUnitWall, on_delete=models.CASCADE)
-    wall_thickness = models.ForeignKey(PrintUnitWallThickness, on_delete=models.CASCADE)
-    printing_method = models.ForeignKey(printer_models.PrintingMethod, on_delete=models.SET_NULL, null=True)
+    wall_thickness = models.ForeignKey(
+        PrintUnitWallThickness, on_delete=models.CASCADE)
+    printing_method = models.ForeignKey(
+        printer_models.PrintingMethod, on_delete=models.SET_NULL, null=True)
 
     scale = models.FloatField(validators=[
-                MinValueValidator(0.001),
-            ], default=1.0)
+        MinValueValidator(0.001),
+    ], default=1.0)
 
     quantity = models.PositiveIntegerField()
 
-    file = models.FileField(storage=storage_backends.PrivateMediaStorage(), upload_to='print_order_files')
+    file = models.FileField(
+        storage=storage_backends.PrivateMediaStorage(), upload_to='print_order_files')
 
     attachment_files = GenericRelation(common_models.AttachmentFile)
     attachment_images = GenericRelation(common_models.AttachmentImage)
@@ -145,39 +165,49 @@ class OrderUnit(libs_models.BaseTimestampModel):
     estimated_time = models.PositiveIntegerField()
     eta = models.DateTimeField(null=True, blank=True)
 
-    model_volume = models.FloatField(help_text='Volume with length_unit unit. Format: "x,y,z"')
-    model_dimensions = models.CharField(max_length=128, help_text='Dimensions with length_unit unit.')
+    model_volume = models.FloatField(
+        help_text='Volume with length_unit unit. Format: "x,y,z"')
+    model_dimensions = models.CharField(
+        max_length=128, help_text='Dimensions with length_unit unit.')
 
-    model_rotation = models.CharField(max_length=128, help_text='Rotation chosen by user on frontend. Format: "x,y,z"')
-    optimal_rotation = models.CharField(max_length=128, help_text='Rotation determined by Threejs on frontend to be optimal. Format: "x,y,z"')
-    use_optimal_rotation = models.BooleanField(help_text='If true then optimal_rotation should bu used, else use model_rotation')
+    model_rotation = models.CharField(
+        max_length=128, help_text='Rotation chosen by user on frontend. Format: "x,y,z"')
+    optimal_rotation = models.CharField(
+        max_length=128, help_text='Rotation determined by Threejs on frontend to be optimal. Format: "x,y,z"')
+    use_optimal_rotation = models.BooleanField(
+        help_text='If true then optimal_rotation should bu used, else use model_rotation')
 
     length_unit = models.CharField(max_length=8, help_text='mms or inches')
-    rotation_unit = models.CharField(max_length=12, help_text="degrees or radians")
+    rotation_unit = models.CharField(
+        max_length=12, help_text="degrees or radians")
 
-    screenshot = models.ImageField(storage=storage_backends.PrivateMediaStorage(), upload_to='print_unit_screenshots/', null=True, blank=True)
+    screenshot = models.ImageField(storage=storage_backends.PrivateMediaStorage(
+    ), upload_to='print_unit_screenshots/', null=True, blank=True)
 
     def __str__(self):
         return "{}: [{}] {} ATTRIBUTES={},{}".format(self.pk, self.created_at, self.file, self.spool, self.length_unit)
 
 
 # * Every time 'status' field of PrintOrder changes, send email to 'contact_email' field
-signals.pre_save.connect(receiver=libs_signals.print_order_pre_save_signal, sender=PrintOrder)
-signals.post_save.connect(receiver=libs_signals.print_order_post_save_signal, sender=PrintOrder)
+signals.pre_save.connect(
+    receiver=libs_signals.print_order_pre_save_signal, sender=PrintOrder)
+signals.post_save.connect(
+    receiver=libs_signals.print_order_post_save_signal, sender=PrintOrder)
+
 
 def create_printing_job_for_print_order_unit(sender, instance, created, raw, **kwargs):
 
     if raw:
         return
 
-    # ! STATUS_IN_PROGRESS means that printing order has been 
+    # ! STATUS_IN_PROGRESS means that printing order has been
     # ! paid and has to be printed and sent to customer
 
-    # ! This can cause problems in future. 
+    # ! This can cause problems in future.
 
-    if instance.status != PrintOrder.STATUS_IN_PROGRESS:
-        return
-    
+    # if instance.status != PrintOrder.STATUS_IN_PROGRESS:
+    #    return
+
     print_job_tasks.create_printing_jobs_for_print_order.delay({
         'data': {
             'print_order': {
@@ -209,4 +239,5 @@ def create_printing_job_for_print_order_unit(sender, instance, created, raw, **k
 # ! It will be called with .save() method on model object
 # !
 # ! See how status gets updated in 'payment/views.py'
-signals.post_save.connect(receiver=create_printing_job_for_print_order_unit, sender=PrintOrder)
+signals.post_save.connect(
+    receiver=create_printing_job_for_print_order_unit, sender=PrintOrder)

@@ -40,6 +40,9 @@ class PrintOrderViewSet(viewsets.ModelViewSet, common_permissions.IsAdminOrObjec
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
+    def perform_create(self, serializer):
+        serializer.save()
+
     def get_queryset(self):
         # * As this method filters only order which belong to request.user,
         # * nobody else can perform any changes on this object
@@ -66,6 +69,9 @@ class PrintOrderUnitViewSet(viewsets.ModelViewSet, common_permissions.IsAdminOrO
         IsAuthenticated: [],
         AllowAny: ['create']
     }
+
+    def perform_create(self, serializer):
+        serializer.save()
 
     def get_queryset(self):
         # * As this method filters only order which belong to request.user,
