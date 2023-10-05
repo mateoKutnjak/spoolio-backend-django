@@ -99,7 +99,9 @@ def generate_print_jobs(units: List[PrintOrderUnitPlaceholder], fake: bool) -> d
     # * Keeps track of latest ending time of all print jobs
     last_end_at = pytz.UTC.localize(datetime.fromtimestamp(1))
 
+    job_ids = []
     for unit in units:
+        unit_jobs = []
 
         logger.info('')
         logger.info('Unit: {}'.format(unit))
@@ -134,11 +136,12 @@ def generate_print_jobs(units: List[PrintOrderUnitPlaceholder], fake: bool) -> d
             
             if not fake:
                 job = print_job_models.PrintingJob.objects.create(
-                    print_order_unit_id=unit.id, 
                     printer=printer,
                     duration=job_duration,
                     start_at=start_at,
                     end_at=end_at)
+                
+                unit_jobs.append(job.id)
                 
                 logger.info('')
                 logger.info('Printing job #{} created for print order unit #{} on printer {}'.format(job.id, unit.id, printer.name))
@@ -150,8 +153,10 @@ def generate_print_jobs(units: List[PrintOrderUnitPlaceholder], fake: bool) -> d
             if last_end_at < end_at:
                 last_end_at = end_at
 
+        job_ids.append(unit_jobs)
+
     # * Returning most recent ending time of a print job
-    return last_end_at, None
+    return last_end_at, job_ids, None
 
 def fillPrinterSurface(unit: PrintOrderUnitPlaceholder, printer: printer_models.Printer, quantity: int):
 

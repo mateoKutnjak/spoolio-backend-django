@@ -31,6 +31,7 @@ def print_order_pre_save_signal(sender, instance, raw, using, **kwargs):
                     [obj.user_profile.email or obj.user_profile.user.email],
                     fail_silently=False,
                 )
+
         except Exception as e:
             logger.critical("Exception occurred while trying to send order status change email: {}".format(e))
 

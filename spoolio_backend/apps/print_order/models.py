@@ -86,14 +86,14 @@ class PrintOrder(libs_models.BaseTimestampModel):
 
     # ! IMPORTANT ! For every change in server side (django choices) adjust frontend enums (constants.vue)
 
-    STATUS_AWAITING_PAYMENT = 'awaiting_payment'
+    STATUS_REVIEWING = 'reviewing'
     STATUS_REJECTED = 'rejected'
     STATUS_IN_PROGRESS = 'in_progress'
     STATUS_SHIPPED = 'shipped'
     STATUS_DELIVERED = 'delivered'
 
     ORDER_STATUS_CHOICES = (
-        (STATUS_AWAITING_PAYMENT, STATUS_AWAITING_PAYMENT.replace('_', ' ').capitalize()),
+        (STATUS_REVIEWING, STATUS_REVIEWING.replace('_', ' ').capitalize()),
         (STATUS_REJECTED, STATUS_REJECTED.replace('_', ' ').capitalize()),
         (STATUS_IN_PROGRESS, STATUS_IN_PROGRESS.replace('_', ' ').capitalize()),
         (STATUS_SHIPPED, STATUS_SHIPPED.replace('_', ' ').capitalize()),
@@ -122,7 +122,7 @@ class PrintOrder(libs_models.BaseTimestampModel):
     estimated_time = models.PositiveIntegerField()
 
     status = models.CharField(
-        max_length=16, choices=ORDER_STATUS_CHOICES, default='awaiting_payment')
+        max_length=16, choices=ORDER_STATUS_CHOICES, default='reviewing')
 
     def __str__(self):
         return "{}: [{}] BY={} CONTACT_EMAIL={} STATUS={}".format(self.pk, self.created_at, self.user_profile.user.email if self.user_profile is not None and self.user_profile.user is not None else 'guest', self.contact_email, self.status)
@@ -239,5 +239,6 @@ def create_printing_job_for_print_order_unit(sender, instance, created, raw, **k
 # ! It will be called with .save() method on model object
 # !
 # ! See how status gets updated in 'payment/views.py'
-signals.post_save.connect(
-    receiver=create_printing_job_for_print_order_unit, sender=PrintOrder)
+
+#signals.post_save.connect(
+#    receiver=create_printing_job_for_print_order_unit, sender=PrintOrder)

@@ -51,10 +51,13 @@ class PrintJobEndingTimeEstimationConsumer(AsyncWebsocketConsumer):
     async def on_success(self, event):
         estimated_ending_time = event.get('payload', {}).get(
             'data', {}).get('estimated_ending_time')
+        job_ids = event.get('payload', {}).get(
+            'data', {}).get('job_ids')
 
         if estimated_ending_time:
             data = {
                 "estimated_ending_time": estimated_ending_time,
+                "job_ids": job_ids
             }
 
             await self.send(text_data=channels.generate_data_response(data))

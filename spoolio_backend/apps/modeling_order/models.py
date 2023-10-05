@@ -39,7 +39,6 @@ class OrderType(models.Model):
 class ModelingOrder(libs_models.SoftDeleteModel):
 
     STATUS_REVIEWING = 'reviewing'
-    STATUS_ESTIMATING_PRICE = 'estimating_price'
     STATUS_AWAITING_PAYMENT = 'awaiting_payment'
     STATUS_REJECTED = 'rejected'
     STATUS_IN_PROGRESS = 'in_progress'
@@ -48,7 +47,6 @@ class ModelingOrder(libs_models.SoftDeleteModel):
 
     ORDER_STATUS_CHOICES = (
         (STATUS_REVIEWING, STATUS_REVIEWING.replace('_', ' ').capitalize()),
-        (STATUS_ESTIMATING_PRICE, STATUS_ESTIMATING_PRICE.replace('_', ' ').capitalize()),
         (STATUS_AWAITING_PAYMENT, STATUS_AWAITING_PAYMENT.replace('_', ' ').capitalize()),
         (STATUS_REJECTED, STATUS_REJECTED.replace('_', ' ').capitalize()),
         (STATUS_IN_PROGRESS, STATUS_IN_PROGRESS.replace('_', ' ').capitalize()),
