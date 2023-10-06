@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from . import models, serializers as print_order_serializers
-
+from ..print_job.models import PrintingJob
 
 from .. common import models as common_models, serializers as common_serializers
 from .. filament import models as filament_models, serializers as filament_serializers
@@ -50,6 +50,7 @@ class PrintOrderUnitSerializer(serializers.ModelSerializer):
     wall = serializers.PrimaryKeyRelatedField(queryset=models.PrintUnitWall.objects.all())
     wall_thickness = serializers.PrimaryKeyRelatedField(queryset=models.PrintUnitWallThickness.objects.all())
     infill_wall_combination = serializers.PrimaryKeyRelatedField(queryset=models.PrintUnitInfillWallCombination.objects.all(), required=False)
+    job_ids = serializers.ListField(allow_null=True, required=False, child=serializers.IntegerField())
 
     def to_representation(self, instance):
         self.fields['spool'] = filament_serializers.SpoolSerializer(read_only=True)
@@ -58,6 +59,19 @@ class PrintOrderUnitSerializer(serializers.ModelSerializer):
         self.fields['wall_thickness'] = print_order_serializers.PrintUnitWallThicknessSerializer(read_only=True)
 
         return super(PrintOrderUnitSerializer, self).to_representation(instance)
+    
+    def create(self, validated_data):
+        job_ids = validated_data.pop('job_ids')
+
+        unit = models.OrderUnit.objects.create(**validated_data)
+
+        if job_ids:
+            if len(job_ids) > 0:
+                PrintingJob.objects.filter(pk__in=job_ids).update(
+                    print_order_unit=unit,
+                    status=PrintingJob.STATUS_REVIEWING
+                )
+        return unit
 
     class Meta:
         model = models.OrderUnit
