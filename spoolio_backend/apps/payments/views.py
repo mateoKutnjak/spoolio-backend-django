@@ -31,8 +31,7 @@ def check_print_order_amount(print_order_id: int, amount: float):
     try:
         obj = print_order_models.PrintOrder.objects.get(pk=print_order_id)
 
-        # ! Save tax percentage as constant or depending on country
-        total_price = float(obj.estimated_price) * 1.25 + float(obj.shipping_method.price)
+        total_price = float(obj.estimated_price) + float(obj.shipping_method.price)
 
         # ! If rounding of number changes (here we use math.floor), make 
         # ! sure same method is used on frontend price calculation
@@ -156,6 +155,7 @@ def create_payment(request):
             automatic_payment_methods={
                 'enabled': False,
             },
+            capture_method="manual",
             metadata={
                 'order_id': int(request.data['id']),
                 'service': request.data['service'],
