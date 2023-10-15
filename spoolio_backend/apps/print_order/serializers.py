@@ -1,4 +1,5 @@
 from rest_framework import serializers
+import json
 
 from . import models, serializers as print_order_serializers
 from ..print_job.models import PrintingJob
@@ -50,7 +51,7 @@ class PrintOrderUnitSerializer(serializers.ModelSerializer):
     wall = serializers.PrimaryKeyRelatedField(queryset=models.PrintUnitWall.objects.all())
     wall_thickness = serializers.PrimaryKeyRelatedField(queryset=models.PrintUnitWallThickness.objects.all())
     infill_wall_combination = serializers.PrimaryKeyRelatedField(queryset=models.PrintUnitInfillWallCombination.objects.all(), required=False)
-    job_ids = serializers.ListField(allow_null=True, required=False, child=serializers.IntegerField())
+    job_ids = serializers.CharField(allow_null=True, required=False)
 
     def to_representation(self, instance):
         self.fields['spool'] = filament_serializers.SpoolSerializer(read_only=True)
@@ -61,7 +62,12 @@ class PrintOrderUnitSerializer(serializers.ModelSerializer):
         return super(PrintOrderUnitSerializer, self).to_representation(instance)
     
     def create(self, validated_data):
-        job_ids = validated_data.pop('job_ids')
+        job_data = validated_data.pop('job_ids')
+
+        if len(job_data) < 3:
+            return  None
+                
+        job_ids = json.loads(job_data)
 
         unit = models.OrderUnit.objects.create(**validated_data)
 

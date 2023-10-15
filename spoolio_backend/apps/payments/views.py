@@ -7,7 +7,7 @@ from django.core.mail import send_mail
 from django.db.models import F, Sum
 from django.http import JsonResponse
 
-import logging.config
+import logging
 
 from rest_framework.decorators import api_view
 
@@ -197,6 +197,7 @@ def init_payment(request):
         )
 
         return JsonResponse(data={
+            'intentId': intent['id'],
             'clientSecret': intent['client_secret']
         })
     except Exception as e:
@@ -256,8 +257,21 @@ def stripe_webhooks(request):
     logger.info('Stripe webhook of type {} received'.format(event['type']))
 
     # Handle the event
-    if event['type'] == 'charge.succeeded':
+    # if event['type'] == 'charge.succeeded':
+    #    metadata = event['data']['object']['metadata']
+    #    update_order_status(metadata.get('order_id'), metadata.get('service'))
+    
+    # Handle the event
+    if event['type'] == 'payment_intent.amount_capturable_updated':
+        status = event['data']['object']['status']
+        intent_id = event['data']['object']['id']
+        logger.info("ID: {} -- Payment Status: {}".format(intent_id, status))
+        # update_order_status(metadata.get('order_id'), metadata.get('service'))
+
+    # Handle the event
+    if event['type'] == 'payment_intent.succeeded':
         metadata = event['data']['object']['metadata']
         update_order_status(metadata.get('order_id'), metadata.get('service'))
+        
 
     return JsonResponse({"success": True})
