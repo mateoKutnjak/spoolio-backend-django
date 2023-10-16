@@ -15,6 +15,7 @@ import stripe
 
 from .. modeling_order import models as modeling_order_models
 from .. print_order import models as print_order_models
+from .. print_job import models as print_job_models
 from .. store_order import models as store_order_models
 
 
@@ -260,18 +261,36 @@ def stripe_webhooks(request):
     # if event['type'] == 'charge.succeeded':
     #    metadata = event['data']['object']['metadata']
     #    update_order_status(metadata.get('order_id'), metadata.get('service'))
-    
+
     # Handle the event
     if event['type'] == 'payment_intent.amount_capturable_updated':
         status = event['data']['object']['status']
         intent_id = event['data']['object']['id']
         logger.info("ID: {} -- Payment Status: {}".format(intent_id, status))
-        # update_order_status(metadata.get('order_id'), metadata.get('service'))
+        if status == "requires_capture":
+            try:
+                metadata = event['data']['object']['metadata']
+                obj = print_order_models.PrintOrder.objects.get(
+                    pk=metadata.get('order_id'))
+                obj.payment_intent = intent_id
+                obj.save()
+            except ObjectDoesNotExist:
+                order_not_found = True
 
-    # Handle the event
-    if event['type'] == 'payment_intent.succeeded':
+    elif event['type'] == 'payment_intent.succeeded':
         metadata = event['data']['object']['metadata']
+
+        print_job_models.PrintingJob.objects.filter(
+            print_order_unit__order__pk=metadata.get('order_id')
+        ).update(status=print_job_models.PrintingJob.STATUS_IN_QUEUE)
+
         update_order_status(metadata.get('order_id'), metadata.get('service'))
-        
+
+    elif event['type'] == 'payment_intent.canceled':
+        metadata = event['data']['object']['metadata']
+
+        print_job_models.PrintingJob.objects.filter(
+            print_order_unit__order__pk=metadata.get('order_id')
+        ).update(status=print_job_models.PrintingJob.STATUS_REJECTED)
 
     return JsonResponse({"success": True})

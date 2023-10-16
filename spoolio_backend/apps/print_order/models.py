@@ -114,6 +114,8 @@ class PrintOrder(libs_models.BaseTimestampModel):
 
     comment = models.TextField(blank=True, null=True)
 
+    payment_intent = models.CharField(max_length=124, blank=True, null=True)
+
     # Images and PDFs
     attachment_files = GenericRelation(common_models.AttachmentFile)
     attachment_images = GenericRelation(common_models.AttachmentImage)
@@ -240,5 +242,5 @@ def create_printing_job_for_print_order_unit(sender, instance, created, raw, **k
 # !
 # ! See how status gets updated in 'payment/views.py'
 
-#signals.post_save.connect(
+# signals.post_save.connect(
 #    receiver=create_printing_job_for_print_order_unit, sender=PrintOrder)
