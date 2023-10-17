@@ -1,6 +1,9 @@
 from decouple import Config, RepositoryEnv
 
+from django.utils.log import DEFAULT_LOGGING
+
 from .base import *
+import logging.config
 
 
 env_file = os.path.join(BASE_DIR, '.env.development')
@@ -22,7 +25,7 @@ ALLOWED_HOSTS = ['localhost', 'web']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME':env_config_db('POSTGRES_NAME'),
+        'NAME': env_config_db('POSTGRES_NAME'),
         'USER': env_config_db('POSTGRES_USER'),
         'PASSWORD': env_config_db('POSTGRES_PASSWORD'),
         'HOST': env_config_db('POSTGRES_HOST'),
@@ -30,7 +33,7 @@ DATABASES = {
     }
 }
 
-# ****** CORS ******* 
+# ****** CORS *******
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000'
 ]
@@ -42,7 +45,7 @@ CSRF_TRUSTED_ORIGINS = ['http://localhost:3000']
 
 if env_config('USE_SPACES', default=False, cast=bool):
 
-    # ****** Digital Ocean Spaces ******* 
+    # ****** Digital Ocean Spaces *******
     AWS_ACCESS_KEY_ID = env_config('SPACES_ACCESS_KEY')
     AWS_SECRET_ACCESS_KEY = env_config('SPACES_ACCESS_KEY_SECRET')
 
@@ -63,20 +66,20 @@ if env_config('USE_SPACES', default=False, cast=bool):
 
 else:
 
-    # ****** Local media/static files ******* 
+    # ****** Local media/static files *******
     STATIC_URL = 'static/'
     STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
     MEDIA_URL = 'media/'
-    MEDIA_ROOT  = os.path.join(BASE_DIR, 'media')
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# ****** Stripe ******* 
+# ****** Stripe *******
 STRIPE_API_KEY = env_config('STRIPE_SECRET_KEY_TEST')
 
 # ****** Django Channels ****** #
 # ! DEVELOPMENT MODE:
 # !
-# ! Don't forget to run REDIS before starting Django 
+# ! Don't forget to run REDIS before starting Django
 # ! server (in separate terminal) with command
 # !
 # ! docker run -ti -p 6379:6379 redis
@@ -93,7 +96,7 @@ CHANNEL_LAYERS = {
 # ****** Celery[redis] ****** #
 # ! DEVELOPMENT MODE:
 # !
-# ! Don't forget to run CELERY before starting Django 
+# ! Don't forget to run CELERY before starting Django
 # ! server (in separate terminal) with command
 # !
 # ! celery -A spoolio_backend worker --loglevel=info --concurrency 1 -E
@@ -102,3 +105,40 @@ CELERY_RESULT_BACKEND = "redis://redis:6379/0"
 
 # ****** Django-request ****** #
 REQUEST_BASE_URL = 'http://localhost:8000'
+
+
+now = datetime.datetime.now()
+logging.config.dictConfig({
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'console': {
+            'format': '%(levelname)s %(asctime)s %(message)s'
+        },
+        'file': {
+            'format': '%(levelname)s %(asctime)s %(pathname)s (line %(lineno)d) %(message)s'
+        },
+        'django.server': DEFAULT_LOGGING['formatters']['django.server'],
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'console',
+        },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'formatter': 'file',
+            'filename': str(BASE_DIR) + '/logs/' + ('DEV' if DEBUG else 'PROD') + now.strftime("-%Y-%m-%d") + '.log',
+        },
+        'django.server': DEFAULT_LOGGING['handlers']['django.server'],
+    },
+    'loggers': {
+        '': {
+            'level': 'INFO',
+            'handlers': ['console', 'file']
+        },
+        'django.server': DEFAULT_LOGGING['loggers']['django.server'],
+    }
+})

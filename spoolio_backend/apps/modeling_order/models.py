@@ -24,7 +24,7 @@ class ItemAttribute(models.Model):
 
     def __str__(self) -> str:
         return self.name
-    
+
 
 class OrderType(models.Model):
 
@@ -54,7 +54,8 @@ class ModelingOrder(libs_models.SoftDeleteModel):
         (STATUS_DELIVERED, STATUS_DELIVERED.replace('_', ' ').capitalize()),
     )
 
-    user_profile = models.ForeignKey(user_profile_models.UserProfile, blank=True, null=True, on_delete=models.SET_NULL)
+    user_profile = models.ForeignKey(
+        user_profile_models.UserProfile, blank=True, null=True, on_delete=models.SET_NULL)
 
     contact_email = models.EmailField()
     comment = models.TextField(blank=True, null=True)
@@ -63,17 +64,24 @@ class ModelingOrder(libs_models.SoftDeleteModel):
     attachment_files = GenericRelation(common_models.AttachmentFile)
     attachment_images = GenericRelation(common_models.AttachmentImage)
 
-    item_type = models.ForeignKey(ItemType, on_delete=models.SET_NULL, null=True)
-    item_attributes = models.ManyToManyField(ItemAttribute)
-    order_type = models.ForeignKey(OrderType, on_delete=models.SET_NULL, null=True)
+    item_type = models.ForeignKey(
+        ItemType, on_delete=models.SET_NULL, null=True)
+    item_attributes = models.ManyToManyField(
+        ItemAttribute, blank=True)
+    order_type = models.ForeignKey(
+        OrderType, on_delete=models.SET_NULL, null=True)
 
-    estimated_price = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True, help_text="VAT will be added on this price")
+    estimated_price = models.DecimalField(
+        max_digits=12, decimal_places=2, blank=True, null=True, help_text="VAT will be added on this price")
 
-    status = models.CharField(max_length=16, choices=ORDER_STATUS_CHOICES, default='reviewing')
+    status = models.CharField(
+        max_length=16, choices=ORDER_STATUS_CHOICES, default='reviewing')
 
     def __str__(self):
-        return "{}: [{}] BY={} CONTACT_EMAIL={}".format(self.pk, self.created_at, self.user_profile.user.email if self.user_profile is not None and self.user_profile.user is not None else 'guest', self.contact_email )
+        return "{}: [{}] BY={} CONTACT_EMAIL={}".format(self.pk, self.created_at, self.user_profile.user.email if self.user_profile is not None and self.user_profile.user is not None else 'guest', self.contact_email)
 
 
-signals.pre_save.connect(receiver=libs_signals.print_order_pre_save_signal, sender=ModelingOrder)
-signals.post_save.connect(receiver=libs_signals.print_order_post_save_signal, sender=ModelingOrder)
+signals.pre_save.connect(
+    receiver=libs_signals.print_order_pre_save_signal, sender=ModelingOrder)
+signals.post_save.connect(
+    receiver=libs_signals.print_order_post_save_signal, sender=ModelingOrder)
