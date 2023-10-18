@@ -39,8 +39,10 @@ class UserDetailsSerializer(serializers.ModelSerializer):
 class InvitationTokenRequiredRegisterSerializer(RegisterSerializer):
 
     invitation_token = serializers.CharField(write_only=True)
-    order_id = serializers.IntegerField(write_only=True)
-    order_type = serializers.CharField(write_only=True)
+    order_id = serializers.CharField(
+        required=False, allow_null=True, allow_blank=True, write_only=True)
+    order_type = serializers.CharField(
+        required=False, allow_null=True, allow_blank=True, write_only=True)
 
     def validate_invitation_token(self, invitation_token):
 
@@ -61,12 +63,6 @@ class InvitationTokenRequiredRegisterSerializer(RegisterSerializer):
         logger.info("Invitation token success")
         return invitation_token
 
-    def validate_order_id(self, order_id):
-        return order_id
-
-    def validate_order_type(self, order_type):
-        return order_type
-
     def save(self, request):
 
         logger.info("Save Entered!")
@@ -83,15 +79,18 @@ class InvitationTokenRequiredRegisterSerializer(RegisterSerializer):
         try:
             order_id = self.validated_data.get('order_id')
             order_type = self.validated_data.get('order_type')
+            logger.info("Order_id: {}, order_type: {}".format(
+                order_id, order_type))
             if order_type and order_id:
                 if order_type == "modeling":
                     order = modeling_models.ModelingOrder.objects.get(
-                        pk=order_id)
-                    order.user_profile = user.id
+                        pk=int(order_id))
+                    order.user_profile_id = user.id
                     order.save()
                 elif order_type == "printing":
-                    order = print_models.PrintOrder.objects.get(pk=order_id)
-                    order.user_profile = user.id
+                    order = print_models.PrintOrder.objects.get(
+                        pk=int(order_id))
+                    order.user_profile_id = user.id
                     order.save()
         except:
             raise serializers.ValidationError("Order part error")
