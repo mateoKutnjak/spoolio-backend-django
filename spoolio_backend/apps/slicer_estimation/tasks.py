@@ -26,18 +26,22 @@ def task_execute(job_params):
     # *** Check websocket communication parameters *** #
     # ************************************************ #
 
-    channel_group_name = job_params.get('meta', {}).get('django_channels', {}).get('channel_group_name', None)
+    channel_group_name = job_params.get('meta', {}).get(
+        'django_channels', {}).get('channel_group_name', None)
 
     if not channel_group_name:
-        logger.error('Celery task stopped. Parameter "channel_group_name" missing')
+        logger.error(
+            'Celery task stopped. Parameter "channel_group_name" missing')
         return
 
     # ************************ #
     # *** Check parameters *** #
     # ************************ #
 
-    model_filepath = job_params.get('task', {}).get('meta', {}).get('model_filepath')
-    config_filepath = job_params.get('task', {}).get('meta', {}).get('config_filepath')
+    model_filepath = job_params.get('task', {}).get(
+        'meta', {}).get('model_filepath')
+    config_filepath = job_params.get('task', {}).get(
+        'meta', {}).get('config_filepath')
 
     required_parameters = {
         '--slice': model_filepath,
@@ -46,11 +50,13 @@ def task_execute(job_params):
 
     for required_parameter in required_parameters:
         if not required_parameter:
-            error_message = 'Celery task stopped. Parameter {} missing'.format(required_parameter)
-            channels_utils.channels_group_send_error(error_message, channel_group_name=channel_group_name)
+            error_message = 'Celery task stopped. Parameter {} missing'.format(
+                required_parameter)
+            channels_utils.channels_group_send_error(
+                error_message, channel_group_name=channel_group_name)
             cleanFiles()
             return
-    
+
     # **************************** #
     # *** Clean files function *** #
     # **************************** #
@@ -60,27 +66,30 @@ def task_execute(job_params):
             if os.path.isfile(model_filepath):
                 os.remove(model_filepath)
         except NameError:
-            pass # * Variable is not defined
+            pass  # * Variable is not defined
 
         try:
             if os.path.isfile(gcode_path):
                 os.remove(gcode_path)
         except NameError:
-            pass # * Variable is not defined
+            pass  # * Variable is not defined
 
     # ****************************** #
     # *** Check other parameters *** #
     # ****************************** #
 
-    print_order_unit = job_params.get('task', {}).get('data', {}).get('print_order_unit', {})
+    print_order_unit = job_params.get('task', {}).get(
+        'data', {}).get('print_order_unit', {})
 
-    other_units = job_params.get('task', {}).get('data', {}).get('other_units', [])
+    other_units = job_params.get('task', {}).get(
+        'data', {}).get('other_units', [])
 
     quantity = print_order_unit.get('quantity')
     material = print_order_unit.get('spool', {}).get('material', {})
     fill_density = print_order_unit.get('infill', {}).get('percentage')
     walls_count = print_order_unit.get('wall', {}).get('amount')
-    wall_thickness = print_order_unit.get('wall_thickness', {}).get('thickness')
+    wall_thickness = print_order_unit.get(
+        'wall_thickness', {}).get('thickness')
     model_rotation_raw = print_order_unit.get('model_rotation')
     scale = print_order_unit.get('scale')
 
@@ -88,27 +97,31 @@ def task_execute(job_params):
     filament_density = material.get('filament_density')
     extrusion_multiplier = material.get('extrusion_multiplier')
     filament_deretract_speed = material.get('filament_deretract_speed')
-    filament_max_volumetric_speed = material.get('filament_max_volumetric_speed')
+    filament_max_volumetric_speed = material.get(
+        'filament_max_volumetric_speed')
     filament_retract_length = material.get('filament_retract_length')
     filament_retract_lift = material.get('filament_retract_lift')
 
-
     quantity = print_order_unit.get('quantity')
     material = print_order_unit.get('spool', {}).get('material')
-    
+
     if quantity is None or not material or scale is None:
-        error_message = 'Quantity (={}) or material (={}) or scale (={}) is not set'.format(quantity, material, scale)
-        channels_utils.channels_group_send_error(error_message, channel_group_name=channel_group_name)
+        error_message = 'Quantity (={}) or material (={}) or scale (={}) is not set'.format(
+            quantity, material, scale)
+        channels_utils.channels_group_send_error(
+            error_message, channel_group_name=channel_group_name)
         return
 
     # * Parsing model rotation
 
-    rotation_x, rotation_y, rotation_z, error_message = parse_model_rotation(model_rotation_raw)
+    rotation_x, rotation_y, rotation_z, error_message = parse_model_rotation(
+        model_rotation_raw)
 
     if error_message:
-        channels_utils.channels_group_send_error(error_message, channel_group_name=channel_group_name)
+        channels_utils.channels_group_send_error(
+            error_message, channel_group_name=channel_group_name)
         return
-    
+
     # * Checking existance of prusa-slicer command flags
 
     params = {
@@ -132,7 +145,8 @@ def task_execute(job_params):
     # *** Build prusa-slicer command *** #
     # ********************************** #
 
-    slicer_command = 'prusa-slicer --load {} --slice "{}"'.format(config_filepath, model_filepath)
+    slicer_command = 'prusa-slicer --load {} --slice "{}"'.format(
+        config_filepath, model_filepath)
     for flag, value in params.items():
         if value is not None:
             slicer_command += " {} {}".format(flag, value)
@@ -144,12 +158,15 @@ def task_execute(job_params):
     # ************************** #
 
     try:
-        complete_process = subprocess.run(slicer_command, shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
+        complete_process = subprocess.run(
+            slicer_command, shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
 
         if complete_process.returncode > 0:
 
-            logger.error('Slicer error. Return code: {}'.format(complete_process.returncode))
-            logger.error('Slicer error. output lines: {}'.format(complete_process.stdout))
+            logger.error('Slicer error. Return code: {}'.format(
+                complete_process.returncode))
+            logger.error('Slicer error. output lines: {}'.format(
+                complete_process.stdout))
 
             error_message = 'Error occurred in subprocess command'
 
@@ -163,16 +180,18 @@ def task_execute(job_params):
 
                         if len(output_line) > 1:
                             error_message = output_line_split[1]
-            
-            channels_utils.channels_group_send_error(error_message, channel_group_name=channel_group_name)
+
+            channels_utils.channels_group_send_error(
+                error_message, channel_group_name=channel_group_name)
             cleanFiles()
             return
-        
+
     except subprocess.CalledProcessError as e:
-        channels_utils.channels_group_send_error(str(e), channel_group_name=channel_group_name)
+        channels_utils.channels_group_send_error(
+            str(e), channel_group_name=channel_group_name)
         cleanFiles()
         return
-    
+
     # ************************************ #
     # *** .GCODE ESTIMATION EXTRACTION *** #
     # ************************************ #
@@ -182,17 +201,20 @@ def task_execute(job_params):
 
     if not gcode_paths:
         error_message = '.gcode files not found in directory'
-        channels_utils.channels_group_send_error(error_message, channel_group_name=channel_group_name)
+        channels_utils.channels_group_send_error(
+            error_message, channel_group_name=channel_group_name)
         cleanFiles()
         return
 
     if len(gcode_paths) > 1:
         error_message = 'Duplicated .gcode files'
-        channels_utils.channels_group_send_error(error_message, channel_group_name=channel_group_name)
+        channels_utils.channels_group_send_error(
+            error_message, channel_group_name=channel_group_name)
         cleanFiles()
         return
 
     gcode_path = gcode_paths[0]
+    print(gcode_path)
     gcode_filename = os.path.basename(gcode_path)
     gcode_filename_without_suffix = os.path.splitext(gcode_filename)[0]
 
@@ -204,40 +226,53 @@ def task_execute(job_params):
     pattern = re.compile(r"(\d+d)?(\d+h)?(\d+m)?")
     estimated_duration_split = pattern.search(estimated_duration_raw).groups()
     if len(estimated_duration_split) != 3:
-        error_message = 'Split DHM format invalid length. Expected 3, got {}'.format(len(estimated_duration_split))
-        channels_utils.channels_group_send_error(error_message, channel_group_name=channel_group_name)
+        error_message = 'Split DHM format invalid length. Expected 3, got {}'.format(
+            len(estimated_duration_split))
+        channels_utils.channels_group_send_error(
+            error_message, channel_group_name=channel_group_name)
 
         cleanFiles()
         return
 
-    estimated_duration_days_raw = estimated_duration_split[0].replace("d", "") if estimated_duration_split[0] is not None else '0'
-    estimated_duration_hours_raw = estimated_duration_split[1].replace("h", "") if estimated_duration_split[1] is not None else '0'
-    estimated_duration_minutes_raw = estimated_duration_split[2].replace("m", "") if estimated_duration_split[2] is not None else '0'
+    estimated_duration_days_raw = estimated_duration_split[0].replace(
+        "d", "") if estimated_duration_split[0] is not None else '0'
+    estimated_duration_hours_raw = estimated_duration_split[1].replace(
+        "h", "") if estimated_duration_split[1] is not None else '0'
+    estimated_duration_minutes_raw = estimated_duration_split[2].replace(
+        "m", "") if estimated_duration_split[2] is not None else '0'
+
+    time_str = 'days: {}, hours: {}, minutes: {}'.format(
+        estimated_duration_days_raw, estimated_duration_hours_raw, estimated_duration_minutes_raw)
+    print(time_str)
 
     try:
         estimated_duration = datetime.timedelta(
             days=int(estimated_duration_days_raw),
             hours=int(estimated_duration_hours_raw),
             minutes=int(estimated_duration_minutes_raw),
-        ).seconds
+        ).total_seconds()
+        print(estimated_duration)
     except ValueError:
-        error_message = 'Error while parsing duration DHM format: raw value = {}'.format(estimated_duration_raw)
-        channels_utils.channels_group_send_error(error_message, channel_group_name=channel_group_name)
+        error_message = 'Error while parsing duration DHM format: raw value = {}'.format(
+            estimated_duration_raw)
+        channels_utils.channels_group_send_error(
+            error_message, channel_group_name=channel_group_name)
         cleanFiles()
         return
 
     estimated_price = float(estimated_price_raw)
 
     if error_message:
-        channels_utils.channels_group_send_error(error_message, channel_group_name=channel_group_name)
+        channels_utils.channels_group_send_error(
+            error_message, channel_group_name=channel_group_name)
         cleanFiles()
         return
 
-    price_list = order_utils.calculatePrice(estimated_price, estimated_duration)
-
+    price_list = order_utils.calculatePrice(
+        estimated_price, estimated_duration)
 
     data = {
-        "estimated_time": estimated_duration, 
+        "estimated_time": estimated_duration,
         "estimated_price": estimated_price,
         "pricing_list": price_list
     }
@@ -247,20 +282,21 @@ def task_execute(job_params):
         channel_group_name=channel_group_name
     )
 
+
 def parse_model_rotation(model_rotation_raw: str):
     if model_rotation_raw is None:
         return None, None, None, 'Model rotation string is None'
-    
+
     model_rotation_split = model_rotation_raw.split(',')
     if len(model_rotation_split) != 3:
         return None, None, None, 'Model rotation string split by delimiter "," does not give 3 values'
-    
+
     try:
         rotation_x = float(model_rotation_split[0])
         rotation_y = float(model_rotation_split[1])
         rotation_z = float(model_rotation_split[2])
-                      
+
     except ValueError:
         return None, None, None, "Some of the values in model rotation cannot be parsed as float"
-    
+
     return rotation_x, rotation_y, rotation_z, None
