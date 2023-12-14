@@ -50,12 +50,14 @@ def check_print_order_amount(print_order_id: int, amount: float):
 
 
 def check_modeling_order_amount(modeling_order_id: int, amount: float):
+    print("Checking modeling order amounts!")
     try:
         obj = modeling_order_models.ModelingOrder.objects.get(
             pk=modeling_order_id)
 
         # ! Save tax percentage as constant or depending on country
-        total_price = float(obj.estimated_price) * 1.25
+        # total_price = float(obj.estimated_price) * 1.25
+        total_price = float(obj.estimated_price)
 
         # ! If rounding of number changes (here we use math.floor), make
         # ! sure same method is used on frontend price calculation
@@ -63,6 +65,8 @@ def check_modeling_order_amount(modeling_order_id: int, amount: float):
 
         # * Stripe amount is measured x100
         stripe_amount = int(total_price * 100)
+
+        print("Frontend amount: {}, Backend amount: {}".format(amount, total_price))
 
         if abs(amount - total_price) <= EPSILON:
             return True, stripe_amount, None
@@ -151,24 +155,38 @@ def create_payment(request):
         request.data['id'], request.data['amount'])
 
     if not is_amount_ok:
+        print("Amount not OK")
         return JsonResponse(data={'error': message}, status=400)
 
     try:
         # Create a PaymentIntent with the order amount and currency
-
-        intent = stripe.PaymentIntent.create(
-            amount=amount,
-            currency=request.data['currency'],
-            automatic_payment_methods={
-                'enabled': False,
-            },
-            capture_method="manual",
-            metadata={
-                'order_id': int(request.data['id']),
-                'service': request.data['service'],
-            }
-            # payment_method_types=['card'],
-        )
+        if request.data['service'] == 'printing':
+            intent = stripe.PaymentIntent.create(
+                amount=amount,
+                currency=request.data['currency'],
+                automatic_payment_methods={
+                    'enabled': False,
+                },
+                capture_method="manual",
+                metadata={
+                    'order_id': int(request.data['id']),
+                    'service': request.data['service'],
+                }
+                # payment_method_types=['card'],
+            )
+        else:
+            intent = stripe.PaymentIntent.create(
+                amount=amount,
+                currency=request.data['currency'],
+                automatic_payment_methods={
+                    'enabled': False,
+                },
+                metadata={
+                    'order_id': int(request.data['id']),
+                    'service': request.data['service'],
+                }
+                # payment_method_types=['card'],
+            )
 
         return JsonResponse(data={
             'clientSecret': intent['client_secret']
