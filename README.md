@@ -1,66 +1,227 @@
-# Spoolio Web REST API server
+# Spoolio Backend (Django)
 
-## How to run it?
+> Backend system powering a 3D printing platform with automated
+> slicing-based pricing and Stripe payments.
 
-### Development
+Backend service for a **3D printing web platform**, enabling users to
+upload models, configure print settings, and order prints through an
+integrated payment system.
 
-- Checkout to branch [TODO]
-`git checkout [TODO]`
-- Build docker images
-`docker-compose -f docker-compose.dev.yml build`
-- Run docker compose for development
-`docker-compose -f docker-compose.dev.yml up`
-- Fixtures load/dump (commands inside `web` docker service container)
+------------------------------------------------------------------------
 
-`python3 manage.py dumpdata --indent 4 --natural-foreign --natural-primary -e contenttypes -e auth.Permission -e sessions.session -e request.request > fixtures/backup.json`
+## Highlights
 
-`python3 manage.py loaddata fixtures/backup.json`
+-   Full-featured **Django REST backend**
+-   3D printing workflow with customizable parameters
+-   **Automated price estimation via PrusaSlicer**
+-   Stripe payments integration
+-   Dockerized dev & production environments
+-   Real-world system with complex domain logic
 
-### Production
+------------------------------------------------------------------------
 
-Running production has to be done on hosting service instance (for example Digital Ocean Ubuntu machine) through docker-compose.
+## Overview
 
-#### From scratch
+Spoolio allows users to:
 
-- Create Ubuntu instance (droplet) on Digital Ocean
-  - Enable SSH key authentication
-- Connect to running instance with VS Code using `ssh root@<DROPLET_IP>`
-- [OPTIONAL] Install `zsh` with command `apt install -y zsh`
-- [OPTIONAL] Install `oh-my-zsh` with command `sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"`
-- Install Docker by following this [commands in step 1](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04#step-1-installing-docker)
-- Install docker-compose by following this [commands in step 1](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-20-04#step-1-installing-docker-compose)
-- `git clone git@github.com:mateoKutnjak/spoolio-backend-django.git`
-  - if error `Permission denied (publickey)`
-    - generate SSH key pair with command `ssh-keygen` and press ENTER for every question without any inputs
-    - copy terminal output of command `cat .ssh/id_rsa.pub` and add new SSH key to github settings
-    - `git clone` again
-- dont forget to `git checkout <branch_name>`
-- copy environment files with command `scp .env.development .env.production .env.production.db root@<DROPLET_IP>:<PATH_TO_PROJECT_ROOT>`
-- change ownership of direcories that docker uses through volume: `chown 1000:1000 tmp/ logs/ backups/`
-- build docker images using `docker-compose build`
+-   upload 3D models
+-   configure printing parameters (layer height, color, etc.)
+-   get price and time estimates
+-   manage a cart of print jobs
+-   complete purchases via Stripe
+-   track order history
 
-#### Start docker-compose services
+The backend serves a frontend built with **Nuxt3 + Three.js**.
 
-- Using command `docker-compose up` all services are started
+------------------------------------------------------------------------
 
-#### Certbot
+## Core Features
 
-Using this [guide](https://mindsers.blog/post/https-using-nginx-certbot-docker/) certbot was set up. It also has part for renewing through `docker-compose` service. It needs to be renewed every 90 days.
+### User & Authentication
 
-Renew certificate by starting `docker-compose` services with `docker compose -f docker-compose.yml up` and in different terminal call `docker compose run --rm certbot renew`. Make sure that firewall does not block ports 80 and 443.
+-   Registration and login
+-   Profile management
+-   Secured API endpoints
 
-#### Redis
+### 3D Printing Workflow
 
-To protect remote access to redis instance through add firewall to Digital Ocean droplet. See this [screenshot](https://www.dropbox.com/s/v3qbmwkqb0ztchn/Screenshot%20from%202023-04-18%2012-48-01.png?dl=0)
+-   3D model upload and management
+-   Custom print configuration
 
-#### Stripe
+### Price Estimation
 
-Django backend uses `secret` API key from Stripe developer webpage to create payment intents.
+-   Integration with **PrusaSlicer CLI**
+-   Calculates print time and cost
 
-#### Prusa slicer price/duration estimation
+### Orders & Cart
 
-See this [flowchart](https://ibb.co/KNPJTch)
+-   Multi-item cart system
+-   Order tracking and history
 
-## TODOs
+### Payments
 
-- To which branch should be checkout when cloning project for development/production?
+-   Stripe payment intents
+-   Secure checkout flow
+
+------------------------------------------------------------------------
+
+## Tech Stack
+
+-   Python / Django
+-   Django REST Framework
+-   PostgreSQL
+-   Redis
+-   Docker / Docker Compose
+-   Stripe API
+-   PrusaSlicer
+
+------------------------------------------------------------------------
+
+## What This Project Demonstrates
+
+-   Real-world backend system design
+-   Integration of external tools into backend workflows
+-   Payment system implementation
+-   Handling domain-specific logic (3D printing)
+-   Deployment and infrastructure setup with Docker
+
+------------------------------------------------------------------------
+
+## For Developers
+
+### Running the Project
+
+#### Development
+
+``` bash
+docker-compose -f docker-compose.dev.yml build
+docker-compose -f docker-compose.dev.yml up
+```
+
+------------------------------------------------------------------------
+
+### Database Fixtures
+
+Run inside the web container:
+
+``` bash
+python3 manage.py dumpdata --indent 4 --natural-foreign --natural-primary \
+-e contenttypes -e auth.Permission -e sessions.session -e request.request > fixtures/backup.json
+
+python3 manage.py loaddata fixtures/backup.json
+```
+
+------------------------------------------------------------------------
+
+### Production Deployment
+
+Deployment is intended for a cloud VM (e.g. DigitalOcean Ubuntu
+instance) using Docker.
+
+#### Setup Steps
+
+-   Create Ubuntu droplet
+-   Enable SSH access
+-   Connect via SSH:
+
+``` bash
+ssh root@<DROPLET_IP>
+```
+
+#### Optional (Shell setup)
+
+``` bash
+apt install -y zsh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+```
+
+#### Install Docker & Docker Compose
+
+(Follow official Docker installation steps)
+
+------------------------------------------------------------------------
+
+### Clone Repository
+
+``` bash
+git clone git@github.com:mateoKutnjak/spoolio-backend-django.git
+```
+
+If you get:
+
+Permission denied (publickey)
+
+Do:
+
+``` bash
+ssh-keygen
+cat ~/.ssh/id_rsa.pub
+```
+
+Add the key to your GitHub account and clone again.
+
+------------------------------------------------------------------------
+
+### Environment Setup
+
+``` bash
+scp .env.development .env.production .env.production.db root@<DROPLET_IP>:<PROJECT_PATH>
+```
+
+------------------------------------------------------------------------
+
+### Permissions
+
+``` bash
+chown 1000:1000 tmp/ logs/ backups/
+```
+
+------------------------------------------------------------------------
+
+### Build & Run
+
+``` bash
+docker-compose build
+docker-compose up
+```
+
+------------------------------------------------------------------------
+
+### HTTPS (Certbot)
+
+Certificates are configured using Certbot and must be renewed every 90
+days.
+
+Renew manually:
+
+``` bash
+docker-compose -f docker-compose.yml up
+docker-compose run --rm certbot renew
+```
+
+Make sure ports **80 and 443** are open.
+
+------------------------------------------------------------------------
+
+### Redis Security
+
+Restrict remote access using firewall rules on the hosting instance.
+
+------------------------------------------------------------------------
+
+### Stripe Configuration
+
+Set Stripe secret API key in environment variables to enable payment
+processing.
+
+------------------------------------------------------------------------
+
+### PrusaSlicer Integration
+
+Used for estimating:
+
+-   print duration
+-   material usage
+-   pricing
+
+------------------------------------------------------------------------
